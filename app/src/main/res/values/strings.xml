@@ -16,4 +16,5 @@
     <string name="search_hint">নিবন্ধ খুঁজুন…</string>
     <string name="developer_name">জোবায়ের আবদুল্লাহ</string>
     <string name="developer_label">অ্যাপ নির্মাতা</string>
+    <string name="widget_description">সাহিত্য পত্রিকা উইজেট</string>
 </resources>

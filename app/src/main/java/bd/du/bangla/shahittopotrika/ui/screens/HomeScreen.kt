@@ -7,10 +7,12 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Bookmark
+import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
@@ -48,7 +50,9 @@ fun HomeScreen(
     onSearchClick: () -> Unit,
     onIssueListClick: () -> Unit,
     onAboutClick: () -> Unit,
-    onBookmarksClick: () -> Unit
+    onBookmarksClick: () -> Unit,
+    onSettingsClick: () -> Unit = {},
+    onHistoryClick: () -> Unit = {}
 ) {
     val currentIssueState by viewModel.currentIssue.collectAsState()
     val isRefreshing      by viewModel.isRefreshingHome.collectAsState()
@@ -93,12 +97,20 @@ fun HomeScreen(
                 TopAppBar(
                     title = { Text("হোম", fontSize = 14.sp) },
                     actions = {
+                        IconButton(onClick = onHistoryClick) {
+                            Icon(Icons.Default.History, "পঠন ইতিহাস",
+                                tint = Color.White)
+                        }
                         IconButton(onClick = onBookmarksClick) {
                             Icon(Icons.Default.Bookmark, "Bookmarks",
                                 tint = Color.White)
                         }
                         IconButton(onClick = onSearchClick) {
                             Icon(Icons.Default.Search, "অনুসন্ধান",
+                                tint = Color.White)
+                        }
+                        IconButton(onClick = onSettingsClick) {
+                            Icon(Icons.Default.Settings, "সেটিংস",
                                 tint = Color.White)
                         }
                     },
@@ -207,14 +219,16 @@ fun HomeScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp),
-                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     QuickNavCard("আর্কাইভ", "সকল সংখ্যা",
                         Icons.Default.List, Modifier.weight(1f), onIssueListClick)
-                    QuickNavCard("Bookmarks", "সংরক্ষিত",
+                    QuickNavCard("সংরক্ষিত", "Bookmarks",
                         Icons.Default.Bookmark, Modifier.weight(1f), onBookmarksClick)
-                    QuickNavCard("সম্পর্কে", "পরিচিতি",
-                        Icons.Default.Info, Modifier.weight(1f), onAboutClick)
+                    QuickNavCard("ইতিহাস", "পড়েছি",
+                        Icons.Default.History, Modifier.weight(1f), onHistoryClick)
+                    QuickNavCard("সেটিংস", "পছন্দ",
+                        Icons.Default.Settings, Modifier.weight(1f), onSettingsClick)
                 }
 
                 Spacer(Modifier.height(16.dp))

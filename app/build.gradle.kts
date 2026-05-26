@@ -13,8 +13,8 @@ android {
         applicationId = "bd.du.bangla.shahittopotrika"
         minSdk = 26
         targetSdk = 35
-        versionCode = 1
-        versionName = "1.0.0"
+        versionCode = 2
+        versionName = "1.1.0"
     }
 
     signingConfigs {
@@ -66,5 +66,7 @@ dependencies {
     implementation(libs.room.runtime)
     implementation(libs.room.ktx)
     ksp(libs.room.compiler)
+    implementation(libs.datastore.preferences)
+    implementation(libs.work.runtime.ktx)
     debugImplementation(libs.androidx.ui.tooling)
 }

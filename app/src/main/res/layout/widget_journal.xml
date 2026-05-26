@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@drawable/widget_background"
+    android:gravity="center"
+    android:padding="12dp">
+
+    <TextView
+        android:id="@+id/widget_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="সাহিত্য পত্রিকা"
+        android:textColor="#FFFFFF"
+        android:textSize="15sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/widget_subtitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="বাংলা বিভাগ, ঢাকা বিশ্ববিদ্যালয়"
+        android:textColor="#CCFFFFFF"
+        android:textSize="11sp"
+        android:layout_marginTop="2dp" />
+
+    <TextView
+        android:id="@+id/widget_tap_hint"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="👆 ট্যাপ করুন"
+        android:textColor="#AAFFFFFF"
+        android:textSize="10sp"
+        android:layout_marginTop="6dp" />
+
+</LinearLayout>

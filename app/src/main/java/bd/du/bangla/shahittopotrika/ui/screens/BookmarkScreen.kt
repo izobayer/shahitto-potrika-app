@@ -1,5 +1,6 @@
 package bd.du.bangla.shahittopotrika.ui.screens
 
+import android.content.Intent
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -8,12 +9,14 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.IosShare
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -35,6 +38,7 @@ fun BookmarkScreen(
     onBack: () -> Unit
 ) {
     val bookmarks by bookmarkVm.bookmarks.collectAsState()
+    val context = LocalContext.current
     Scaffold(
         topBar = {
             TopAppBar(
@@ -43,6 +47,29 @@ fun BookmarkScreen(
                     IconButton(onClick = onBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "ফিরে যান",
                             tint = MaterialTheme.colorScheme.onPrimary)
+                    }
+                },
+                actions = {
+                    if (bookmarks.isNotEmpty()) {
+                        IconButton(onClick = {
+                            val text = bookmarks.joinToString("\n\n") { bm ->
+                                buildString {
+                                    append("📖 ${bm.title}")
+                                    if (bm.authors.isNotBlank()) append("\n✍️ ${bm.authors}")
+                                    append("\n🔗 ${bm.url}")
+                                }
+                            }
+                            context.startActivity(Intent.createChooser(
+                                Intent(Intent.ACTION_SEND).apply {
+                                    type = "text/plain"
+                                    putExtra(Intent.EXTRA_SUBJECT, "সংরক্ষিত নিবন্ধ – সাহিত্য পত্রিকা")
+                                    putExtra(Intent.EXTRA_TEXT, text)
+                                }, "রপ্তানি করুন"
+                            ))
+                        }) {
+                            Icon(Icons.Default.IosShare, "রপ্তানি",
+                                tint = MaterialTheme.colorScheme.onPrimary)
+                        }
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(

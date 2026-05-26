@@ -9,19 +9,21 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.unit.Density
 import androidx.core.view.WindowCompat
 
-// ── Brand colours ─────────────────────────────────────────
-val Navy        = Color(0xFF101E5A)   // primary / splash bg
+val Navy        = Color(0xFF101E5A)
 val NavyLight   = Color(0xFF2B3E9E)
 val NavyDark    = Color(0xFF080F2E)
-val HeaderBg    = Color(0xFFEEF2F6)   // surface / header bg
-val AccentBlue  = Color(0xFF2563EB)   // links / active
+val HeaderBg    = Color(0xFFEEF2F6)
+val AccentBlue  = Color(0xFF2563EB)
 val TextPrimary = Color(0xFF1B2C3D)
 val TextSub     = Color(0xFF5A6A7A)
 
@@ -66,7 +68,8 @@ private val DarkColors = darkColorScheme(
 @Composable
 fun ShahittoPotrikaTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    dynamicColor: Boolean = false,          // keep brand identity
+    fontScale: Float = 1.0f,
+    dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
     val colorScheme = when {
@@ -88,8 +91,17 @@ fun ShahittoPotrikaTheme(
         }
     }
 
-    MaterialTheme(
-        colorScheme = colorScheme,
-        content     = content
+    // Apply font scale without affecting layout density
+    val baseDensity = LocalDensity.current
+    val scaledDensity = Density(
+        density   = baseDensity.density,
+        fontScale = fontScale
     )
+
+    CompositionLocalProvider(LocalDensity provides scaledDensity) {
+        MaterialTheme(
+            colorScheme = colorScheme,
+            content     = content
+        )
+    }
 }

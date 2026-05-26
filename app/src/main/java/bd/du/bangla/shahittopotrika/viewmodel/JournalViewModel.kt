@@ -4,6 +4,8 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import bd.du.bangla.shahittopotrika.ShahittoPotrikaApplication
+import bd.du.bangla.shahittopotrika.data.local.entity.ArticleNoteEntity
+import bd.du.bangla.shahittopotrika.data.local.entity.ReadHistoryEntity
 import bd.du.bangla.shahittopotrika.data.model.Article
 import bd.du.bangla.shahittopotrika.data.model.Issue
 import bd.du.bangla.shahittopotrika.data.model.JournalInfo
@@ -32,7 +34,7 @@ class JournalViewModel(app: Application) : AndroidViewModel(app) {
             .map<List<Issue>, UiState<List<Issue>>> { UiState.Success(it) }
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), UiState.Loading)
 
-    // ── Articles for selected issue ─────────────────────────
+    // ── Articles ────────────────────────────────────────────
     private val _currentIssueUrl = MutableStateFlow("")
     private val _isRefreshingArticles = MutableStateFlow(false)
     val isRefreshingArticles: StateFlow<Boolean> = _isRefreshingArticles
@@ -50,13 +52,23 @@ class JournalViewModel(app: Application) : AndroidViewModel(app) {
     private val _articleDetail = MutableStateFlow<UiState<Article>>(UiState.Loading)
     val articleDetail: StateFlow<UiState<Article>> = _articleDetail
 
-    // ── Bookmark state ──────────────────────────────────────
+    // ── Bookmark ────────────────────────────────────────────
     private val _currentArticleId = MutableStateFlow("")
     val isBookmarked: StateFlow<Boolean> =
-        _currentArticleId
-            .filter { it.isNotBlank() }
+        _currentArticleId.filter { it.isNotBlank() }
             .flatMapLatest { repo.isBookmarked(it) }
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
+
+    // ── Note for current article ────────────────────────────
+    val currentNote: StateFlow<ArticleNoteEntity?> =
+        _currentArticleId.filter { it.isNotBlank() }
+            .flatMapLatest { repo.getNoteForArticle(it) }
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
+
+    // ── Read history ────────────────────────────────────────
+    val readHistory: StateFlow<List<ReadHistoryEntity>> =
+        repo.getReadHistory()
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     // ── Journal info ────────────────────────────────────────
     private val _journalInfo = MutableStateFlow<UiState<JournalInfo>>(UiState.Loading)
@@ -72,10 +84,7 @@ class JournalViewModel(app: Application) : AndroidViewModel(app) {
         viewModelScope.launch(Dispatchers.IO) {
             if (!forceRefresh) {
                 val cached = repo.getCachedCurrentIssue()
-                if (cached != null) {
-                    _currentIssue.value = UiState.Success(cached)
-                    return@launch
-                }
+                if (cached != null) { _currentIssue.value = UiState.Success(cached); return@launch }
             }
             _isRefreshingHome.value = true
             repo.refreshCurrentIssue().fold(
@@ -94,7 +103,7 @@ class JournalViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     fun loadIssueArchive(forceRefresh: Boolean = false) {
-        if (!forceRefresh) return   // Flow handles cached data automatically
+        if (!forceRefresh) return
         viewModelScope.launch(Dispatchers.IO) {
             _isRefreshingArchive.value = true
             repo.refreshIssueArchive()
@@ -104,9 +113,6 @@ class JournalViewModel(app: Application) : AndroidViewModel(app) {
 
     fun loadArticlesForIssue(issueUrl: String, forceRefresh: Boolean = false) {
         _currentIssueUrl.value = issueUrl
-        if (!forceRefresh) {
-            // Flow from DB handles it; also trigger network refresh
-        }
         viewModelScope.launch(Dispatchers.IO) {
             _isRefreshingArticles.value = true
             repo.refreshArticles(issueUrl)
@@ -120,24 +126,43 @@ class JournalViewModel(app: Application) : AndroidViewModel(app) {
         viewModelScope.launch(Dispatchers.IO) {
             _articleDetail.value = UiState.Loading
             repo.getArticleDetail(articleUrl).fold(
-                onSuccess = { _articleDetail.value = UiState.Success(it) },
+                onSuccess = { article ->
+                    _articleDetail.value = UiState.Success(article)
+                    repo.markAsRead(article)       // auto-add to history
+                },
                 onFailure = { _articleDetail.value = UiState.Error(it.message ?: "লোড করতে সমস্যা") }
             )
         }
     }
 
-    fun toggleBookmark(article: Article) {
-        viewModelScope.launch(Dispatchers.IO) {
-            if (isBookmarked.value) {
-                repo.removeBookmark(article.id)
-            } else {
-                repo.addBookmark(article)
-            }
-        }
+    fun toggleBookmark(article: Article) = viewModelScope.launch(Dispatchers.IO) {
+        if (isBookmarked.value) repo.removeBookmark(article.id) else repo.addBookmark(article)
     }
 
-    fun removeBookmark(articleId: String) {
-        viewModelScope.launch(Dispatchers.IO) { repo.removeBookmark(articleId) }
+    fun removeBookmark(articleId: String) = viewModelScope.launch(Dispatchers.IO) {
+        repo.removeBookmark(articleId)
+    }
+
+    fun saveNote(articleId: String, articleTitle: String, text: String) =
+        viewModelScope.launch(Dispatchers.IO) {
+            repo.saveNote(articleId, articleTitle, text)
+        }
+
+    fun deleteNote(articleId: String) = viewModelScope.launch(Dispatchers.IO) {
+        repo.deleteNote(articleId)
+    }
+
+    /** Allows notes screen to activate the note flow without re-fetching the article. */
+    fun setCurrentArticle(id: String) {
+        _currentArticleId.value = id
+    }
+
+    fun deleteFromHistory(id: String) = viewModelScope.launch(Dispatchers.IO) {
+        repo.deleteFromHistory(id)
+    }
+
+    fun clearHistory() = viewModelScope.launch(Dispatchers.IO) {
+        repo.clearHistory()
     }
 
     fun loadJournalInfo() {

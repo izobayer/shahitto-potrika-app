@@ -7,18 +7,21 @@ import bd.du.bangla.shahittopotrika.data.model.Article
 import bd.du.bangla.shahittopotrika.data.model.Issue
 import bd.du.bangla.shahittopotrika.data.model.JournalInfo
 import bd.du.bangla.shahittopotrika.data.parser.JournalParser
+import bd.du.bangla.shahittopotrika.data.preferences.UserPreferences
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
 class JournalRepository(context: Context) {
 
-    private val db         = AppDatabase.get(context)
-    private val issueDao   = db.issueDao()
-    private val articleDao = db.articleDao()
-    private val bookmarkDao= db.bookmarkDao()
+    private val db          = AppDatabase.get(context)
+    private val issueDao    = db.issueDao()
+    private val articleDao  = db.articleDao()
+    private val bookmarkDao = db.bookmarkDao()
+    private val historyDao  = db.readHistoryDao()
+    private val noteDao     = db.articleNoteDao()
+    val prefs               = UserPreferences(context)
 
     // ── Issues ─────────────────────────────────────────────
-
     fun getIssueArchiveFlow(): Flow<List<Issue>> =
         issueDao.getAllIssues().map { it.map(IssueEntity::toIssue) }
 
@@ -39,7 +42,6 @@ class JournalRepository(context: Context) {
     }
 
     // ── Articles ───────────────────────────────────────────
-
     fun getArticlesFlow(issueUrl: String): Flow<List<Article>> =
         articleDao.getArticlesForIssue(issueUrl).map { it.map(ArticleEntity::toArticle) }
 
@@ -56,35 +58,47 @@ class JournalRepository(context: Context) {
     }
 
     // ── Search ─────────────────────────────────────────────
-
     suspend fun search(query: String): Result<List<Article>> = runCatching {
         JournalParser.search(query)
     }
 
     // ── Journal info ───────────────────────────────────────
-
     suspend fun getJournalInfo(): Result<JournalInfo> = runCatching {
         JournalParser.fetchJournalInfo()
     }
 
     // ── Bookmarks ──────────────────────────────────────────
-
     fun getAllBookmarks(): Flow<List<BookmarkEntity>> = bookmarkDao.getAllBookmarks()
-
-    fun isBookmarked(articleId: String): Flow<Boolean> =
-        bookmarkDao.isBookmarked(articleId)
+    fun isBookmarked(articleId: String): Flow<Boolean> = bookmarkDao.isBookmarked(articleId)
 
     suspend fun addBookmark(article: Article) {
         bookmarkDao.insert(BookmarkEntity(
-            articleId = article.id,
-            title     = article.title,
-            authors   = article.authors,
-            url       = article.url,
-            pdfUrl    = article.pdfUrl
-        ))
+            articleId = article.id, title = article.title,
+            authors = article.authors, url = article.url, pdfUrl = article.pdfUrl))
     }
 
-    suspend fun removeBookmark(articleId: String) {
-        bookmarkDao.delete(articleId)
+    suspend fun removeBookmark(articleId: String) = bookmarkDao.delete(articleId)
+
+    // ── Reading history ────────────────────────────────────
+    fun getReadHistory(): Flow<List<ReadHistoryEntity>> = historyDao.getAll()
+
+    suspend fun markAsRead(article: Article) {
+        historyDao.insert(ReadHistoryEntity(
+            articleId = article.id, title = article.title,
+            authors = article.authors, url = article.url))
     }
+
+    suspend fun deleteFromHistory(id: String) = historyDao.delete(id)
+    suspend fun clearHistory() = historyDao.clearAll()
+
+    // ── Notes ──────────────────────────────────────────────
+    fun getAllNotes(): Flow<List<ArticleNoteEntity>> = noteDao.getAll()
+    fun getNoteForArticle(articleId: String): Flow<ArticleNoteEntity?> = noteDao.getNote(articleId)
+
+    suspend fun saveNote(articleId: String, articleTitle: String, text: String) {
+        if (text.isBlank()) noteDao.delete(articleId)
+        else noteDao.upsert(ArticleNoteEntity(articleId, articleTitle, text))
+    }
+
+    suspend fun deleteNote(articleId: String) = noteDao.delete(articleId)
 }

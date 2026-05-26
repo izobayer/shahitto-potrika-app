@@ -2,6 +2,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="28" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <application
         android:name=".ShahittoPotrikaApplication"
@@ -13,15 +16,43 @@
         android:theme="@style/Theme.ShahittoPotrika"
         android:usesCleartextTraffic="false">
 
+        <!-- ── Main activity ──────────────────────────────── -->
         <activity
             android:name=".MainActivity"
             android:exported="true"
+            android:launchMode="singleTask"
             android:windowSoftInputMode="adjustResize"
             android:theme="@style/Theme.ShahittoPotrika.Splash">
+
+            <!-- App launcher -->
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
+            <!-- Deep link: https://journal.bangla.du.ac.bd/index.php/sp/article/view/* -->
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data
+                    android:scheme="https"
+                    android:host="journal.bangla.du.ac.bd"
+                    android:pathPrefix="/index.php/sp/article/view/" />
+            </intent-filter>
         </activity>
+
+        <!-- ── Home screen widget ────────────────────────── -->
+        <receiver
+            android:name=".widget.JournalWidgetProvider"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/journal_widget_info" />
+        </receiver>
+
     </application>
 </manifest>
