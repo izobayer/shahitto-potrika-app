@@ -7,6 +7,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Bookmark
+import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Search
@@ -18,20 +19,26 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import bd.du.bangla.shahittopotrika.R
 import bd.du.bangla.shahittopotrika.data.model.Issue
 import bd.du.bangla.shahittopotrika.data.model.UiState
 import bd.du.bangla.shahittopotrika.ui.components.ShimmerIssueCard
+import bd.du.bangla.shahittopotrika.ui.theme.HeaderBg
 import bd.du.bangla.shahittopotrika.ui.theme.Navy
 import bd.du.bangla.shahittopotrika.viewmodel.JournalViewModel
 import coil.compose.AsyncImage
+
+private const val LOGO_URL =
+    "https://journal.bangla.du.ac.bd/public/journals/1/pageHeaderLogoImage_en.png"
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -47,42 +54,79 @@ fun HomeScreen(
     val isRefreshing      by viewModel.isRefreshingHome.collectAsState()
 
     Scaffold(
+        // ── Top bar: website-style header (light bg + navy strip) ──
         topBar = {
-            TopAppBar(
-                title = {
-                    Column {
-                        Text("সাহিত্য পত্রিকা", fontWeight = FontWeight.Bold, fontSize = 18.sp)
-                        Text("বাংলা বিভাগ • ঢাকা বিশ্ববিদ্যালয়",
-                            fontSize = 11.sp,
-                            color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.75f))
+            Column {
+                // Site header — light background like the website
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(HeaderBg)
+                        .padding(horizontal = 16.dp, vertical = 10.dp)
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        AsyncImage(
+                            model = LOGO_URL,
+                            contentDescription = "সাহিত্য পত্রিকা লোগো",
+                            modifier = Modifier.height(48.dp),
+                            contentScale = ContentScale.FillHeight
+                        )
+                        Column {
+                            Text(
+                                "সাহিত্য পত্রিকা",
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 18.sp,
+                                color = Navy
+                            )
+                            Text(
+                                "বাংলা বিভাগ, ঢাকা বিশ্ববিদ্যালয়",
+                                fontSize = 11.sp,
+                                color = Navy.copy(alpha = 0.7f)
+                            )
+                        }
                     }
-                },
-                actions = {
-                    IconButton(onClick = onBookmarksClick) {
-                        Icon(Icons.Default.Bookmark, contentDescription = "Bookmarks",
-                            tint = MaterialTheme.colorScheme.onPrimary)
-                    }
-                    IconButton(onClick = onSearchClick) {
-                        Icon(Icons.Default.Search, contentDescription = "অনুসন্ধান",
-                            tint = MaterialTheme.colorScheme.onPrimary)
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Navy,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimary
+                }
+                // Navy nav strip — like website's navigation bar
+                TopAppBar(
+                    title = { Text("হোম", fontSize = 14.sp) },
+                    actions = {
+                        IconButton(onClick = onBookmarksClick) {
+                            Icon(Icons.Default.Bookmark, "Bookmarks",
+                                tint = Color.White)
+                        }
+                        IconButton(onClick = onSearchClick) {
+                            Icon(Icons.Default.Search, "অনুসন্ধান",
+                                tint = Color.White)
+                        }
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = Navy,
+                        titleContentColor = Color.White
+                    ),
+                    modifier = Modifier.height(48.dp)
                 )
-            )
+            }
         },
         bottomBar = {
             NavigationBar(containerColor = MaterialTheme.colorScheme.surface) {
-                NavigationBarItem(selected = true,  onClick = { },
-                    icon = { Icon(Icons.Default.List, null) }, label = { Text("হোম") })
+                NavigationBarItem(selected = true, onClick = { },
+                    icon = { Icon(Icons.Default.Home, null) },
+                    label = { Text("হোম", fontSize = 11.sp) })
                 NavigationBarItem(selected = false, onClick = onIssueListClick,
-                    icon = { Icon(Icons.Default.List, null) }, label = { Text("সংখ্যাসমূহ") })
+                    icon = { Icon(Icons.Default.List, null) },
+                    label = { Text("সংখ্যা", fontSize = 11.sp) })
                 NavigationBarItem(selected = false, onClick = onSearchClick,
-                    icon = { Icon(Icons.Default.Search, null) }, label = { Text("অনুসন্ধান") })
+                    icon = { Icon(Icons.Default.Search, null) },
+                    label = { Text("খুঁজুন", fontSize = 11.sp) })
+                NavigationBarItem(selected = false, onClick = onBookmarksClick,
+                    icon = { Icon(Icons.Default.Bookmark, null) },
+                    label = { Text("সংরক্ষিত", fontSize = 11.sp) })
                 NavigationBarItem(selected = false, onClick = onAboutClick,
-                    icon = { Icon(Icons.Default.Info, null) }, label = { Text("সম্পর্কে") })
+                    icon = { Icon(Icons.Default.Info, null) },
+                    label = { Text("সম্পর্কে", fontSize = 11.sp) })
             }
         }
     ) { paddingValues ->
@@ -96,32 +140,40 @@ fun HomeScreen(
                     .verticalScroll(rememberScrollState())
                     .fillMaxSize()
             ) {
-                // ── Hero ──────────────────────────────────
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(Brush.verticalGradient(listOf(Navy, Navy.copy(alpha = 0.85f))))
-                        .padding(24.dp),
-                    contentAlignment = Alignment.Center
+                // ── ISSN info strip ──────────────────────────
+                Surface(
+                    color = Navy.copy(alpha = 0.08f),
+                    modifier = Modifier.fillMaxWidth()
                 ) {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text("সাহিত্য পত্রিকা",
-                            color = MaterialTheme.colorScheme.onPrimary,
-                            fontSize = 28.sp, fontWeight = FontWeight.Bold,
-                            textAlign = TextAlign.Center)
-                        Spacer(Modifier.height(4.dp))
-                        Text("ISSN: 0304-9612 • eISSN: 2959-5827",
-                            color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.70f),
-                            fontSize = 12.sp, textAlign = TextAlign.Center)
-                    }
+                    Text(
+                        "ISSN: 0304-9612  •  eISSN: 2959-5827  •  প্রতিষ্ঠা: ১৯৫৭",
+                        fontSize = 11.sp,
+                        color = Navy.copy(alpha = 0.75f),
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.padding(vertical = 6.dp)
+                    )
                 }
 
                 Spacer(Modifier.height(16.dp))
 
-                Text("চলতি সংখ্যা",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp))
+                // ── Current issue ────────────────────────────
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 4.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        "চলতি সংখ্যা",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = Navy
+                    )
+                    TextButton(onClick = onIssueListClick) {
+                        Text("সকল সংখ্যা →", fontSize = 12.sp, color = Navy)
+                    }
+                }
 
                 when (val state = currentIssueState) {
                     is UiState.Loading -> {
@@ -133,44 +185,70 @@ fun HomeScreen(
                             modifier = Modifier.padding(16.dp))
                     }
                     is UiState.Success -> {
-                        IssueCard(issue = state.data,
+                        IssueCard(
+                            issue = state.data,
                             onClick = { onIssueClick(state.data) },
-                            modifier = Modifier.padding(horizontal = 16.dp))
+                            modifier = Modifier.padding(horizontal = 16.dp)
+                        )
                     }
+                }
+
+                Spacer(Modifier.height(20.dp))
+
+                // ── Quick nav ────────────────────────────────
+                Text(
+                    "দ্রুত নেভিগেশন",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = Navy,
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
+                )
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp),
+                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    QuickNavCard("আর্কাইভ", "সকল সংখ্যা",
+                        Icons.Default.List, Modifier.weight(1f), onIssueListClick)
+                    QuickNavCard("Bookmarks", "সংরক্ষিত",
+                        Icons.Default.Bookmark, Modifier.weight(1f), onBookmarksClick)
+                    QuickNavCard("সম্পর্কে", "পরিচিতি",
+                        Icons.Default.Info, Modifier.weight(1f), onAboutClick)
                 }
 
                 Spacer(Modifier.height(16.dp))
 
-                Text("দ্রুত নেভিগেশন",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp))
-
-                Row(
-                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                // ── Footer strip ─────────────────────────────
+                Surface(
+                    color = Navy,
+                    modifier = Modifier.fillMaxWidth()
                 ) {
-                    QuickNavCard("সংখ্যা আর্কাইভ", "সকল সংখ্যা দেখুন",
-                        Icons.Default.List, Modifier.weight(1f), onIssueListClick)
-                    QuickNavCard("Bookmarks", "সংরক্ষিত নিবন্ধ",
-                        Icons.Default.Bookmark, Modifier.weight(1f), onBookmarksClick)
-                    QuickNavCard("সম্পর্কে", "পত্রিকার তথ্য",
-                        Icons.Default.Info, Modifier.weight(1f), onAboutClick)
+                    Text(
+                        "© ১৯৫৭–২০২৬  সাহিত্য পত্রিকা  •  বাংলা বিভাগ  •  ঢাকা বিশ্ববিদ্যালয়",
+                        fontSize = 11.sp,
+                        color = Color.White.copy(alpha = 0.80f),
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 12.dp, horizontal = 16.dp)
+                    )
                 }
-
-                Spacer(Modifier.height(24.dp))
             }
         }
     }
 }
+
+// ── Shared composables ────────────────────────────────────
 
 @Composable
 fun IssueCard(issue: Issue, onClick: () -> Unit, modifier: Modifier = Modifier) {
     Card(
         onClick = onClick,
         modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
+        shape = RoundedCornerShape(10.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Row(modifier = Modifier.padding(12.dp)) {
             if (issue.coverImageUrl != null) {
@@ -178,28 +256,42 @@ fun IssueCard(issue: Issue, onClick: () -> Unit, modifier: Modifier = Modifier) 
                     model = issue.coverImageUrl,
                     contentDescription = issue.title,
                     contentScale = ContentScale.Crop,
-                    modifier = Modifier.size(90.dp, 120.dp).clip(RoundedCornerShape(8.dp))
+                    modifier = Modifier
+                        .size(80.dp, 110.dp)
+                        .clip(RoundedCornerShape(6.dp))
                 )
                 Spacer(Modifier.width(12.dp))
             }
             Column(modifier = Modifier.weight(1f)) {
                 Text(issue.title, fontWeight = FontWeight.Bold,
-                    style = MaterialTheme.typography.titleSmall,
-                    maxLines = 2, overflow = TextOverflow.Ellipsis)
+                    fontSize = 15.sp, maxLines = 2, overflow = TextOverflow.Ellipsis,
+                    lineHeight = 21.sp, color = Navy)
                 if (issue.volume.isNotBlank()) {
                     Spacer(Modifier.height(4.dp))
-                    Text(issue.volume + if (issue.number.isNotBlank()) ", ${issue.number}" else "",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text(
+                        issue.volume + if (issue.number.isNotBlank()) ", ${issue.number}" else "",
+                        fontSize = 12.sp,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
                 }
                 if (issue.year.isNotBlank()) {
                     Spacer(Modifier.height(2.dp))
-                    Text(issue.year, style = MaterialTheme.typography.bodySmall,
+                    Text(issue.year, fontSize = 12.sp,
                         color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
-                Spacer(Modifier.height(8.dp))
-                Text("নিবন্ধ পড়ুন →", color = Navy,
-                    fontWeight = FontWeight.SemiBold, fontSize = 13.sp)
+                Spacer(Modifier.height(10.dp))
+                Surface(
+                    shape = RoundedCornerShape(4.dp),
+                    color = Navy
+                ) {
+                    Text(
+                        "নিবন্ধ দেখুন →",
+                        color = Color.White,
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Medium,
+                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp)
+                    )
+                }
             }
         }
     }
@@ -214,17 +306,18 @@ fun QuickNavCard(
 ) {
     Card(
         onClick = onClick, modifier = modifier,
-        shape = RoundedCornerShape(10.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+        shape = RoundedCornerShape(8.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
     ) {
         Column(
-            modifier = Modifier.padding(10.dp),
+            modifier = Modifier.padding(10.dp).fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Icon(icon, contentDescription = null, tint = Navy, modifier = Modifier.size(26.dp))
+            Icon(icon, contentDescription = null, tint = Navy, modifier = Modifier.size(24.dp))
             Spacer(Modifier.height(4.dp))
             Text(title, fontWeight = FontWeight.SemiBold, fontSize = 12.sp,
-                textAlign = TextAlign.Center)
+                textAlign = TextAlign.Center, color = Navy)
             Text(subtitle, fontSize = 10.sp,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center)

@@ -14,4 +14,6 @@
     <string name="retry">আবার চেষ্টা করুন</string>
     <string name="no_results">কোনো ফলাফল পাওয়া যায়নি</string>
     <string name="search_hint">নিবন্ধ খুঁজুন…</string>
+    <string name="developer_name">জোবায়ের আবদুল্লাহ</string>
+    <string name="developer_label">অ্যাপ নির্মাতা</string>
 </resources>
