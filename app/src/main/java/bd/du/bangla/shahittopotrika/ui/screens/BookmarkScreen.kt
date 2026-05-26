@@ -1,7 +1,5 @@
 package bd.du.bangla.shahittopotrika.ui.screens
 
-import android.content.Intent
-import android.net.Uri
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -16,7 +14,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -34,11 +31,10 @@ fun BookmarkScreen(
     journalVm: JournalViewModel,
     bookmarkVm: BookmarkViewModel = viewModel(),
     onArticleClick: (String) -> Unit,
+    onOpenPdf: (pdfUrl: String, title: String) -> Unit = { _, _ -> },
     onBack: () -> Unit
 ) {
     val bookmarks by bookmarkVm.bookmarks.collectAsState()
-    val context = LocalContext.current
-
     Scaffold(
         topBar = {
             TopAppBar(
@@ -107,7 +103,7 @@ fun BookmarkScreen(
                         onDelete = { journalVm.removeBookmark(bm.articleId) },
                         onOpenPdf = {
                             if (bm.pdfUrl != null)
-                                context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(bm.pdfUrl)))
+                                onOpenPdf(bm.pdfUrl, bm.title)
                         }
                     )
                 }

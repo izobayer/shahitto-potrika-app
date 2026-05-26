@@ -20,16 +20,21 @@ object Routes {
     const val SEARCH         = "search"
     const val ABOUT          = "about"
     const val BOOKMARKS      = "bookmarks"
+    const val PDF_VIEWER     = "pdf_viewer/{pdfUrl}/{title}"
 
-    fun articleList(issueUrl: String)    = "article_list/${URLEncoder.encode(issueUrl, "UTF-8")}"
-    fun articleDetail(articleUrl: String) = "article_detail/${URLEncoder.encode(articleUrl, "UTF-8")}"
+    fun articleList(issueUrl: String) =
+        "article_list/${URLEncoder.encode(issueUrl, "UTF-8")}"
+    fun articleDetail(articleUrl: String) =
+        "article_detail/${URLEncoder.encode(articleUrl, "UTF-8")}"
+    fun pdfViewer(pdfUrl: String, title: String = "PDF") =
+        "pdf_viewer/${URLEncoder.encode(pdfUrl, "UTF-8")}/${URLEncoder.encode(title, "UTF-8")}"
 }
 
 @Composable
 fun AppNavigation(
     navController: NavHostController,
-    journalVm: JournalViewModel  = viewModel(),
-    searchVm:  SearchViewModel   = viewModel(),
+    journalVm:  JournalViewModel  = viewModel(),
+    searchVm:   SearchViewModel   = viewModel(),
     bookmarkVm: BookmarkViewModel = viewModel()
 ) {
     NavHost(navController = navController, startDestination = Routes.HOME) {
@@ -68,9 +73,12 @@ fun AppNavigation(
             val articleUrl = back.arguments?.getString("articleUrl")
                 ?.let { URLDecoder.decode(it, "UTF-8") } ?: ""
             ArticleDetailScreen(
-                articleUrl = articleUrl,
-                viewModel  = journalVm,
-                onBack     = { navController.popBackStack() }
+                articleUrl  = articleUrl,
+                viewModel   = journalVm,
+                onBack      = { navController.popBackStack() },
+                onOpenPdf   = { pdfUrl, title ->
+                    navController.navigate(Routes.pdfViewer(pdfUrl, title))
+                }
             )
         }
 
@@ -92,7 +100,22 @@ fun AppNavigation(
                 journalVm      = journalVm,
                 bookmarkVm     = bookmarkVm,
                 onArticleClick = { navController.navigate(Routes.articleDetail(it)) },
+                onOpenPdf      = { pdfUrl, title ->
+                    navController.navigate(Routes.pdfViewer(pdfUrl, title))
+                },
                 onBack         = { navController.popBackStack() }
+            )
+        }
+
+        composable(Routes.PDF_VIEWER) { back ->
+            val pdfUrl = back.arguments?.getString("pdfUrl")
+                ?.let { URLDecoder.decode(it, "UTF-8") } ?: ""
+            val title  = back.arguments?.getString("title")
+                ?.let { URLDecoder.decode(it, "UTF-8") } ?: "PDF"
+            PdfViewerScreen(
+                pdfUrl = pdfUrl,
+                title  = title,
+                onBack = { navController.popBackStack() }
             )
         }
     }

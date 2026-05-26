@@ -39,7 +39,10 @@ private const val LOGO_URL =
 fun ArticleDetailScreen(
     articleUrl: String,
     viewModel: JournalViewModel,
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    onOpenPdf: (pdfUrl: String, title: String) -> Unit = { url, _ ->
+        // default: no-op — nav handles it
+    }
 ) {
     val articleState by viewModel.articleDetail.collectAsState()
     val isBookmarked by viewModel.isBookmarked.collectAsState()
@@ -195,11 +198,10 @@ fun ArticleDetailScreen(
 
                         if (article.pdfUrl != null) {
                             Button(
-                                onClick = { context.startActivity(
-                                    Intent(Intent.ACTION_VIEW, Uri.parse(article.pdfUrl))) },
+                                onClick = { onOpenPdf(article.pdfUrl, article.title) },
                                 modifier = Modifier.weight(1f),
                                 colors = ButtonDefaults.buttonColors(containerColor = Navy)
-                            ) { Text("PDF খুলুন") }
+                            ) { Text("PDF পড়ুন") }
                         }
                     }
                 }
