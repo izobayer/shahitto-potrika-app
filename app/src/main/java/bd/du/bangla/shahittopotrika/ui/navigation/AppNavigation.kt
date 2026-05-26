@@ -5,57 +5,51 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import bd.du.bangla.shahittopotrika.ui.screens.AboutScreen
-import bd.du.bangla.shahittopotrika.ui.screens.ArticleDetailScreen
-import bd.du.bangla.shahittopotrika.ui.screens.ArticleListScreen
-import bd.du.bangla.shahittopotrika.ui.screens.HomeScreen
-import bd.du.bangla.shahittopotrika.ui.screens.IssueListScreen
-import bd.du.bangla.shahittopotrika.ui.screens.SearchScreen
+import bd.du.bangla.shahittopotrika.ui.screens.*
+import bd.du.bangla.shahittopotrika.viewmodel.BookmarkViewModel
 import bd.du.bangla.shahittopotrika.viewmodel.JournalViewModel
 import bd.du.bangla.shahittopotrika.viewmodel.SearchViewModel
 import java.net.URLDecoder
 import java.net.URLEncoder
 
-// ── Route constants ────────────────────────────────────────
 object Routes {
-    const val HOME            = "home"
-    const val ISSUE_LIST      = "issue_list"
-    const val ARTICLE_LIST    = "article_list/{issueUrl}"
-    const val ARTICLE_DETAIL  = "article_detail/{articleUrl}"
-    const val SEARCH          = "search"
-    const val ABOUT           = "about"
+    const val HOME           = "home"
+    const val ISSUE_LIST     = "issue_list"
+    const val ARTICLE_LIST   = "article_list/{issueUrl}"
+    const val ARTICLE_DETAIL = "article_detail/{articleUrl}"
+    const val SEARCH         = "search"
+    const val ABOUT          = "about"
+    const val BOOKMARKS      = "bookmarks"
 
-    fun articleList(issueUrl: String)   = "article_list/${URLEncoder.encode(issueUrl, "UTF-8")}"
+    fun articleList(issueUrl: String)    = "article_list/${URLEncoder.encode(issueUrl, "UTF-8")}"
     fun articleDetail(articleUrl: String) = "article_detail/${URLEncoder.encode(articleUrl, "UTF-8")}"
 }
 
 @Composable
 fun AppNavigation(
     navController: NavHostController,
-    journalVm: JournalViewModel = viewModel(),
-    searchVm:  SearchViewModel  = viewModel()
+    journalVm: JournalViewModel  = viewModel(),
+    searchVm:  SearchViewModel   = viewModel(),
+    bookmarkVm: BookmarkViewModel = viewModel()
 ) {
     NavHost(navController = navController, startDestination = Routes.HOME) {
 
         composable(Routes.HOME) {
             HomeScreen(
-                viewModel  = journalVm,
-                onIssueClick     = { issue ->
-                    navController.navigate(Routes.articleList(issue.url))
-                },
+                viewModel        = journalVm,
+                onIssueClick     = { navController.navigate(Routes.articleList(it.url)) },
                 onSearchClick    = { navController.navigate(Routes.SEARCH) },
                 onIssueListClick = { navController.navigate(Routes.ISSUE_LIST) },
-                onAboutClick     = { navController.navigate(Routes.ABOUT) }
+                onAboutClick     = { navController.navigate(Routes.ABOUT) },
+                onBookmarksClick = { navController.navigate(Routes.BOOKMARKS) }
             )
         }
 
         composable(Routes.ISSUE_LIST) {
             IssueListScreen(
-                viewModel = journalVm,
-                onIssueClick = { issue ->
-                    navController.navigate(Routes.articleList(issue.url))
-                },
-                onBack = { navController.popBackStack() }
+                viewModel    = journalVm,
+                onIssueClick = { navController.navigate(Routes.articleList(it.url)) },
+                onBack       = { navController.popBackStack() }
             )
         }
 
@@ -63,12 +57,10 @@ fun AppNavigation(
             val issueUrl = back.arguments?.getString("issueUrl")
                 ?.let { URLDecoder.decode(it, "UTF-8") } ?: ""
             ArticleListScreen(
-                issueUrl  = issueUrl,
-                viewModel = journalVm,
-                onArticleClick = { article ->
-                    navController.navigate(Routes.articleDetail(article.url))
-                },
-                onBack = { navController.popBackStack() }
+                issueUrl       = issueUrl,
+                viewModel      = journalVm,
+                onArticleClick = { navController.navigate(Routes.articleDetail(it.url)) },
+                onBack         = { navController.popBackStack() }
             )
         }
 
@@ -84,19 +76,23 @@ fun AppNavigation(
 
         composable(Routes.SEARCH) {
             SearchScreen(
-                viewModel = searchVm,
-                journalVm = journalVm,
-                onArticleClick = { article ->
-                    navController.navigate(Routes.articleDetail(article.url))
-                },
-                onBack = { navController.popBackStack() }
+                viewModel      = searchVm,
+                journalVm      = journalVm,
+                onArticleClick = { navController.navigate(Routes.articleDetail(it.url)) },
+                onBack         = { navController.popBackStack() }
             )
         }
 
         composable(Routes.ABOUT) {
-            AboutScreen(
-                viewModel = journalVm,
-                onBack = { navController.popBackStack() }
+            AboutScreen(viewModel = journalVm, onBack = { navController.popBackStack() })
+        }
+
+        composable(Routes.BOOKMARKS) {
+            BookmarkScreen(
+                journalVm      = journalVm,
+                bookmarkVm     = bookmarkVm,
+                onArticleClick = { navController.navigate(Routes.articleDetail(it)) },
+                onBack         = { navController.popBackStack() }
             )
         }
     }
