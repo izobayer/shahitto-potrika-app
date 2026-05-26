@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">সাহিত্য পত্রিকা</string>
+    <string name="home">হোম</string>
+    <string name="issues">সংখ্যাসমূহ</string>
+    <string name="search">অনুসন্ধান</string>
+    <string name="about">সম্পর্কে</string>
+    <string name="current_issue">চলতি সংখ্যা</string>
+    <string name="archive">আর্কাইভ</string>
+    <string name="read_article">নিবন্ধ পড়ুন</string>
+    <string name="download_pdf">PDF ডাউনলোড</string>
+    <string name="loading">লোড হচ্ছে…</string>
+    <string name="error_loading">লোড করতে সমস্যা হয়েছে। আবার চেষ্টা করুন।</string>
+    <string name="retry">আবার চেষ্টা করুন</string>
+    <string name="no_results">কোনো ফলাফল পাওয়া যায়নি</string>
+    <string name="search_hint">নিবন্ধ খুঁজুন…</string>
+</resources>

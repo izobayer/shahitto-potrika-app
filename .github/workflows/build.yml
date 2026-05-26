@@ -1,0 +1,87 @@
+name: Build & Release APK
+
+on:
+  push:
+    branches: [ main ]
+    tags:     [ 'v*' ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:          # manual trigger
+
+jobs:
+  build:
+    name: Build APK
+    runs-on: ubuntu-latest
+
+    steps:
+      # ── 1. Checkout ─────────────────────────────────────
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      # ── 2. Java 17 ──────────────────────────────────────
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      # ── 3. Setup Gradle (handles wrapper + caching) ─────
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          gradle-version: '8.9'
+
+      # ── 4. Generate wrapper (first run bootstraps it) ───
+      - name: Bootstrap Gradle wrapper
+        run: gradle wrapper --gradle-version 8.9 --distribution-type bin
+
+      # ── 5. Build debug APK (always) ─────────────────────
+      - name: Build Debug APK
+        run: ./gradlew assembleDebug --stacktrace
+
+      - name: Upload Debug APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: debug-apk
+          path: app/build/outputs/apk/debug/app-debug.apk
+          retention-days: 14
+
+      # ── 6. Build release APK (only when keystore secret set) ──
+      - name: Build Release APK
+        if: ${{ secrets.KEYSTORE_BASE64 != '' }}
+        env:
+          KEYSTORE_BASE64:   ${{ secrets.KEYSTORE_BASE64 }}
+          KEYSTORE_FILE:     keystore.jks
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS:         ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD:      ${{ secrets.KEY_PASSWORD }}
+        run: |
+          echo "$KEYSTORE_BASE64" | base64 --decode > keystore.jks
+          ./gradlew assembleRelease --stacktrace
+
+      - name: Upload Release APK
+        if: ${{ secrets.KEYSTORE_BASE64 != '' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-apk
+          path: app/build/outputs/apk/release/app-release.apk
+          retention-days: 30
+
+      # ── 7. Create GitHub Release on tag push ────────────
+      - name: Create GitHub Release
+        if: startsWith(github.ref, 'refs/tags/v') && secrets.KEYSTORE_BASE64 != ''
+        uses: softprops/action-gh-release@v2
+        with:
+          files: app/build/outputs/apk/release/app-release.apk
+          name: সাহিত্য পত্রিকা ${{ github.ref_name }}
+          body: |
+            ## সাহিত্য পত্রিকা অ্যান্ড্রয়েড অ্যাপ ${{ github.ref_name }}
+
+            বাংলা বিভাগ, ঢাকা বিশ্ববিদ্যালয়ের সাহিত্য পত্রিকার অফিসিয়াল অ্যান্ড্রয়েড অ্যাপ।
+
+            ### ডাউনলোড করুন
+            নিচের `app-release.apk` ফাইলটি ডাউনলোড করে ইনস্টল করুন।
+
+            > ⚠️ প্রথমবার ইনস্টলের সময় "Unknown Sources" থেকে অনুমতি দিতে হবে।
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -1,0 +1,184 @@
+package bd.du.bangla.shahittopotrika.ui.screens
+
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import bd.du.bangla.shahittopotrika.data.model.Article
+import bd.du.bangla.shahittopotrika.data.model.UiState
+import bd.du.bangla.shahittopotrika.ui.theme.Navy
+import bd.du.bangla.shahittopotrika.viewmodel.JournalViewModel
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ArticleListScreen(
+    issueUrl: String,
+    viewModel: JournalViewModel,
+    onArticleClick: (Article) -> Unit,
+    onBack: () -> Unit
+) {
+    val articlesState by viewModel.articles.collectAsState()
+
+    LaunchedEffect(issueUrl) {
+        viewModel.loadArticlesForIssue(issueUrl)
+    }
+
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("নিবন্ধসমূহ") },
+                navigationIcon = {
+                    IconButton(onClick = onBack) {
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "ফিরে যান",
+                            tint = MaterialTheme.colorScheme.onPrimary)
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = Navy,
+                    titleContentColor = MaterialTheme.colorScheme.onPrimary
+                )
+            )
+        }
+    ) { paddingValues ->
+        when (val state = articlesState) {
+            is UiState.Loading -> {
+                Box(
+                    Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        CircularProgressIndicator(color = Navy)
+                        Spacer(Modifier.height(12.dp))
+                        Text("নিবন্ধ লোড হচ্ছে…")
+                    }
+                }
+            }
+            is UiState.Error -> {
+                Box(
+                    Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues)
+                        .padding(16.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    ErrorCard(
+                        message = state.message,
+                        onRetry = { viewModel.loadArticlesForIssue(issueUrl) }
+                    )
+                }
+            }
+            is UiState.Success -> {
+                if (state.data.isEmpty()) {
+                    Box(
+                        Modifier
+                            .fillMaxSize()
+                            .padding(paddingValues),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text("কোনো নিবন্ধ পাওয়া যায়নি")
+                    }
+                } else {
+                    LazyColumn(
+                        contentPadding = PaddingValues(
+                            start = 16.dp, end = 16.dp,
+                            top = paddingValues.calculateTopPadding() + 8.dp,
+                            bottom = paddingValues.calculateBottomPadding() + 8.dp
+                        ),
+                        verticalArrangement = Arrangement.spacedBy(10.dp)
+                    ) {
+                        items(state.data) { article ->
+                            ArticleCard(
+                                article = article,
+                                onClick = { onArticleClick(article) }
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun ArticleCard(article: Article, onClick: () -> Unit, modifier: Modifier = Modifier) {
+    Card(
+        onClick = onClick,
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(10.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+    ) {
+        Column(modifier = Modifier.padding(14.dp)) {
+            Text(
+                text = article.title,
+                fontWeight = FontWeight.SemiBold,
+                fontSize = 14.sp,
+                maxLines = 3,
+                overflow = TextOverflow.Ellipsis,
+                lineHeight = 20.sp
+            )
+            if (article.authors.isNotBlank()) {
+                Spacer(Modifier.height(4.dp))
+                Text(
+                    text = article.authors,
+                    fontSize = 12.sp,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
+            if (article.abstract.isNotBlank()) {
+                Spacer(Modifier.height(6.dp))
+                Text(
+                    text = article.abstract,
+                    fontSize = 12.sp,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 3,
+                    overflow = TextOverflow.Ellipsis,
+                    lineHeight = 18.sp
+                )
+            }
+            Spacer(Modifier.height(8.dp))
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "বিস্তারিত পড়ুন →",
+                    color = Navy,
+                    fontWeight = FontWeight.SemiBold,
+                    fontSize = 12.sp
+                )
+                if (article.pdfUrl != null) {
+                    Surface(
+                        shape = RoundedCornerShape(4.dp),
+                        color = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.5f)
+                    ) {
+                        Text(
+                            text = "PDF",
+                            fontSize = 10.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.error,
+                            modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
