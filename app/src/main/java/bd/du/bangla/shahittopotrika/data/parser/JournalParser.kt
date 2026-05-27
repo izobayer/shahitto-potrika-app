@@ -63,7 +63,7 @@ object JournalParser {
             val titleEl = el.selectFirst(".title a") ?: return@forEach
             val articleUrl = titleEl.absUrl("href")
             val id = articleUrl.substringAfterLast("/").ifBlank { articleUrl.hashCode().toString() }
-            val authors = el.select(".authors").text()
+            val authors = cleanAuthors(el.select(".authors").text())
             val abstract = el.selectFirst(".abstract")?.text() ?: ""
             val pdfEl = el.selectFirst("a.obj_galley_link.pdf")
             articles.add(
@@ -80,8 +80,10 @@ object JournalParser {
     fun fetchArticleDetail(articleUrl: String): Article {
         val doc = fetch(articleUrl)
         val title = doc.selectFirst("h1.title, .page_article h1")?.text() ?: ""
-        val authors = doc.select(".authors .name").joinToString(", ") { it.text() }
-            .ifBlank { doc.selectFirst(".authors")?.text() ?: "" }
+        val authors = cleanAuthors(
+            doc.select(".authors .name").joinToString(", ") { it.text() }
+                .ifBlank { doc.selectFirst(".authors")?.text() ?: "" }
+        )
         val abstract = doc.selectFirst(".abstract p, .abstract")?.text() ?: ""
         val pdfLink = doc.select("a.obj_galley_link.pdf").firstOrNull()?.absUrl("href")
             ?: doc.select("a.obj_galley_link").firstOrNull()?.absUrl("href")
@@ -109,6 +111,22 @@ object JournalParser {
                 url = articleUrl, pdfUrl = null
             )
         }.filterNotNull()
+    }
+
+    // ── Author name cleaning ───────────────────────────────────
+    /**
+     * Removes stray non-letter prefix characters that OJS sometimes emits
+     * before author names (e.g. "►", "•", Unicode directional marks, NBSP).
+     */
+    private fun cleanAuthors(raw: String): String {
+        if (raw.isBlank()) return raw
+        // Split by comma, clean each name, rejoin
+        return raw.split(",").joinToString(", ") { part ->
+            part.trim()
+                // Drop any leading characters that are NOT letters, digits, or spaces
+                .trimStart { c -> !c.isLetterOrDigit() && c != ' ' }
+                .trim()
+        }.trim(',', ' ')
     }
 
     // ── Journal Info ──────────────────────────────────────────

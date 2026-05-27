@@ -37,7 +37,7 @@ fun ReadHistoryScreen(
         AlertDialog(
             onDismissRequest = { showClearDialog = false },
             title = { Text("ইতিহাস মুছবেন?") },
-            text  = { Text("সকল পঠিত নিবন্ধের ইতিহাস মুছে যাবে।") },
+            text  = { Text("সকল পঠিত প্রবন্ধের ইতিহাস মুছে যাবে।") },
             confirmButton = {
                 TextButton(onClick = {
                     viewModel.clearHistory()
@@ -53,7 +53,7 @@ fun ReadHistoryScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("পঠিত নিবন্ধ") },
+                title = { Text("পঠিত প্রবন্ধ") },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, "ফিরে যান",
@@ -79,10 +79,10 @@ fun ReadHistoryScreen(
                         modifier = Modifier.size(64.dp),
                         tint = MaterialTheme.colorScheme.outline)
                     Spacer(Modifier.height(12.dp))
-                    Text("কোনো পঠিত নিবন্ধ নেই",
+                    Text("কোনো পঠিত প্রবন্ধ নেই",
                         color = MaterialTheme.colorScheme.onSurfaceVariant)
                     Spacer(Modifier.height(6.dp))
-                    Text("নিবন্ধ পড়লে এখানে দেখাবে",
+                    Text("প্রবন্ধ পড়লে এখানে দেখাবে",
                         fontSize = 13.sp,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         textAlign = TextAlign.Center)
@@ -98,7 +98,7 @@ fun ReadHistoryScreen(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 item {
-                    Text("${history.size}টি পঠিত নিবন্ধ",
+                    Text("${history.size}টি পঠিত প্রবন্ধ",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }

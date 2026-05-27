@@ -299,7 +299,7 @@ fun IssueCard(issue: Issue, onClick: () -> Unit, modifier: Modifier = Modifier) 
                     color = Navy
                 ) {
                     Text(
-                        "নিবন্ধ দেখুন →",
+                        "প্রবন্ধ দেখুন →",
                         color = Color.White,
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Medium,

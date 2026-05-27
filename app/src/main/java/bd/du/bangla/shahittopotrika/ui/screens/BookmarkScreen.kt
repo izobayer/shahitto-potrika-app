@@ -42,7 +42,7 @@ fun BookmarkScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("সংরক্ষিত নিবন্ধ") },
+                title = { Text("সংরক্ষিত প্রবন্ধ") },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "ফিরে যান",
@@ -62,7 +62,7 @@ fun BookmarkScreen(
                             context.startActivity(Intent.createChooser(
                                 Intent(Intent.ACTION_SEND).apply {
                                     type = "text/plain"
-                                    putExtra(Intent.EXTRA_SUBJECT, "সংরক্ষিত নিবন্ধ – সাহিত্য পত্রিকা")
+                                    putExtra(Intent.EXTRA_SUBJECT, "সংরক্ষিত প্রবন্ধ – সাহিত্য পত্রিকা")
                                     putExtra(Intent.EXTRA_TEXT, text)
                                 }, "রপ্তানি করুন"
                             ))
@@ -93,13 +93,13 @@ fun BookmarkScreen(
                     )
                     Spacer(Modifier.height(12.dp))
                     Text(
-                        "কোনো সংরক্ষিত নিবন্ধ নেই",
+                        "কোনো সংরক্ষিত প্রবন্ধ নেই",
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         textAlign = TextAlign.Center
                     )
                     Spacer(Modifier.height(6.dp))
                     Text(
-                        "নিবন্ধ পড়ার সময় bookmark বাটনে ক্লিক করুন",
+                        "প্রবন্ধ পড়ার সময় bookmark বাটনে ক্লিক করুন",
                         fontSize = 13.sp,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         textAlign = TextAlign.Center,
@@ -118,7 +118,7 @@ fun BookmarkScreen(
             ) {
                 item {
                     Text(
-                        "${bookmarks.size}টি সংরক্ষিত নিবন্ধ",
+                        "${bookmarks.size}টি সংরক্ষিত প্রবন্ধ",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )

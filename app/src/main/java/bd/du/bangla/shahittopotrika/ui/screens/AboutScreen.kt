@@ -10,8 +10,10 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Code
+import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Language
 import androidx.compose.material3.*
+import androidx.compose.foundation.clickable
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -190,6 +192,24 @@ fun AboutScreen(
                             fontSize = 12.sp,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
+                        Spacer(Modifier.height(4.dp))
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(4.dp),
+                            modifier = androidx.compose.ui.Modifier.clickable {
+                                context.startActivity(Intent(Intent.ACTION_SENDTO).apply {
+                                    data = Uri.parse("mailto:zobayer@du.ac.bd")
+                                })
+                            }
+                        ) {
+                            Icon(Icons.Default.Email, null,
+                                tint = Navy, modifier = androidx.compose.ui.Modifier.size(14.dp))
+                            Text(
+                                "zobayer@du.ac.bd",
+                                fontSize = 12.sp,
+                                color = Navy
+                            )
+                        }
                     }
                 }
             }

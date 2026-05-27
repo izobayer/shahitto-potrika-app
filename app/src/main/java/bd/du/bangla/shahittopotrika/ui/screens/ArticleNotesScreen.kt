@@ -39,7 +39,7 @@ fun ArticleNotesScreen(
         AlertDialog(
             onDismissRequest = { showDeleteDialog = false },
             title = { Text("নোট মুছবেন?") },
-            text  = { Text("এই নিবন্ধের নোট মুছে যাবে।") },
+            text  = { Text("এই প্রবন্ধের নোট মুছে যাবে।") },
             confirmButton = {
                 TextButton(onClick = {
                     viewModel.deleteNote(articleId)

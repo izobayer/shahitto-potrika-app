@@ -116,7 +116,7 @@ fun ArticleDetailScreen(
                     }
                 }
                 TopAppBar(
-                    title = { Text("নিবন্ধ", maxLines = 1, fontSize = 14.sp) },
+                    title = { Text("প্রবন্ধ", maxLines = 1, fontSize = 14.sp) },
                     navigationIcon = {
                         IconButton(onClick = {
                             tts?.stop()
@@ -261,7 +261,7 @@ fun ArticleDetailScreen(
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         CircularProgressIndicator(color = Navy)
                         Spacer(Modifier.height(12.dp))
-                        Text("নিবন্ধ লোড হচ্ছে…")
+                        Text("প্রবন্ধ লোড হচ্ছে…")
                     }
                 }
             }

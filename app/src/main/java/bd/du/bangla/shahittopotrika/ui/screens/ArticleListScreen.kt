@@ -70,7 +70,7 @@ fun ArticleListScreen(
                     }
                 }
                 TopAppBar(
-                    title = { Text("নিবন্ধসমূহ", fontSize = 14.sp) },
+                    title = { Text("প্রবন্ধসমূহ", fontSize = 14.sp) },
                     navigationIcon = {
                         IconButton(onClick = onBack) {
                             Icon(Icons.AutoMirrored.Filled.ArrowBack, "ফিরে যান",
@@ -109,7 +109,7 @@ fun ArticleListScreen(
                 is UiState.Success -> {
                     if (state.data.isEmpty()) {
                         Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                            Text("কোনো নিবন্ধ পাওয়া যায়নি")
+                            Text("কোনো প্রবন্ধ পাওয়া যায়নি")
                         }
                     } else {
                         LazyColumn(

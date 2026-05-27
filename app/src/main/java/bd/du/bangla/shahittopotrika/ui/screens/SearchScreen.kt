@@ -63,7 +63,7 @@ fun SearchScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp, vertical = 12.dp),
-                placeholder = { Text("নিবন্ধ খুঁজুন…") },
+                placeholder = { Text("প্রবন্ধ খুঁজুন…") },
                 singleLine = true,
                 leadingIcon = {
                     Icon(Icons.Default.Search, contentDescription = null)
@@ -104,7 +104,7 @@ fun SearchScreen(
                 null -> {
                     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         Text(
-                            "নিবন্ধ খুঁজতে উপরের বাক্সে টাইপ করুন",
+                            "প্রবন্ধ খুঁজতে উপরের বাক্সে টাইপ করুন",
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
