@@ -1,6 +1,5 @@
 package bd.du.bangla.shahittopotrika.ui.screens
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -14,18 +13,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import bd.du.bangla.shahittopotrika.ui.theme.HeaderBg
 import bd.du.bangla.shahittopotrika.ui.theme.Navy
 import bd.du.bangla.shahittopotrika.viewmodel.SettingsViewModel
-import coil.compose.AsyncImage
-
-private const val LOGO_URL =
-    "https://journal.bangla.du.ac.bd/public/journals/1/pageHeaderLogoImage_en.png"
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -39,37 +32,17 @@ fun SettingsScreen(
 
     Scaffold(
         topBar = {
-            Column {
-                Box(
-                    modifier = Modifier.fillMaxWidth().background(HeaderBg)
-                        .padding(horizontal = 16.dp, vertical = 8.dp)
-                ) {
-                    Row(verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                        AsyncImage(model = LOGO_URL, contentDescription = null,
-                            modifier = Modifier.height(42.dp),
-                            contentScale = ContentScale.FillHeight)
-                        Column {
-                            Text("সাহিত্য পত্রিকা", fontWeight = FontWeight.Bold,
-                                fontSize = 16.sp, color = Navy)
-                            Text("বাংলা বিভাগ, ঢাকা বিশ্ববিদ্যালয়",
-                                fontSize = 10.sp, color = Navy.copy(alpha = 0.7f))
-                        }
+            TopAppBar(
+                title = { Text("সেটিংস", fontSize = 14.sp) },
+                navigationIcon = {
+                    IconButton(onClick = onBack) {
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, "ফিরে যান",
+                            tint = Color.White)
                     }
-                }
-                TopAppBar(
-                    title = { Text("সেটিংস", fontSize = 14.sp) },
-                    navigationIcon = {
-                        IconButton(onClick = onBack) {
-                            Icon(Icons.AutoMirrored.Filled.ArrowBack, "ফিরে যান",
-                                tint = Color.White)
-                        }
-                    },
-                    colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = Navy, titleContentColor = Color.White),
-                    modifier = Modifier.height(48.dp)
-                )
-            }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = Navy, titleContentColor = Color.White)
+            )
         }
     ) { padding ->
         Column(

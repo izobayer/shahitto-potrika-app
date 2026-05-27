@@ -1,6 +1,5 @@
 package bd.du.bangla.shahittopotrika.ui.screens
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -24,7 +23,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -34,13 +32,9 @@ import bd.du.bangla.shahittopotrika.R
 import bd.du.bangla.shahittopotrika.data.model.Issue
 import bd.du.bangla.shahittopotrika.data.model.UiState
 import bd.du.bangla.shahittopotrika.ui.components.ShimmerIssueCard
-import bd.du.bangla.shahittopotrika.ui.theme.HeaderBg
 import bd.du.bangla.shahittopotrika.ui.theme.Navy
 import bd.du.bangla.shahittopotrika.viewmodel.JournalViewModel
 import coil.compose.AsyncImage
-
-private const val LOGO_URL =
-    "https://journal.bangla.du.ac.bd/public/journals/1/pageHeaderLogoImage_en.png"
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -58,69 +52,42 @@ fun HomeScreen(
     val isRefreshing      by viewModel.isRefreshingHome.collectAsState()
 
     Scaffold(
-        // ── Top bar: website-style header (light bg + navy strip) ──
         topBar = {
-            Column {
-                // Site header — light background like the website
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(HeaderBg)
-                        .padding(horizontal = 16.dp, vertical = 10.dp)
-                ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
-                        AsyncImage(
-                            model = LOGO_URL,
-                            contentDescription = "সাহিত্য পত্রিকা লোগো",
-                            modifier = Modifier.height(48.dp),
-                            contentScale = ContentScale.FillHeight
+            TopAppBar(
+                title = {
+                    Column(verticalArrangement = Arrangement.Center) {
+                        Text(
+                            "সাহিত্য পত্রিকা",
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 16.sp,
+                            color = Color.White
                         )
-                        Column {
-                            Text(
-                                "সাহিত্য পত্রিকা",
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 18.sp,
-                                color = Navy
-                            )
-                            Text(
-                                "বাংলা বিভাগ, ঢাকা বিশ্ববিদ্যালয়",
-                                fontSize = 11.sp,
-                                color = Navy.copy(alpha = 0.7f)
-                            )
-                        }
+                        Text(
+                            "বাংলা বিভাগ, ঢাকা বিশ্ববিদ্যালয়",
+                            fontSize = 10.sp,
+                            color = Color.White.copy(alpha = 0.75f)
+                        )
                     }
-                }
-                // Navy nav strip — like website's navigation bar
-                TopAppBar(
-                    title = { Text("হোম", fontSize = 14.sp) },
-                    actions = {
-                        IconButton(onClick = onHistoryClick) {
-                            Icon(Icons.Default.History, "পঠন ইতিহাস",
-                                tint = Color.White)
-                        }
-                        IconButton(onClick = onBookmarksClick) {
-                            Icon(Icons.Default.Bookmark, "Bookmarks",
-                                tint = Color.White)
-                        }
-                        IconButton(onClick = onSearchClick) {
-                            Icon(Icons.Default.Search, "অনুসন্ধান",
-                                tint = Color.White)
-                        }
-                        IconButton(onClick = onSettingsClick) {
-                            Icon(Icons.Default.Settings, "সেটিংস",
-                                tint = Color.White)
-                        }
-                    },
-                    colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = Navy,
-                        titleContentColor = Color.White
-                    ),
-                    modifier = Modifier.height(48.dp)
+                },
+                actions = {
+                    IconButton(onClick = onHistoryClick) {
+                        Icon(Icons.Default.History, "পঠন ইতিহাস", tint = Color.White)
+                    }
+                    IconButton(onClick = onBookmarksClick) {
+                        Icon(Icons.Default.Bookmark, "Bookmarks", tint = Color.White)
+                    }
+                    IconButton(onClick = onSearchClick) {
+                        Icon(Icons.Default.Search, "অনুসন্ধান", tint = Color.White)
+                    }
+                    IconButton(onClick = onSettingsClick) {
+                        Icon(Icons.Default.Settings, "সেটিংস", tint = Color.White)
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = Navy,
+                    titleContentColor = Color.White
                 )
-            }
+            )
         },
         bottomBar = {
             NavigationBar(containerColor = MaterialTheme.colorScheme.surface) {

@@ -1,15 +1,16 @@
 package bd.du.bangla.shahittopotrika.ui.screens
 
-import android.annotation.SuppressLint
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.Color as AndroidColor
+import android.graphics.pdf.PdfRenderer
 import android.net.Uri
-import android.webkit.WebChromeClient
-import android.webkit.WebResourceError
-import android.webkit.WebResourceRequest
-import android.webkit.WebView
-import android.webkit.WebViewClient
+import android.os.ParcelFileDescriptor
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Download
@@ -19,20 +20,21 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.viewinterop.AndroidView
-import bd.du.bangla.shahittopotrika.ui.theme.HeaderBg
 import bd.du.bangla.shahittopotrika.ui.theme.Navy
-import coil.compose.AsyncImage
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import java.io.File
+import java.util.concurrent.TimeUnit
 
-private const val LOGO_URL =
-    "https://journal.bangla.du.ac.bd/public/journals/1/pageHeaderLogoImage_en.png"
-
-@SuppressLint("SetJavaScriptEnabled")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PdfViewerScreen(
@@ -42,51 +44,42 @@ fun PdfViewerScreen(
 ) {
     val context = LocalContext.current
 
-    // Google Docs embedded viewer — works without any extra library
-    val viewerUrl = remember(pdfUrl) {
-        "https://docs.google.com/gview?embedded=true&url=${Uri.encode(pdfUrl)}"
-    }
+    var pdfFile   by remember { mutableStateOf<File?>(null) }
+    var pageCount by remember { mutableIntStateOf(0) }
+    var loading   by remember { mutableStateOf(true) }
+    var errorMsg  by remember { mutableStateOf<String?>(null) }
+    var retryKey  by remember { mutableIntStateOf(0) }
 
-    var isLoading by remember { mutableStateOf(true) }
-    var hasError  by remember { mutableStateOf(false) }
-    var progress  by remember { mutableIntStateOf(0) }
-    var webViewRef by remember { mutableStateOf<WebView?>(null) }
+    // Download the PDF on first compose (or retry)
+    LaunchedEffect(pdfUrl, retryKey) {
+        loading  = true
+        errorMsg = null
+        withContext(Dispatchers.IO) {
+            try {
+                val file = downloadPdf(context, pdfUrl)
+                ParcelFileDescriptor.open(file, ParcelFileDescriptor.MODE_READ_ONLY).use { pfd ->
+                    PdfRenderer(pfd).use { renderer ->
+                        pageCount = renderer.pageCount
+                    }
+                }
+                if (pageCount == 0) throw Exception("PDF-এ কোনো পৃষ্ঠা নেই")
+                pdfFile  = file
+                loading  = false
+            } catch (e: Exception) {
+                errorMsg = e.message ?: "PDF লোড করা যায়নি"
+                loading  = false
+            }
+        }
+    }
 
     Scaffold(
         topBar = {
             Column {
-                // ── Site header ──────────────────────────────
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(HeaderBg)
-                        .padding(horizontal = 16.dp, vertical = 8.dp)
-                ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(10.dp)
-                    ) {
-                        AsyncImage(
-                            model = LOGO_URL,
-                            contentDescription = "লোগো",
-                            modifier = Modifier.height(40.dp),
-                            contentScale = ContentScale.FillHeight
-                        )
-                        Column {
-                            Text("সাহিত্য পত্রিকা",
-                                fontWeight = FontWeight.Bold, fontSize = 16.sp, color = Navy)
-                            Text("বাংলা বিভাগ, ঢাকা বিশ্ববিদ্যালয়",
-                                fontSize = 10.sp, color = Navy.copy(alpha = 0.7f))
-                        }
-                    }
-                }
-                // ── Nav bar ──────────────────────────────────
                 TopAppBar(
                     title = {
                         Text(
-                            text = title.take(40) + if (title.length > 40) "…" else "",
-                            fontSize = 13.sp,
-                            maxLines = 1
+                            title.take(38) + if (title.length > 38) "…" else "",
+                            fontSize = 13.sp, maxLines = 1
                         )
                     },
                     navigationIcon = {
@@ -96,127 +89,205 @@ fun PdfViewerScreen(
                         }
                     },
                     actions = {
-                        // Reload button
-                        IconButton(onClick = {
-                            hasError = false
-                            isLoading = true
-                            webViewRef?.loadUrl(viewerUrl)
-                        }) {
-                            Icon(Icons.Default.Refresh, "রিলোড", tint = Color.White)
+                        IconButton(onClick = { retryKey++ }) {
+                            Icon(Icons.Default.Refresh, "আবার লোড", tint = Color.White)
                         }
-                        // Open in external browser / download
                         IconButton(onClick = {
                             context.startActivity(
                                 Intent(Intent.ACTION_VIEW, Uri.parse(pdfUrl))
                             )
                         }) {
-                            Icon(Icons.Default.Download, "ডাউনলোড", tint = Color.White)
+                            Icon(Icons.Default.Download, "বাইরে খুলুন", tint = Color.White)
                         }
                     },
                     colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = Navy,
-                        titleContentColor = Color.White
-                    ),
-                    modifier = Modifier.height(48.dp)
+                        containerColor = Navy, titleContentColor = Color.White
+                    )
                 )
-                // ── Progress bar ──────────────────────────────
-                if (isLoading && !hasError) {
+                if (loading) {
                     LinearProgressIndicator(
-                        progress = { progress / 100f },
                         modifier = Modifier.fillMaxWidth(),
                         color = Color(0xFF2563EB),
-                        trackColor = Navy.copy(alpha = 0.2f)
+                        trackColor = Navy.copy(alpha = 0.3f)
                     )
                 }
             }
         }
-    ) { paddingValues ->
-        Box(modifier = Modifier.padding(paddingValues).fillMaxSize()) {
-
-            if (hasError) {
-                // Error state — offer to open externally
-                Column(
-                    modifier = Modifier.fillMaxSize(),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
-                ) {
-                    Text("PDF লোড করা যায়নি", fontWeight = FontWeight.SemiBold)
-                    Spacer(Modifier.height(12.dp))
-                    Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                        OutlinedButton(onClick = {
-                            hasError = false
-                            isLoading = true
-                            webViewRef?.loadUrl(viewerUrl)
-                        }) {
-                            Text("আবার চেষ্টা")
-                        }
-                        Button(
-                            onClick = {
-                                context.startActivity(
-                                    Intent(Intent.ACTION_VIEW, Uri.parse(pdfUrl))
-                                )
-                            },
-                            colors = ButtonDefaults.buttonColors(containerColor = Navy)
-                        ) {
-                            Text("বাইরে খুলুন")
-                        }
-                    }
-                }
-            } else {
-                // WebView
-                AndroidView(
-                    modifier = Modifier.fillMaxSize(),
-                    factory = { ctx ->
-                        WebView(ctx).also { wv ->
-                            webViewRef = wv
-                            wv.settings.apply {
-                                javaScriptEnabled  = true
-                                domStorageEnabled  = true
-                                loadWithOverviewMode = true
-                                useWideViewPort    = true
-                                builtInZoomControls = true
-                                displayZoomControls = false
-                                setSupportZoom(true)
-                            }
-                            wv.webChromeClient = object : WebChromeClient() {
-                                override fun onProgressChanged(view: WebView?, newProgress: Int) {
-                                    progress = newProgress
-                                    if (newProgress == 100) isLoading = false
-                                }
-                            }
-                            wv.webViewClient = object : WebViewClient() {
-                                override fun onPageFinished(view: WebView?, url: String?) {
-                                    isLoading = false
-                                }
-                                override fun onReceivedError(
-                                    view: WebView?,
-                                    request: WebResourceRequest?,
-                                    error: WebResourceError?
-                                ) {
-                                    if (request?.isForMainFrame == true) hasError = true
-                                }
-                            }
-                            wv.loadUrl(viewerUrl)
-                        }
-                    }
-                )
-
-                // Loading spinner overlay (initial load)
-                if (isLoading && progress < 15) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .background(MaterialTheme.colorScheme.background),
-                        contentAlignment = Alignment.Center
-                    ) {
+    ) { padding ->
+        Box(modifier = Modifier.padding(padding).fillMaxSize()) {
+            when {
+                loading -> {
+                    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
                             CircularProgressIndicator(color = Navy)
                             Spacer(Modifier.height(12.dp))
-                            Text("PDF লোড হচ্ছে…", color = Navy)
+                            Text("PDF ডাউনলোড হচ্ছে…", color = Navy)
                         }
                     }
+                }
+                errorMsg != null -> {
+                    Column(
+                        Modifier.fillMaxSize().padding(24.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        Text("❌ $errorMsg",
+                            color = MaterialTheme.colorScheme.error,
+                            style = MaterialTheme.typography.bodyLarge)
+                        Spacer(Modifier.height(16.dp))
+                        Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                            OutlinedButton(onClick = { retryKey++ }) {
+                                Text("আবার চেষ্টা")
+                            }
+                            Button(
+                                onClick = {
+                                    context.startActivity(
+                                        Intent(Intent.ACTION_VIEW, Uri.parse(pdfUrl))
+                                    )
+                                },
+                                colors = ButtonDefaults.buttonColors(containerColor = Navy)
+                            ) { Text("ব্রাউজারে খুলুন") }
+                        }
+                    }
+                }
+                pdfFile != null && pageCount > 0 -> {
+                    PdfPagesView(file = pdfFile!!, pageCount = pageCount)
                 }
             }
         }
     }
 }
+
+// ── PDF pages viewer ──────────────────────────────────────────────────────────
+
+@Composable
+fun PdfPagesView(file: File, pageCount: Int) {
+    val config  = LocalConfiguration.current
+    val density = LocalDensity.current
+    val screenWidthPx = with(density) { config.screenWidthDp.dp.roundToPx() }
+
+    LazyColumn(
+        state  = rememberLazyListState(),
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color(0xFF555555))
+    ) {
+        items(count = pageCount, key = { it }) { pageIndex ->
+            PdfPage(
+                file         = file,
+                pageIndex    = pageIndex,
+                screenWidth  = screenWidthPx,
+                modifier     = Modifier.fillMaxWidth()
+            )
+            Spacer(Modifier.height(4.dp))
+        }
+    }
+}
+
+@Composable
+fun PdfPage(
+    file: File,
+    pageIndex: Int,
+    screenWidth: Int,
+    modifier: Modifier = Modifier
+) {
+    var bitmap by remember(pageIndex) { mutableStateOf<Bitmap?>(null) }
+
+    LaunchedEffect(pageIndex, screenWidth) {
+        withContext(Dispatchers.IO) {
+            try {
+                ParcelFileDescriptor.open(file, ParcelFileDescriptor.MODE_READ_ONLY).use { pfd ->
+                    PdfRenderer(pfd).use { renderer ->
+                        renderer.openPage(pageIndex).use { page ->
+                            val scale  = screenWidth.toFloat() / page.width.toFloat()
+                            val width  = screenWidth
+                            val height = (page.height * scale).toInt().coerceAtLeast(1)
+                            val bmp = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+                            bmp.eraseColor(AndroidColor.WHITE)
+                            page.render(bmp, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
+                            bitmap = bmp
+                        }
+                    }
+                }
+            } catch (_: Exception) { /* leave bitmap null */ }
+        }
+    }
+
+    DisposableEffect(pageIndex) {
+        onDispose { bitmap?.recycle() }
+    }
+
+    if (bitmap != null) {
+        Image(
+            bitmap          = bitmap!!.asImageBitmap(),
+            contentDescription = "পৃষ্ঠা ${pageIndex + 1}",
+            contentScale    = ContentScale.FillWidth,
+            modifier        = modifier
+        )
+    } else {
+        // Placeholder while rendering
+        Box(
+            modifier = modifier
+                .aspectRatio(1f / 1.414f)       // A4 ratio placeholder
+                .background(Color.White),
+            contentAlignment = Alignment.Center
+        ) {
+            CircularProgressIndicator(
+                color       = Navy,
+                strokeWidth = 2.dp,
+                modifier    = Modifier.size(28.dp)
+            )
+        }
+    }
+}
+
+// ── PDF download helper ───────────────────────────────────────────────────────
+
+private val httpClient by lazy {
+    OkHttpClient.Builder()
+        .followRedirects(true)
+        .connectTimeout(20, TimeUnit.SECONDS)
+        .readTimeout(60, TimeUnit.SECONDS)
+        .build()
+}
+
+/**
+ * Downloads [url] to the app's cache directory.
+ * Converts OJS galley-view URLs to direct download URLs automatically.
+ * Returns the cached [File] immediately if already downloaded.
+ */
+private suspend fun downloadPdf(context: android.content.Context, rawUrl: String): File =
+    withContext(Dispatchers.IO) {
+        // OJS: /article/view/{id}/{galleryId} → /article/download/{id}/{galleryId}
+        val url = rawUrl.replace("/article/view/", "/article/download/")
+
+        val cacheFile = File(context.cacheDir, "pdf_${url.hashCode()}.pdf")
+        if (cacheFile.exists() && cacheFile.length() > 512L) return@withContext cacheFile
+
+        val request = Request.Builder()
+            .url(url)
+            .header("Accept", "application/pdf, */*")
+            .build()
+
+        httpClient.newCall(request).execute().use { response ->
+            if (!response.isSuccessful)
+                throw Exception("সার্ভার সাড়া দেয়নি (${response.code})")
+
+            val bytes = response.body?.bytes()
+                ?: throw Exception("PDF ডেটা খালি")
+
+            // Verify PDF magic bytes: %PDF
+            if (bytes.size < 4 ||
+                bytes[0] != 0x25.toByte() ||   // %
+                bytes[1] != 0x50.toByte() ||   // P
+                bytes[2] != 0x44.toByte() ||   // D
+                bytes[3] != 0x46.toByte()       // F
+            ) {
+                throw Exception("এই লিংকটি সরাসরি PDF নয়। ব্রাউজারে খুলুন।")
+            }
+
+            cacheFile.writeBytes(bytes)
+        }
+
+        cacheFile
+    }

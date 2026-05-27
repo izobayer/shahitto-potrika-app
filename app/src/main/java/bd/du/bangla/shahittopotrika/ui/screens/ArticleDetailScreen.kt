@@ -9,7 +9,6 @@ import android.net.Uri
 import android.os.Environment
 import android.speech.tts.TextToSpeech
 import android.speech.tts.UtteranceProgressListener
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -22,22 +21,16 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import bd.du.bangla.shahittopotrika.data.model.Article
 import bd.du.bangla.shahittopotrika.data.model.UiState
-import bd.du.bangla.shahittopotrika.ui.theme.HeaderBg
 import bd.du.bangla.shahittopotrika.ui.theme.Navy
 import bd.du.bangla.shahittopotrika.viewmodel.JournalViewModel
-import coil.compose.AsyncImage
 import kotlinx.coroutines.launch
 import java.util.Locale
-
-private const val LOGO_URL =
-    "https://journal.bangla.du.ac.bd/public/journals/1/pageHeaderLogoImage_en.png"
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -90,166 +83,139 @@ fun ArticleDetailScreen(
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
-            Column {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(HeaderBg)
-                        .padding(horizontal = 16.dp, vertical = 10.dp)
-                ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
-                        AsyncImage(
-                            model = LOGO_URL,
-                            contentDescription = "লোগো",
-                            modifier = Modifier.height(48.dp),
-                            contentScale = ContentScale.FillHeight
-                        )
-                        Column {
-                            Text("সাহিত্য পত্রিকা",
-                                fontWeight = FontWeight.Bold, fontSize = 18.sp, color = Navy)
-                            Text("বাংলা বিভাগ, ঢাকা বিশ্ববিদ্যালয়",
-                                fontSize = 11.sp, color = Navy.copy(alpha = 0.7f))
+            TopAppBar(
+                title = { Text("প্রবন্ধ", maxLines = 1, fontSize = 14.sp) },
+                navigationIcon = {
+                    IconButton(onClick = {
+                        tts?.stop()
+                        isSpeaking = false
+                        onBack()
+                    }) {
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, "ফিরে যান",
+                            tint = Color.White)
+                    }
+                },
+                actions = {
+                    if (articleState is UiState.Success) {
+                        val article = (articleState as UiState.Success).data
+                        // Bookmark
+                        IconButton(onClick = { viewModel.toggleBookmark(article) }) {
+                            Icon(
+                                if (isBookmarked) Icons.Default.Bookmark
+                                else Icons.Default.BookmarkBorder,
+                                contentDescription = if (isBookmarked) "Bookmark সরান"
+                                                     else "Bookmark করুন",
+                                tint = if (isBookmarked) Color(0xFFFFD700) else Color.White
+                            )
+                        }
+                        // Share
+                        IconButton(onClick = {
+                            context.startActivity(Intent.createChooser(
+                                Intent(Intent.ACTION_SEND).apply {
+                                    type = "text/plain"
+                                    putExtra(Intent.EXTRA_TEXT,
+                                        "${article.title}\n${article.url}")
+                                }, "শেয়ার করুন"
+                            ))
+                        }) {
+                            Icon(Icons.Default.Share, "শেয়ার", tint = Color.White)
+                        }
+                        // Overflow menu
+                        Box {
+                            IconButton(onClick = { showMenu = true }) {
+                                Icon(Icons.Default.MoreVert, "আরো বিকল্প",
+                                    tint = Color.White)
+                            }
+                            DropdownMenu(
+                                expanded = showMenu,
+                                onDismissRequest = { showMenu = false }
+                            ) {
+                                // TTS
+                                DropdownMenuItem(
+                                    text = {
+                                        Text(if (isSpeaking) "পড়া থামান" else "পড়ে শোনান")
+                                    },
+                                    leadingIcon = {
+                                        Icon(
+                                            if (isSpeaking) Icons.Default.VolumeOff
+                                            else Icons.Default.VolumeUp,
+                                            null
+                                        )
+                                    },
+                                    onClick = {
+                                        showMenu = false
+                                        if (isSpeaking) {
+                                            tts?.stop()
+                                            isSpeaking = false
+                                        } else {
+                                            val text = buildSpeechText(article)
+                                            tts?.speak(
+                                                text, TextToSpeech.QUEUE_FLUSH,
+                                                null, "sp_utterance"
+                                            )
+                                            isSpeaking = true
+                                        }
+                                    }
+                                )
+                                // Citation
+                                DropdownMenuItem(
+                                    text = { Text("উদ্ধৃতি কপি করুন") },
+                                    leadingIcon = {
+                                        Icon(Icons.Default.ContentCopy, null)
+                                    },
+                                    onClick = {
+                                        showMenu = false
+                                        val citation = buildCitation(article)
+                                        val cm = context.getSystemService(
+                                            Context.CLIPBOARD_SERVICE
+                                        ) as ClipboardManager
+                                        cm.setPrimaryClip(
+                                            ClipData.newPlainText("Citation", citation)
+                                        )
+                                        scope.launch {
+                                            snackbarHostState.showSnackbar("উদ্ধৃতি কপি হয়েছে ✓")
+                                        }
+                                    }
+                                )
+                                // Notes
+                                DropdownMenuItem(
+                                    text = { Text("নোট লিখুন") },
+                                    leadingIcon = {
+                                        Icon(Icons.Default.EditNote, null)
+                                    },
+                                    onClick = {
+                                        showMenu = false
+                                        onNotesClick(article.id, article.title)
+                                    }
+                                )
+                                // PDF Download
+                                if (article.pdfUrl != null) {
+                                    HorizontalDivider()
+                                    DropdownMenuItem(
+                                        text = { Text("PDF ডাউনলোড করুন") },
+                                        leadingIcon = {
+                                            Icon(Icons.Default.Download, null)
+                                        },
+                                        onClick = {
+                                            showMenu = false
+                                            downloadPdf(context, article)
+                                            scope.launch {
+                                                snackbarHostState.showSnackbar(
+                                                    "PDF ডাউনলোড শুরু হয়েছে ↓"
+                                                )
+                                            }
+                                        }
+                                    )
+                                }
+                            }
                         }
                     }
-                }
-                TopAppBar(
-                    title = { Text("প্রবন্ধ", maxLines = 1, fontSize = 14.sp) },
-                    navigationIcon = {
-                        IconButton(onClick = {
-                            tts?.stop()
-                            isSpeaking = false
-                            onBack()
-                        }) {
-                            Icon(Icons.AutoMirrored.Filled.ArrowBack, "ফিরে যান",
-                                tint = Color.White)
-                        }
-                    },
-                    actions = {
-                        if (articleState is UiState.Success) {
-                            val article = (articleState as UiState.Success).data
-                            // Bookmark
-                            IconButton(onClick = { viewModel.toggleBookmark(article) }) {
-                                Icon(
-                                    if (isBookmarked) Icons.Default.Bookmark
-                                    else Icons.Default.BookmarkBorder,
-                                    contentDescription = if (isBookmarked) "Bookmark সরান"
-                                                         else "Bookmark করুন",
-                                    tint = if (isBookmarked) Color(0xFFFFD700) else Color.White
-                                )
-                            }
-                            // Share
-                            IconButton(onClick = {
-                                context.startActivity(Intent.createChooser(
-                                    Intent(Intent.ACTION_SEND).apply {
-                                        type = "text/plain"
-                                        putExtra(Intent.EXTRA_TEXT,
-                                            "${article.title}\n${article.url}")
-                                    }, "শেয়ার করুন"
-                                ))
-                            }) {
-                                Icon(Icons.Default.Share, "শেয়ার", tint = Color.White)
-                            }
-                            // Overflow menu
-                            Box {
-                                IconButton(onClick = { showMenu = true }) {
-                                    Icon(Icons.Default.MoreVert, "আরো বিকল্প",
-                                        tint = Color.White)
-                                }
-                                DropdownMenu(
-                                    expanded = showMenu,
-                                    onDismissRequest = { showMenu = false }
-                                ) {
-                                    // TTS
-                                    DropdownMenuItem(
-                                        text = {
-                                            Text(if (isSpeaking) "পড়া থামান" else "পড়ে শোনান")
-                                        },
-                                        leadingIcon = {
-                                            Icon(
-                                                if (isSpeaking) Icons.Default.VolumeOff
-                                                else Icons.Default.VolumeUp,
-                                                null
-                                            )
-                                        },
-                                        onClick = {
-                                            showMenu = false
-                                            if (isSpeaking) {
-                                                tts?.stop()
-                                                isSpeaking = false
-                                            } else {
-                                                val text = buildSpeechText(article)
-                                                tts?.speak(
-                                                    text, TextToSpeech.QUEUE_FLUSH,
-                                                    null, "sp_utterance"
-                                                )
-                                                isSpeaking = true
-                                            }
-                                        }
-                                    )
-                                    // Citation
-                                    DropdownMenuItem(
-                                        text = { Text("উদ্ধৃতি কপি করুন") },
-                                        leadingIcon = {
-                                            Icon(Icons.Default.ContentCopy, null)
-                                        },
-                                        onClick = {
-                                            showMenu = false
-                                            val citation = buildCitation(article)
-                                            val cm = context.getSystemService(
-                                                Context.CLIPBOARD_SERVICE
-                                            ) as ClipboardManager
-                                            cm.setPrimaryClip(
-                                                ClipData.newPlainText("Citation", citation)
-                                            )
-                                            scope.launch {
-                                                snackbarHostState.showSnackbar("উদ্ধৃতি কপি হয়েছে ✓")
-                                            }
-                                        }
-                                    )
-                                    // Notes
-                                    DropdownMenuItem(
-                                        text = { Text("নোট লিখুন") },
-                                        leadingIcon = {
-                                            Icon(Icons.Default.EditNote, null)
-                                        },
-                                        onClick = {
-                                            showMenu = false
-                                            onNotesClick(article.id, article.title)
-                                        }
-                                    )
-                                    // PDF Download
-                                    if (article.pdfUrl != null) {
-                                        HorizontalDivider()
-                                        DropdownMenuItem(
-                                            text = { Text("PDF ডাউনলোড করুন") },
-                                            leadingIcon = {
-                                                Icon(Icons.Default.Download, null)
-                                            },
-                                            onClick = {
-                                                showMenu = false
-                                                downloadPdf(context, article)
-                                                scope.launch {
-                                                    snackbarHostState.showSnackbar(
-                                                        "PDF ডাউনলোড শুরু হয়েছে ↓"
-                                                    )
-                                                }
-                                            }
-                                        )
-                                    }
-                                }
-                            }
-                        }
-                    },
-                    colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = Navy,
-                        titleContentColor = Color.White
-                    ),
-                    modifier = Modifier.height(48.dp)
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = Navy,
+                    titleContentColor = Color.White
                 )
-            }
+            )
         }
     ) { paddingValues ->
         when (val state = articleState) {

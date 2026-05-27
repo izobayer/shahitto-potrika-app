@@ -1,6 +1,5 @@
 package bd.du.bangla.shahittopotrika.ui.screens
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -13,7 +12,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -21,13 +19,8 @@ import androidx.compose.ui.unit.sp
 import bd.du.bangla.shahittopotrika.data.model.Article
 import bd.du.bangla.shahittopotrika.data.model.UiState
 import bd.du.bangla.shahittopotrika.ui.components.ShimmerArticleCard
-import bd.du.bangla.shahittopotrika.ui.theme.HeaderBg
 import bd.du.bangla.shahittopotrika.ui.theme.Navy
 import bd.du.bangla.shahittopotrika.viewmodel.JournalViewModel
-import coil.compose.AsyncImage
-
-private const val LOGO_URL =
-    "https://journal.bangla.du.ac.bd/public/journals/1/pageHeaderLogoImage_en.png"
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -44,46 +37,19 @@ fun ArticleListScreen(
 
     Scaffold(
         topBar = {
-            Column {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(HeaderBg)
-                        .padding(horizontal = 16.dp, vertical = 10.dp)
-                ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
-                        AsyncImage(
-                            model = LOGO_URL,
-                            contentDescription = "লোগো",
-                            modifier = Modifier.height(48.dp),
-                            contentScale = ContentScale.FillHeight
-                        )
-                        Column {
-                            Text("সাহিত্য পত্রিকা",
-                                fontWeight = FontWeight.Bold, fontSize = 18.sp, color = Navy)
-                            Text("বাংলা বিভাগ, ঢাকা বিশ্ববিদ্যালয়",
-                                fontSize = 11.sp, color = Navy.copy(alpha = 0.7f))
-                        }
+            TopAppBar(
+                title = { Text("প্রবন্ধসমূহ", fontSize = 14.sp) },
+                navigationIcon = {
+                    IconButton(onClick = onBack) {
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, "ফিরে যান",
+                            tint = Color.White)
                     }
-                }
-                TopAppBar(
-                    title = { Text("প্রবন্ধসমূহ", fontSize = 14.sp) },
-                    navigationIcon = {
-                        IconButton(onClick = onBack) {
-                            Icon(Icons.AutoMirrored.Filled.ArrowBack, "ফিরে যান",
-                                tint = Color.White)
-                        }
-                    },
-                    colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = Navy,
-                        titleContentColor = Color.White
-                    ),
-                    modifier = Modifier.height(48.dp)
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = Navy,
+                    titleContentColor = Color.White
                 )
-            }
+            )
         }
     ) { paddingValues ->
         PullToRefreshBox(

@@ -117,16 +117,16 @@ object JournalParser {
     /**
      * Removes stray non-letter prefix characters that OJS sometimes emits
      * before author names (e.g. "►", "•", Unicode directional marks, NBSP).
+     * Uses \p{L} / \p{N} so Bengali (and all Unicode) letters are recognised.
      */
+    private val leadingJunkRe = Regex("^[^\\p{L}\\p{N}]+")
+
     private fun cleanAuthors(raw: String): String {
         if (raw.isBlank()) return raw
-        // Split by comma, clean each name, rejoin
-        return raw.split(",").joinToString(", ") { part ->
-            part.trim()
-                // Drop any leading characters that are NOT letters, digits, or spaces
-                .trimStart { c -> !c.isLetterOrDigit() && c != ' ' }
-                .trim()
-        }.trim(',', ' ')
+        return raw.split(Regex("[,;]+"))
+            .map { part -> part.trim().replace(leadingJunkRe, "").trim() }
+            .filter { it.isNotBlank() }
+            .joinToString(", ")
     }
 
     // ── Journal Info ──────────────────────────────────────────
