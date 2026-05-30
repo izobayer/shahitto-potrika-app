@@ -27,9 +27,9 @@ class ChatRepository {
         .build()
 
     companion object {
-        private const val MODEL   = "gemini-2.0-flash"
+        private const val MODEL   = "gemini-1.5-flash-latest"
         private const val API_URL =
-            "https://generativelanguage.googleapis.com/v1beta/models/$MODEL:generateContent"
+            "https://generativelanguage.googleapis.com/v1/models/$MODEL:generateContent"
 
         private const val SYSTEM_PROMPT =
             "তুমি সাহিত্য পত্রিকার একজন সহকারী চ্যাটবট। সাহিত্য পত্রিকা হলো ঢাকা বিশ্ববিদ্যালয়ের " +
