@@ -6,6 +6,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Bookmark
+import androidx.compose.material.icons.filled.Chat
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Info
@@ -46,7 +47,8 @@ fun HomeScreen(
     onAboutClick: () -> Unit,
     onBookmarksClick: () -> Unit,
     onSettingsClick: () -> Unit = {},
-    onHistoryClick: () -> Unit = {}
+    onHistoryClick: () -> Unit = {},
+    onChatClick: () -> Unit = {}
 ) {
     val currentIssueState by viewModel.currentIssue.collectAsState()
     val isRefreshing      by viewModel.isRefreshingHome.collectAsState()
@@ -88,6 +90,23 @@ fun HomeScreen(
                     titleContentColor = Color.White
                 )
             )
+        },
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick          = onChatClick,
+                containerColor   = Navy,
+                contentColor     = Color.White,
+                shape            = RoundedCornerShape(16.dp)
+            ) {
+                Row(
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                ) {
+                    Icon(Icons.Default.Chat, null, modifier = Modifier.size(20.dp))
+                    Text("সহকারী", fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
+                }
+            }
         },
         bottomBar = {
             NavigationBar(containerColor = MaterialTheme.colorScheme.surface) {

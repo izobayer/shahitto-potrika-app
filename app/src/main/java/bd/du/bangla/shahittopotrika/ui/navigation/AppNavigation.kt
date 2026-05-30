@@ -8,6 +8,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import bd.du.bangla.shahittopotrika.ui.screens.*
 import bd.du.bangla.shahittopotrika.viewmodel.BookmarkViewModel
+import bd.du.bangla.shahittopotrika.viewmodel.ChatViewModel
 import bd.du.bangla.shahittopotrika.viewmodel.JournalViewModel
 import bd.du.bangla.shahittopotrika.viewmodel.SearchViewModel
 import java.net.URLDecoder
@@ -25,6 +26,7 @@ object Routes {
     const val SETTINGS       = "settings"
     const val READ_HISTORY   = "read_history"
     const val NOTES          = "notes/{articleId}/{articleTitle}"
+    const val CHAT           = "chat"
 
     fun articleList(issueUrl: String) =
         "article_list/${URLEncoder.encode(issueUrl, "UTF-8")}"
@@ -42,7 +44,8 @@ fun AppNavigation(
     deepLinkUrl: String? = null,
     journalVm:  JournalViewModel  = viewModel(),
     searchVm:   SearchViewModel   = viewModel(),
-    bookmarkVm: BookmarkViewModel = viewModel()
+    bookmarkVm: BookmarkViewModel = viewModel(),
+    chatVm:     ChatViewModel     = viewModel()
 ) {
     // Handle deep links (e.g. https://journal.bangla.du.ac.bd/index.php/sp/article/view/123)
     LaunchedEffect(deepLinkUrl) {
@@ -62,7 +65,8 @@ fun AppNavigation(
                 onAboutClick     = { navController.navigate(Routes.ABOUT) },
                 onBookmarksClick = { navController.navigate(Routes.BOOKMARKS) },
                 onSettingsClick  = { navController.navigate(Routes.SETTINGS) },
-                onHistoryClick   = { navController.navigate(Routes.READ_HISTORY) }
+                onHistoryClick   = { navController.navigate(Routes.READ_HISTORY) },
+                onChatClick      = { navController.navigate(Routes.CHAT) }
             )
         }
 
@@ -147,6 +151,13 @@ fun AppNavigation(
                 viewModel        = journalVm,
                 onArticleClick   = { navController.navigate(Routes.articleDetail(it)) },
                 onBack           = { navController.popBackStack() }
+            )
+        }
+
+        composable(Routes.CHAT) {
+            ChatScreen(
+                onBack = { navController.popBackStack() },
+                vm     = chatVm
             )
         }
 

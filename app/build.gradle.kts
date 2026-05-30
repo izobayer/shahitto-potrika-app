@@ -13,8 +13,13 @@ android {
         applicationId = "bd.du.bangla.shahittopotrika"
         minSdk = 26
         targetSdk = 35
-        versionCode = 4
-        versionName = "1.3.0"
+        versionCode = 5
+        versionName = "1.4.0"
+        // Anthropic API key — set ANTHROPIC_API_KEY env var or GitHub Actions secret
+        buildConfigField(
+            "String", "ANTHROPIC_API_KEY",
+            "\"${System.getenv("ANTHROPIC_API_KEY") ?: ""}\""
+        )
     }
 
     signingConfigs {
