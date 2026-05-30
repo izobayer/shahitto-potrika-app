@@ -27,7 +27,7 @@ class ChatRepository {
         .build()
 
     companion object {
-        private const val MODEL   = "gemini-1.5-flash"
+        private const val MODEL   = "gemini-2.0-flash"
         private const val API_URL =
             "https://generativelanguage.googleapis.com/v1beta/models/$MODEL:generateContent"
 
