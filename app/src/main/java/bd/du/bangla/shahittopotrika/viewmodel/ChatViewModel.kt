@@ -25,7 +25,7 @@ class ChatViewModel : ViewModel() {
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading
 
-    val hasApiKey: Boolean get() = BuildConfig.ANTHROPIC_API_KEY.isNotBlank()
+    val hasApiKey: Boolean get() = BuildConfig.GOOGLE_AI_API_KEY.isNotBlank()
 
     // ── Public actions ────────────────────────────────────────────────────────
 
@@ -35,7 +35,7 @@ class ChatViewModel : ViewModel() {
         if (!hasApiKey) {
             _messages.value = _messages.value + ChatMessage(
                 role    = "assistant",
-                content = "⚠️ API কী সেট করা নেই। বিল্ডের সময় ANTHROPIC_API_KEY পরিবেশ চলক সেট করতে হবে।"
+                content = "⚠️ API কী সেট করা নেই। বিল্ডের সময় GOOGLE_AI_API_KEY পরিবেশ চলক সেট করতে হবে।"
             )
             return
         }
@@ -48,7 +48,7 @@ class ChatViewModel : ViewModel() {
             try {
                 val response = repository.sendMessage(
                     conversationHistory = _messages.value,
-                    apiKey = BuildConfig.ANTHROPIC_API_KEY
+                    apiKey = BuildConfig.GOOGLE_AI_API_KEY
                 )
                 _messages.value = _messages.value + ChatMessage(
                     role    = "assistant",
