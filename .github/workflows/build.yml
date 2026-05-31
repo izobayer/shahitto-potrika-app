@@ -37,8 +37,6 @@ jobs:
 
       # ── 5. Build Debug APK (always) ──────────────────────
       - name: Build Debug APK
-        env:
-          GOOGLE_AI_API_KEY: ${{ secrets.GOOGLE_AI_API_KEY }}
         run: ./gradlew assembleDebug --stacktrace
 
       - name: Upload Debug APK
@@ -64,7 +62,6 @@ jobs:
       - name: Build Release APK
         if: steps.check-keystore.outputs.available == 'true'
         env:
-          GOOGLE_AI_API_KEY: ${{ secrets.GOOGLE_AI_API_KEY }}
           KEYSTORE_BASE64:   ${{ secrets.KEYSTORE_BASE64 }}
           KEYSTORE_FILE:     keystore.jks
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
