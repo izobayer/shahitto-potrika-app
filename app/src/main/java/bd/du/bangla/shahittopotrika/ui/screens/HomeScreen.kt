@@ -1,10 +1,14 @@
 package bd.du.bangla.shahittopotrika.ui.screens
 
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Home
@@ -28,7 +32,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import bd.du.bangla.shahittopotrika.R
 import bd.du.bangla.shahittopotrika.data.model.Issue
 import bd.du.bangla.shahittopotrika.data.model.UiState
 import bd.du.bangla.shahittopotrika.ui.components.ShimmerIssueCard
@@ -90,22 +93,44 @@ fun HomeScreen(
             )
         },
         bottomBar = {
+            val itemColors = NavigationBarItemDefaults.colors(
+                indicatorColor        = Navy.copy(alpha = 0.12f),
+                selectedIconColor     = Navy,
+                selectedTextColor     = Navy,
+                unselectedIconColor   = MaterialTheme.colorScheme.onSurfaceVariant,
+                unselectedTextColor   = MaterialTheme.colorScheme.onSurfaceVariant
+            )
             NavigationBar(containerColor = MaterialTheme.colorScheme.surface) {
-                NavigationBarItem(selected = true, onClick = { },
-                    icon = { Icon(Icons.Default.Home, null) },
-                    label = { Text("হোম", fontSize = 11.sp) })
-                NavigationBarItem(selected = false, onClick = onIssueListClick,
-                    icon = { Icon(Icons.Default.List, null) },
-                    label = { Text("সংখ্যা", fontSize = 11.sp) })
-                NavigationBarItem(selected = false, onClick = onSearchClick,
-                    icon = { Icon(Icons.Default.Search, null) },
-                    label = { Text("খুঁজুন", fontSize = 11.sp) })
-                NavigationBarItem(selected = false, onClick = onBookmarksClick,
-                    icon = { Icon(Icons.Default.Bookmark, null) },
-                    label = { Text("সংরক্ষিত", fontSize = 11.sp) })
-                NavigationBarItem(selected = false, onClick = onAboutClick,
-                    icon = { Icon(Icons.Default.Info, null) },
-                    label = { Text("সম্পর্কে", fontSize = 11.sp) })
+                NavigationBarItem(
+                    selected = true, onClick = { },
+                    icon    = { Icon(Icons.Default.Home, null) },
+                    label   = { Text("হোম", fontSize = 11.sp) },
+                    colors  = itemColors
+                )
+                NavigationBarItem(
+                    selected = false, onClick = onIssueListClick,
+                    icon    = { Icon(Icons.Default.List, null) },
+                    label   = { Text("সংখ্যা", fontSize = 11.sp) },
+                    colors  = itemColors
+                )
+                NavigationBarItem(
+                    selected = false, onClick = onSearchClick,
+                    icon    = { Icon(Icons.Default.Search, null) },
+                    label   = { Text("খুঁজুন", fontSize = 11.sp) },
+                    colors  = itemColors
+                )
+                NavigationBarItem(
+                    selected = false, onClick = onBookmarksClick,
+                    icon    = { Icon(Icons.Default.Bookmark, null) },
+                    label   = { Text("সংরক্ষিত", fontSize = 11.sp) },
+                    colors  = itemColors
+                )
+                NavigationBarItem(
+                    selected = false, onClick = onAboutClick,
+                    icon    = { Icon(Icons.Default.Info, null) },
+                    label   = { Text("সম্পর্কে", fontSize = 11.sp) },
+                    colors  = itemColors
+                )
             }
         }
     ) { paddingValues ->
@@ -133,7 +158,7 @@ fun HomeScreen(
                     )
                 }
 
-                Spacer(Modifier.height(16.dp))
+                Spacer(Modifier.height(20.dp))
 
                 // ── Current issue ────────────────────────────
                 Row(
@@ -143,12 +168,7 @@ fun HomeScreen(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Text(
-                        "চলতি সংখ্যা",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold,
-                        color = Navy
-                    )
+                    SectionHeader("চলতি সংখ্যা")
                     TextButton(onClick = onIssueListClick) {
                         Text("সকল সংখ্যা →", fontSize = 12.sp, color = Navy)
                     }
@@ -172,33 +192,47 @@ fun HomeScreen(
                     }
                 }
 
-                Spacer(Modifier.height(20.dp))
+                Spacer(Modifier.height(24.dp))
 
                 // ── Quick nav ────────────────────────────────
-                Text(
+                SectionHeader(
                     "দ্রুত নেভিগেশন",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
-                    color = Navy,
                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
                 )
+                Spacer(Modifier.height(8.dp))
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    QuickNavCard("আর্কাইভ", "সকল সংখ্যা",
-                        Icons.Default.List, Modifier.weight(1f), onIssueListClick)
-                    QuickNavCard("সংরক্ষিত", "Bookmarks",
-                        Icons.Default.Bookmark, Modifier.weight(1f), onBookmarksClick)
-                    QuickNavCard("ইতিহাস", "পড়েছি",
-                        Icons.Default.History, Modifier.weight(1f), onHistoryClick)
-                    QuickNavCard("সেটিংস", "পছন্দ",
-                        Icons.Default.Settings, Modifier.weight(1f), onSettingsClick)
+                    QuickNavCard(
+                        title   = "আর্কাইভ",
+                        icon    = Icons.Default.List,
+                        modifier = Modifier.weight(1f),
+                        onClick  = onIssueListClick
+                    )
+                    QuickNavCard(
+                        title   = "সংরক্ষিত",
+                        icon    = Icons.Default.Bookmark,
+                        modifier = Modifier.weight(1f),
+                        onClick  = onBookmarksClick
+                    )
+                    QuickNavCard(
+                        title   = "ইতিহাস",
+                        icon    = Icons.Default.History,
+                        modifier = Modifier.weight(1f),
+                        onClick  = onHistoryClick
+                    )
+                    QuickNavCard(
+                        title   = "সেটিংস",
+                        icon    = Icons.Default.Settings,
+                        modifier = Modifier.weight(1f),
+                        onClick  = onSettingsClick
+                    )
                 }
 
-                Spacer(Modifier.height(16.dp))
+                Spacer(Modifier.height(24.dp))
 
                 // ── Footer strip ─────────────────────────────
                 Surface(
@@ -220,58 +254,127 @@ fun HomeScreen(
     }
 }
 
-// ── Shared composables ────────────────────────────────────
+// ── Shared composables ────────────────────────────────────────────────────────
+
+@Composable
+fun PillBadge(
+    text: String,
+    containerColor: Color,
+    textColor: Color,
+    modifier: Modifier = Modifier
+) {
+    Surface(
+        shape    = RoundedCornerShape(50.dp),
+        color    = containerColor,
+        modifier = modifier
+    ) {
+        Text(
+            text,
+            fontSize     = 11.sp,
+            fontWeight   = FontWeight.Medium,
+            color        = textColor,
+            modifier     = Modifier.padding(horizontal = 10.dp, vertical = 4.dp)
+        )
+    }
+}
+
+@Composable
+fun SectionHeader(title: String, modifier: Modifier = Modifier) {
+    Row(
+        modifier            = modifier,
+        verticalAlignment   = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        Box(
+            modifier = Modifier
+                .width(4.dp)
+                .height(20.dp)
+                .clip(RoundedCornerShape(2.dp))
+                .background(Navy)
+        )
+        Text(
+            title,
+            style      = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Bold,
+            color      = Navy
+        )
+    }
+}
 
 @Composable
 fun IssueCard(issue: Issue, onClick: () -> Unit, modifier: Modifier = Modifier) {
     Card(
-        onClick = onClick,
-        modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(10.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        onClick   = onClick,
+        modifier  = modifier.fillMaxWidth(),
+        shape     = RoundedCornerShape(20.dp),
+        colors    = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
+        border    = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.25f))
     ) {
-        Row(modifier = Modifier.padding(12.dp)) {
+        Row(modifier = Modifier.padding(14.dp)) {
             if (issue.coverImageUrl != null) {
                 AsyncImage(
-                    model = issue.coverImageUrl,
+                    model            = issue.coverImageUrl,
                     contentDescription = issue.title,
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier
+                    contentScale     = ContentScale.Crop,
+                    modifier         = Modifier
                         .size(80.dp, 110.dp)
-                        .clip(RoundedCornerShape(6.dp))
+                        .clip(RoundedCornerShape(10.dp))
                 )
-                Spacer(Modifier.width(12.dp))
+                Spacer(Modifier.width(14.dp))
             }
             Column(modifier = Modifier.weight(1f)) {
-                Text(issue.title, fontWeight = FontWeight.Bold,
-                    fontSize = 15.sp, maxLines = 2, overflow = TextOverflow.Ellipsis,
-                    lineHeight = 21.sp, color = Navy)
-                if (issue.volume.isNotBlank()) {
-                    Spacer(Modifier.height(4.dp))
-                    Text(
-                        issue.volume + if (issue.number.isNotBlank()) ", ${issue.number}" else "",
-                        fontSize = 12.sp,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
+                Text(
+                    issue.title,
+                    fontWeight  = FontWeight.Bold,
+                    fontSize    = 15.sp,
+                    maxLines    = 2,
+                    overflow    = TextOverflow.Ellipsis,
+                    lineHeight  = 22.sp,
+                    color       = Navy
+                )
+                Spacer(Modifier.height(8.dp))
+                // Volume / Year badges
+                Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                    if (issue.volume.isNotBlank()) {
+                        PillBadge(
+                            text           = issue.volume + if (issue.number.isNotBlank()) " · ${issue.number}" else "",
+                            containerColor = Navy.copy(alpha = 0.08f),
+                            textColor      = Navy
+                        )
+                    }
+                    if (issue.year.isNotBlank()) {
+                        PillBadge(
+                            text           = issue.year,
+                            containerColor = Color(0xFFFFF3E0),
+                            textColor      = Color(0xFFE65100)
+                        )
+                    }
                 }
-                if (issue.year.isNotBlank()) {
-                    Spacer(Modifier.height(2.dp))
-                    Text(issue.year, fontSize = 12.sp,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant)
-                }
-                Spacer(Modifier.height(10.dp))
+                Spacer(Modifier.height(14.dp))
+                // Pill action button
                 Surface(
-                    shape = RoundedCornerShape(4.dp),
+                    shape = RoundedCornerShape(50.dp),
                     color = Navy
                 ) {
-                    Text(
-                        "প্রবন্ধ দেখুন →",
-                        color = Color.White,
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.Medium,
-                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp)
-                    )
+                    Row(
+                        modifier              = Modifier.padding(horizontal = 14.dp, vertical = 8.dp),
+                        verticalAlignment     = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        Text(
+                            "প্রবন্ধ দেখুন",
+                            color      = Color.White,
+                            fontSize   = 12.sp,
+                            fontWeight = FontWeight.Medium
+                        )
+                        Icon(
+                            Icons.AutoMirrored.Filled.ArrowForward,
+                            contentDescription = null,
+                            tint               = Color.White,
+                            modifier           = Modifier.size(14.dp)
+                        )
+                    }
                 }
             }
         }
@@ -280,28 +383,48 @@ fun IssueCard(issue: Issue, onClick: () -> Unit, modifier: Modifier = Modifier) 
 
 @Composable
 fun QuickNavCard(
-    title: String, subtitle: String,
+    title: String,
     icon: ImageVector,
     modifier: Modifier = Modifier,
     onClick: () -> Unit
 ) {
     Card(
-        onClick = onClick, modifier = modifier,
-        shape = RoundedCornerShape(8.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+        onClick   = onClick,
+        modifier  = modifier,
+        shape     = RoundedCornerShape(16.dp),
+        colors    = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
+        border    = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.2f))
     ) {
         Column(
-            modifier = Modifier.padding(10.dp).fillMaxWidth(),
-            horizontalAlignment = Alignment.CenterHorizontally
+            modifier              = Modifier
+                .padding(12.dp)
+                .fillMaxWidth(),
+            horizontalAlignment   = Alignment.CenterHorizontally,
+            verticalArrangement   = Arrangement.spacedBy(8.dp)
         ) {
-            Icon(icon, contentDescription = null, tint = Navy, modifier = Modifier.size(24.dp))
-            Spacer(Modifier.height(4.dp))
-            Text(title, fontWeight = FontWeight.SemiBold, fontSize = 12.sp,
-                textAlign = TextAlign.Center, color = Navy)
-            Text(subtitle, fontSize = 10.sp,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                textAlign = TextAlign.Center)
+            Box(
+                modifier          = Modifier
+                    .size(40.dp)
+                    .clip(CircleShape)
+                    .background(Navy.copy(alpha = 0.08f)),
+                contentAlignment  = Alignment.Center
+            ) {
+                Icon(
+                    icon,
+                    contentDescription = null,
+                    tint               = Navy,
+                    modifier           = Modifier.size(22.dp)
+                )
+            }
+            Text(
+                title,
+                fontWeight  = FontWeight.SemiBold,
+                fontSize    = 11.sp,
+                textAlign   = TextAlign.Center,
+                color       = Navy,
+                maxLines    = 1
+            )
         }
     }
 }
@@ -310,11 +433,18 @@ fun QuickNavCard(
 fun ErrorCard(message: String, onRetry: () -> Unit, modifier: Modifier = Modifier) {
     Card(
         modifier = modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.errorContainer)
+        shape    = RoundedCornerShape(20.dp),
+        colors   = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.errorContainer)
     ) {
-        Column(modifier = Modifier.padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(message, color = MaterialTheme.colorScheme.onErrorContainer,
-                textAlign = TextAlign.Center)
+        Column(
+            modifier            = Modifier.padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                message,
+                color     = MaterialTheme.colorScheme.onErrorContainer,
+                textAlign = TextAlign.Center
+            )
             Spacer(Modifier.height(8.dp))
             TextButton(onClick = onRetry) { Text("আবার চেষ্টা করুন") }
         }

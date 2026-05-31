@@ -1,5 +1,6 @@
 package bd.du.bangla.shahittopotrika.ui.screens
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -46,7 +47,7 @@ fun ArticleListScreen(
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Navy,
+                    containerColor    = Navy,
                     titleContentColor = Color.White
                 )
             )
@@ -60,14 +61,19 @@ fun ArticleListScreen(
             when (val state = articlesState) {
                 is UiState.Loading -> {
                     LazyColumn(
-                        contentPadding = PaddingValues(16.dp),
+                        contentPadding      = PaddingValues(16.dp),
                         verticalArrangement = Arrangement.spacedBy(10.dp)
                     ) {
                         items(6) { ShimmerArticleCard() }
                     }
                 }
                 is UiState.Error -> {
-                    Box(Modifier.fillMaxSize().padding(16.dp), contentAlignment = Alignment.Center) {
+                    Box(
+                        Modifier
+                            .fillMaxSize()
+                            .padding(16.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
                         ErrorCard(state.message,
                             onRetry = { viewModel.loadArticlesForIssue(issueUrl) })
                     }
@@ -79,7 +85,7 @@ fun ArticleListScreen(
                         }
                     } else {
                         LazyColumn(
-                            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+                            contentPadding      = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
                             verticalArrangement = Arrangement.spacedBy(10.dp)
                         ) {
                             items(state.data) { article ->
@@ -96,39 +102,62 @@ fun ArticleListScreen(
 @Composable
 fun ArticleCard(article: Article, onClick: () -> Unit, modifier: Modifier = Modifier) {
     Card(
-        onClick = onClick,
-        modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(10.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        onClick   = onClick,
+        modifier  = modifier.fillMaxWidth(),
+        shape     = RoundedCornerShape(20.dp),
+        colors    = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
+        border    = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.25f))
     ) {
-        Column(modifier = Modifier.padding(14.dp)) {
-            Text(article.title, fontWeight = FontWeight.SemiBold, fontSize = 14.sp,
-                maxLines = 3, overflow = TextOverflow.Ellipsis, lineHeight = 20.sp)
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text(
+                article.title,
+                fontWeight = FontWeight.SemiBold,
+                fontSize   = 14.sp,
+                maxLines   = 3,
+                overflow   = TextOverflow.Ellipsis,
+                lineHeight = 20.sp
+            )
             if (article.authors.isNotBlank()) {
-                Spacer(Modifier.height(4.dp))
-                Text(article.authors, fontSize = 12.sp,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    maxLines = 2, overflow = TextOverflow.Ellipsis)
+                Spacer(Modifier.height(6.dp))
+                Text(
+                    article.authors,
+                    fontSize   = 12.sp,
+                    color      = Navy.copy(alpha = 0.75f),
+                    maxLines   = 1,
+                    overflow   = TextOverflow.Ellipsis,
+                    fontWeight = FontWeight.Medium
+                )
             }
             if (article.abstract.isNotBlank()) {
                 Spacer(Modifier.height(6.dp))
-                Text(article.abstract, fontSize = 12.sp,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    maxLines = 3, overflow = TextOverflow.Ellipsis, lineHeight = 18.sp)
+                Text(
+                    article.abstract,
+                    fontSize   = 12.sp,
+                    color      = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines   = 3,
+                    overflow   = TextOverflow.Ellipsis,
+                    lineHeight = 18.sp
+                )
             }
-            Spacer(Modifier.height(8.dp))
-            Row(modifier = Modifier.fillMaxWidth(),
+            Spacer(Modifier.height(10.dp))
+            Row(
+                modifier              = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically) {
-                Text("বিস্তারিত পড়ুন →", color = Navy,
-                    fontWeight = FontWeight.SemiBold, fontSize = 12.sp)
+                verticalAlignment     = Alignment.CenterVertically
+            ) {
+                Text(
+                    "বিস্তারিত পড়ুন →",
+                    color      = Navy,
+                    fontWeight = FontWeight.SemiBold,
+                    fontSize   = 12.sp
+                )
                 if (article.pdfUrl != null) {
-                    Surface(shape = RoundedCornerShape(4.dp),
-                        color = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.5f)) {
-                        Text("PDF", fontSize = 10.sp, fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.error,
-                            modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp))
-                    }
+                    PillBadge(
+                        text           = "PDF",
+                        containerColor = Color(0xFFFFE8E8),
+                        textColor      = Color(0xFFD32F2F)
+                    )
                 }
             }
         }

@@ -262,51 +262,43 @@ fun ArticleDetailScreen(
                     Spacer(Modifier.height(10.dp))
 
                     if (article.authors.isNotBlank()) {
-                        Text(article.authors,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            fontSize = 14.sp)
-                        Spacer(Modifier.height(6.dp))
+                        PillBadge(
+                            text           = article.authors,
+                            containerColor = Navy.copy(alpha = 0.08f),
+                            textColor      = Navy
+                        )
+                        Spacer(Modifier.height(8.dp))
                     }
                     if (article.doi != null) {
                         Text("DOI: ${article.doi}",
                             color = MaterialTheme.colorScheme.secondary,
                             fontSize = 12.sp)
-                        Spacer(Modifier.height(6.dp))
+                        Spacer(Modifier.height(8.dp))
                     }
 
                     HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
                     if (article.abstract.isNotBlank()) {
-                        Text("সারসংক্ষেপ",
-                            fontWeight = FontWeight.SemiBold,
-                            fontSize = 14.sp, color = Navy)
-                        Spacer(Modifier.height(6.dp))
+                        SectionHeader("সারসংক্ষেপ")
+                        Spacer(Modifier.height(8.dp))
                         Text(article.abstract, fontSize = 14.sp, lineHeight = 22.sp)
-                        Spacer(Modifier.height(12.dp))
+                        Spacer(Modifier.height(16.dp))
                     }
 
                     if (article.keywords.isNotEmpty()) {
-                        Text("মূলশব্দ",
-                            fontWeight = FontWeight.SemiBold,
-                            fontSize = 14.sp, color = Navy)
-                        Spacer(Modifier.height(6.dp))
-                        Row(
+                        SectionHeader("মূলশব্দ")
+                        Spacer(Modifier.height(8.dp))
+                        FlowRow(
                             horizontalArrangement = Arrangement.spacedBy(6.dp),
-                            modifier = Modifier.fillMaxWidth()
+                            verticalArrangement   = Arrangement.spacedBy(6.dp),
+                            modifier              = Modifier.fillMaxWidth()
                         ) {
                             article.keywords.forEach { kw ->
-                                Surface(
-                                    shape = RoundedCornerShape(16.dp),
-                                    color = MaterialTheme.colorScheme.secondaryContainer
-                                ) {
-                                    Text(
-                                        kw, fontSize = 12.sp,
-                                        color = MaterialTheme.colorScheme.onSecondaryContainer,
-                                        modifier = Modifier.padding(
-                                            horizontal = 10.dp, vertical = 4.dp
-                                        )
-                                    )
-                                }
+                                PillBadge(
+                                    text           = kw,
+                                    containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                                    textColor      = MaterialTheme.colorScheme.onSecondaryContainer
+                                )
                             }
                         }
                         Spacer(Modifier.height(16.dp))
@@ -315,25 +307,27 @@ fun ArticleDetailScreen(
                     HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
                     Spacer(Modifier.height(12.dp))
 
-                    // ── Action buttons ────────────────────────
+                    // ── Action buttons (pill shape) ───────────
                     Row(
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier              = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         OutlinedButton(
-                            onClick = {
+                            onClick  = {
                                 context.startActivity(
                                     Intent(Intent.ACTION_VIEW, Uri.parse(article.url))
                                 )
                             },
-                            modifier = Modifier.weight(1f)
+                            modifier = Modifier.weight(1f),
+                            shape    = RoundedCornerShape(50.dp)
                         ) { Text("ওয়েবে পড়ুন") }
 
                         if (article.pdfUrl != null) {
                             Button(
-                                onClick = { onOpenPdf(article.pdfUrl, article.title) },
+                                onClick  = { onOpenPdf(article.pdfUrl, article.title) },
                                 modifier = Modifier.weight(1f),
-                                colors = ButtonDefaults.buttonColors(containerColor = Navy)
+                                shape    = RoundedCornerShape(50.dp),
+                                colors   = ButtonDefaults.buttonColors(containerColor = Navy)
                             ) { Text("PDF পড়ুন") }
                         }
                     }
@@ -342,12 +336,13 @@ fun ArticleDetailScreen(
 
                     // ── Secondary action row ──────────────────
                     Row(
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier              = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         OutlinedButton(
-                            onClick = { onNotesClick(article.id, article.title) },
-                            modifier = Modifier.weight(1f)
+                            onClick  = { onNotesClick(article.id, article.title) },
+                            modifier = Modifier.weight(1f),
+                            shape    = RoundedCornerShape(50.dp)
                         ) {
                             Icon(Icons.Default.EditNote, null,
                                 modifier = Modifier.size(16.dp))
@@ -356,13 +351,14 @@ fun ArticleDetailScreen(
                         }
                         if (article.pdfUrl != null) {
                             OutlinedButton(
-                                onClick = {
+                                onClick  = {
                                     downloadPdf(context, article)
                                     scope.launch {
                                         snackbarHostState.showSnackbar("PDF ডাউনলোড শুরু হয়েছে ↓")
                                     }
                                 },
-                                modifier = Modifier.weight(1f)
+                                modifier = Modifier.weight(1f),
+                                shape    = RoundedCornerShape(50.dp)
                             ) {
                                 Icon(Icons.Default.Download, null,
                                     modifier = Modifier.size(16.dp))

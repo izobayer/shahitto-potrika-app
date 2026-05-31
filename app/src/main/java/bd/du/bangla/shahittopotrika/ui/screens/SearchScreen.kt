@@ -3,6 +3,7 @@ package bd.du.bangla.shahittopotrika.ui.screens
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -58,14 +59,15 @@ fun SearchScreen(
         ) {
             // ── Search bar ─────────────────────────────────
             OutlinedTextField(
-                value = query,
+                value         = query,
                 onValueChange = { viewModel.onQueryChange(it) },
-                modifier = Modifier
+                modifier      = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp, vertical = 12.dp),
-                placeholder = { Text("প্রবন্ধ খুঁজুন…") },
-                singleLine = true,
-                leadingIcon = {
+                placeholder  = { Text("প্রবন্ধ খুঁজুন…") },
+                singleLine   = true,
+                shape        = RoundedCornerShape(50.dp),
+                leadingIcon  = {
                     Icon(Icons.Default.Search, contentDescription = null)
                 },
                 trailingIcon = {
@@ -76,20 +78,22 @@ fun SearchScreen(
                     }
                 },
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
-                keyboardActions  = KeyboardActions(onSearch = { viewModel.search() }),
+                keyboardActions = KeyboardActions(onSearch = { viewModel.search() }),
                 colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = Navy,
-                    cursorColor = Navy
+                    focusedBorderColor   = Navy,
+                    unfocusedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f),
+                    cursorColor          = Navy
                 )
             )
 
             Button(
-                onClick = { viewModel.search() },
+                onClick  = { viewModel.search() },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp),
+                shape   = RoundedCornerShape(50.dp),
                 enabled = query.isNotBlank(),
-                colors = ButtonDefaults.buttonColors(containerColor = Navy)
+                colors  = ButtonDefaults.buttonColors(containerColor = Navy)
             ) {
                 Icon(Icons.Default.Search, contentDescription = null,
                     modifier = Modifier.size(18.dp))
