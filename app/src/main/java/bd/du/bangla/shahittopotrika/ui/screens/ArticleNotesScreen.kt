@@ -14,7 +14,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import bd.du.bangla.shahittopotrika.ui.theme.Navy
+import bd.du.bangla.shahittopotrika.ui.theme.DarkSurface
+import bd.du.bangla.shahittopotrika.ui.theme.OnDarkHigh
+import bd.du.bangla.shahittopotrika.ui.theme.TealAccent
 import bd.du.bangla.shahittopotrika.viewmodel.JournalViewModel
 import kotlinx.coroutines.launch
 
@@ -80,7 +82,7 @@ fun ArticleNotesScreen(
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Navy, titleContentColor = Color.White
+                    containerColor = DarkSurface, titleContentColor = Color.White
                 )
             )
         }
@@ -138,7 +140,7 @@ fun ArticleNotesScreen(
                             scope.launch { snackbarHostState.showSnackbar("নোট সংরক্ষিত হয়েছে") }
                         }
                     },
-                    colors = ButtonDefaults.buttonColors(containerColor = Navy)
+                    colors = ButtonDefaults.buttonColors(containerColor = DarkSurface)
                 ) {
                     Icon(Icons.Default.Save, null, modifier = Modifier.size(16.dp))
                     Spacer(Modifier.width(6.dp))

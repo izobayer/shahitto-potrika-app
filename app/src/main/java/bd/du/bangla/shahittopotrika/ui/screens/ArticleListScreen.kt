@@ -1,6 +1,7 @@
 package bd.du.bangla.shahittopotrika.ui.screens
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -12,6 +13,7 @@ import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -20,7 +22,7 @@ import androidx.compose.ui.unit.sp
 import bd.du.bangla.shahittopotrika.data.model.Article
 import bd.du.bangla.shahittopotrika.data.model.UiState
 import bd.du.bangla.shahittopotrika.ui.components.ShimmerArticleCard
-import bd.du.bangla.shahittopotrika.ui.theme.Navy
+import bd.du.bangla.shahittopotrika.ui.theme.*
 import bd.du.bangla.shahittopotrika.viewmodel.JournalViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -37,18 +39,23 @@ fun ArticleListScreen(
     LaunchedEffect(issueUrl) { viewModel.loadArticlesForIssue(issueUrl) }
 
     Scaffold(
+        containerColor = DarkBg,
         topBar = {
             TopAppBar(
-                title = { Text("প্রবন্ধসমূহ", fontSize = 14.sp) },
+                title = { Text("প্রবন্ধসমূহ", fontSize = 15.sp, color = OnDarkHigh) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, "ফিরে যান",
-                            tint = Color.White)
+                        Icon(
+                            Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "ফিরে যান",
+                            tint = OnDarkHigh
+                        )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor    = Navy,
-                    titleContentColor = Color.White
+                    containerColor    = DarkSurface,
+                    titleContentColor = OnDarkHigh,
+                    navigationIconContentColor = OnDarkHigh
                 )
             )
         }
@@ -56,11 +63,14 @@ fun ArticleListScreen(
         PullToRefreshBox(
             isRefreshing = isRefreshing,
             onRefresh    = { viewModel.loadArticlesForIssue(issueUrl, forceRefresh = true) },
-            modifier     = Modifier.padding(paddingValues)
+            modifier     = Modifier
+                .padding(paddingValues)
+                .background(DarkBg)
         ) {
             when (val state = articlesState) {
                 is UiState.Loading -> {
                     LazyColumn(
+                        modifier            = Modifier.background(DarkBg),
                         contentPadding      = PaddingValues(16.dp),
                         verticalArrangement = Arrangement.spacedBy(10.dp)
                     ) {
@@ -71,25 +81,37 @@ fun ArticleListScreen(
                     Box(
                         Modifier
                             .fillMaxSize()
+                            .background(DarkBg)
                             .padding(16.dp),
                         contentAlignment = Alignment.Center
                     ) {
-                        ErrorCard(state.message,
-                            onRetry = { viewModel.loadArticlesForIssue(issueUrl) })
+                        ErrorCard(
+                            message = state.message,
+                            onRetry = { viewModel.loadArticlesForIssue(issueUrl) }
+                        )
                     }
                 }
                 is UiState.Success -> {
                     if (state.data.isEmpty()) {
-                        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                            Text("কোনো প্রবন্ধ পাওয়া যায়নি")
+                        Box(
+                            Modifier
+                                .fillMaxSize()
+                                .background(DarkBg),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text("কোনো প্রবন্ধ পাওয়া যায়নি", color = OnDarkMed)
                         }
                     } else {
                         LazyColumn(
+                            modifier            = Modifier.background(DarkBg),
                             contentPadding      = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
                             verticalArrangement = Arrangement.spacedBy(10.dp)
                         ) {
                             items(state.data) { article ->
-                                ArticleCard(article = article, onClick = { onArticleClick(article) })
+                                ArticleCard(
+                                    article = article,
+                                    onClick = { onArticleClick(article) }
+                                )
                             }
                         }
                     }
@@ -105,9 +127,9 @@ fun ArticleCard(article: Article, onClick: () -> Unit, modifier: Modifier = Modi
         onClick   = onClick,
         modifier  = modifier.fillMaxWidth(),
         shape     = RoundedCornerShape(20.dp),
-        colors    = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        colors    = CardDefaults.cardColors(containerColor = DarkSurface),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
-        border    = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.25f))
+        border    = BorderStroke(1.dp, DarkOutline)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(
@@ -116,14 +138,15 @@ fun ArticleCard(article: Article, onClick: () -> Unit, modifier: Modifier = Modi
                 fontSize   = 14.sp,
                 maxLines   = 3,
                 overflow   = TextOverflow.Ellipsis,
-                lineHeight = 20.sp
+                lineHeight = 21.sp,
+                color      = OnDarkHigh
             )
             if (article.authors.isNotBlank()) {
                 Spacer(Modifier.height(6.dp))
                 Text(
                     article.authors,
                     fontSize   = 12.sp,
-                    color      = Navy.copy(alpha = 0.75f),
+                    color      = TealAccent,
                     maxLines   = 1,
                     overflow   = TextOverflow.Ellipsis,
                     fontWeight = FontWeight.Medium
@@ -134,7 +157,7 @@ fun ArticleCard(article: Article, onClick: () -> Unit, modifier: Modifier = Modi
                 Text(
                     article.abstract,
                     fontSize   = 12.sp,
-                    color      = MaterialTheme.colorScheme.onSurfaceVariant,
+                    color      = OnDarkMed,
                     maxLines   = 3,
                     overflow   = TextOverflow.Ellipsis,
                     lineHeight = 18.sp
@@ -148,15 +171,15 @@ fun ArticleCard(article: Article, onClick: () -> Unit, modifier: Modifier = Modi
             ) {
                 Text(
                     "বিস্তারিত পড়ুন →",
-                    color      = Navy,
+                    color      = TealAccent,
                     fontWeight = FontWeight.SemiBold,
                     fontSize   = 12.sp
                 )
                 if (article.pdfUrl != null) {
                     PillBadge(
                         text           = "PDF",
-                        containerColor = Color(0xFFFFE8E8),
-                        textColor      = Color(0xFFD32F2F)
+                        containerColor = Color(0xFF2A1010),
+                        textColor      = Color(0xFFFF6B6B)
                     )
                 }
             }

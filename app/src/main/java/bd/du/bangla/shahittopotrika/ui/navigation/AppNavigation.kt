@@ -44,7 +44,6 @@ fun AppNavigation(
     searchVm:   SearchViewModel   = viewModel(),
     bookmarkVm: BookmarkViewModel = viewModel()
 ) {
-    // Handle deep links (e.g. https://journal.bangla.du.ac.bd/index.php/sp/article/view/123)
     LaunchedEffect(deepLinkUrl) {
         if (deepLinkUrl != null && deepLinkUrl.contains("/article/view/")) {
             navController.navigate(Routes.articleDetail(deepLinkUrl))
@@ -68,9 +67,13 @@ fun AppNavigation(
 
         composable(Routes.ISSUE_LIST) {
             IssueListScreen(
-                viewModel    = journalVm,
-                onIssueClick = { navController.navigate(Routes.articleList(it.url)) },
-                onBack       = { navController.popBackStack() }
+                viewModel        = journalVm,
+                onIssueClick     = { navController.navigate(Routes.articleList(it.url)) },
+                onBack           = { navController.popBackStack() },
+                onHomeClick      = { navController.popBackStack(Routes.HOME, inclusive = false) },
+                onSearchClick    = { navController.navigate(Routes.SEARCH) },
+                onBookmarksClick = { navController.navigate(Routes.BOOKMARKS) },
+                onAboutClick     = { navController.navigate(Routes.ABOUT) }
             )
         }
 
@@ -103,10 +106,14 @@ fun AppNavigation(
 
         composable(Routes.SEARCH) {
             SearchScreen(
-                viewModel      = searchVm,
-                journalVm      = journalVm,
-                onArticleClick = { navController.navigate(Routes.articleDetail(it.url)) },
-                onBack         = { navController.popBackStack() }
+                viewModel        = searchVm,
+                journalVm        = journalVm,
+                onArticleClick   = { navController.navigate(Routes.articleDetail(it.url)) },
+                onBack           = { navController.popBackStack() },
+                onHomeClick      = { navController.popBackStack(Routes.HOME, inclusive = false) },
+                onIssueListClick = { navController.navigate(Routes.ISSUE_LIST) },
+                onBookmarksClick = { navController.navigate(Routes.BOOKMARKS) },
+                onAboutClick     = { navController.navigate(Routes.ABOUT) }
             )
         }
 
@@ -144,9 +151,9 @@ fun AppNavigation(
 
         composable(Routes.READ_HISTORY) {
             ReadHistoryScreen(
-                viewModel        = journalVm,
-                onArticleClick   = { navController.navigate(Routes.articleDetail(it)) },
-                onBack           = { navController.popBackStack() }
+                viewModel      = journalVm,
+                onArticleClick = { navController.navigate(Routes.articleDetail(it)) },
+                onBack         = { navController.popBackStack() }
             )
         }
 

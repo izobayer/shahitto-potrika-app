@@ -27,7 +27,9 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import bd.du.bangla.shahittopotrika.ui.theme.Navy
+import bd.du.bangla.shahittopotrika.ui.theme.DarkSurface
+import bd.du.bangla.shahittopotrika.ui.theme.OnDarkHigh
+import bd.du.bangla.shahittopotrika.ui.theme.TealAccent
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
@@ -101,14 +103,14 @@ fun PdfViewerScreen(
                         }
                     },
                     colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = Navy, titleContentColor = Color.White
+                        containerColor = DarkSurface, titleContentColor = Color.White
                     )
                 )
                 if (loading) {
                     LinearProgressIndicator(
                         modifier = Modifier.fillMaxWidth(),
                         color = Color(0xFF2563EB),
-                        trackColor = Navy.copy(alpha = 0.3f)
+                        trackColor = TealAccent.copy(alpha = 0.3f)
                     )
                 }
             }
@@ -119,9 +121,9 @@ fun PdfViewerScreen(
                 loading -> {
                     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            CircularProgressIndicator(color = Navy)
+                            CircularProgressIndicator(color = TealAccent)
                             Spacer(Modifier.height(12.dp))
-                            Text("PDF ডাউনলোড হচ্ছে…", color = Navy)
+                            Text("PDF ডাউনলোড হচ্ছে…", color = TealAccent)
                         }
                     }
                 }
@@ -145,7 +147,7 @@ fun PdfViewerScreen(
                                         Intent(Intent.ACTION_VIEW, Uri.parse(pdfUrl))
                                     )
                                 },
-                                colors = ButtonDefaults.buttonColors(containerColor = Navy)
+                                colors = ButtonDefaults.buttonColors(containerColor = DarkSurface)
                             ) { Text("ব্রাউজারে খুলুন") }
                         }
                     }
@@ -233,7 +235,7 @@ fun PdfPage(
             contentAlignment = Alignment.Center
         ) {
             CircularProgressIndicator(
-                color       = Navy,
+                color       = TealAccent,
                 strokeWidth = 2.dp,
                 modifier    = Modifier.size(28.dp)
             )

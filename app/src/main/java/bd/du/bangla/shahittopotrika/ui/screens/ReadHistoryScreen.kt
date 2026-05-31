@@ -18,7 +18,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import bd.du.bangla.shahittopotrika.ui.theme.Navy
+import bd.du.bangla.shahittopotrika.ui.theme.DarkSurface
+import bd.du.bangla.shahittopotrika.ui.theme.OnDarkHigh
+import bd.du.bangla.shahittopotrika.ui.theme.TealAccent
 import bd.du.bangla.shahittopotrika.viewmodel.JournalViewModel
 import java.text.SimpleDateFormat
 import java.util.*
@@ -68,7 +70,7 @@ fun ReadHistoryScreen(
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Navy, titleContentColor = Color.White)
+                    containerColor = DarkSurface, titleContentColor = Color.White)
             )
         }
     ) { padding ->

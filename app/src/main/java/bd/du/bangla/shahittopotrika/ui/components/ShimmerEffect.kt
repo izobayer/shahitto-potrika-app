@@ -4,7 +4,6 @@ import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -17,14 +16,14 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun shimmerBrush(): Brush {
     val shimmerColors = listOf(
-        Color.LightGray.copy(alpha = 0.4f),
-        Color.LightGray.copy(alpha = 0.15f),
-        Color.LightGray.copy(alpha = 0.4f),
+        Color(0xFF1E3545),
+        Color(0xFF2A4560),
+        Color(0xFF1E3545),
     )
     val transition = rememberInfiniteTransition(label = "shimmer")
     val translateAnim by transition.animateFloat(
-        initialValue = 0f,
-        targetValue  = 1200f,
+        initialValue  = 0f,
+        targetValue   = 1200f,
         animationSpec = infiniteRepeatable(
             animation  = tween(900, easing = LinearEasing),
             repeatMode = RepeatMode.Restart
@@ -50,7 +49,7 @@ fun ShimmerIssueCard() {
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(20.dp))
-            .background(MaterialTheme.colorScheme.surface)
+            .background(Color(0xFF112535))
             .padding(12.dp)
     ) {
         Box(
@@ -77,7 +76,7 @@ fun ShimmerArticleCard() {
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(20.dp))
-            .background(MaterialTheme.colorScheme.surface)
+            .background(Color(0xFF112535))
             .padding(14.dp)
     ) {
         Box(Modifier.fillMaxWidth(0.95f).height(15.dp).clip(RoundedCornerShape(4.dp)).background(brush))

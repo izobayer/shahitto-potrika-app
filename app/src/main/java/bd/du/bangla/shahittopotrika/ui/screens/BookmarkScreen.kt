@@ -24,7 +24,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import bd.du.bangla.shahittopotrika.data.local.entity.BookmarkEntity
-import bd.du.bangla.shahittopotrika.ui.theme.Navy
+import bd.du.bangla.shahittopotrika.ui.theme.DarkSurface
+import bd.du.bangla.shahittopotrika.ui.theme.OnDarkHigh
+import bd.du.bangla.shahittopotrika.ui.theme.TealAccent
 import bd.du.bangla.shahittopotrika.viewmodel.BookmarkViewModel
 import bd.du.bangla.shahittopotrika.viewmodel.JournalViewModel
 
@@ -73,8 +75,8 @@ fun BookmarkScreen(
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Navy,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimary
+                    containerColor = DarkSurface,
+                    titleContentColor = OnDarkHigh
                 )
             )
         }
@@ -189,7 +191,7 @@ fun BookmarkCard(
                     onClick = onClick,
                     contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp)
                 ) {
-                    Text("পড়ুন →", fontSize = 12.sp, color = Navy)
+                    Text("পড়ুন →", fontSize = 12.sp, color = TealAccent)
                 }
                 if (bookmark.pdfUrl != null) {
                     TextButton(

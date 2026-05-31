@@ -27,7 +27,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import bd.du.bangla.shahittopotrika.R
 import bd.du.bangla.shahittopotrika.data.model.UiState
-import bd.du.bangla.shahittopotrika.ui.theme.Navy
+import bd.du.bangla.shahittopotrika.ui.theme.DarkSurface
+import bd.du.bangla.shahittopotrika.ui.theme.OnDarkHigh
+import bd.du.bangla.shahittopotrika.ui.theme.OnDarkMed
+import bd.du.bangla.shahittopotrika.ui.theme.TealAccent
 import bd.du.bangla.shahittopotrika.viewmodel.JournalViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -50,8 +53,8 @@ fun AboutScreen(
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Navy,
-                    titleContentColor = Color.White
+                    containerColor = DarkSurface,
+                    titleContentColor = OnDarkHigh
                 )
             )
         }
@@ -66,7 +69,7 @@ fun AboutScreen(
         ) {
             // ── Journal info ───────────────────────────────
             when (val state = infoState) {
-                is UiState.Loading -> CircularProgressIndicator(color = Navy)
+                is UiState.Loading -> CircularProgressIndicator(color = TealAccent)
                 is UiState.Error -> ErrorCard(state.message,
                     onRetry = { viewModel.loadJournalInfo() })
                 is UiState.Success -> {
@@ -91,7 +94,7 @@ fun AboutScreen(
                         ) {
                             Column(modifier = Modifier.padding(14.dp)) {
                                 Text("পরিচিতি", fontWeight = FontWeight.SemiBold,
-                                    color = Navy, fontSize = 14.sp)
+                                    color = TealAccent, fontSize = 14.sp)
                                 Spacer(Modifier.height(6.dp))
                                 Text(info.description, fontSize = 14.sp, lineHeight = 22.sp)
                             }
@@ -109,7 +112,7 @@ fun AboutScreen(
                         Uri.parse("https://journal.bangla.du.ac.bd/index.php/sp")))
                 },
                 modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(containerColor = Navy),
+                colors = ButtonDefaults.buttonColors(containerColor = TealAccent),
                 shape = RoundedCornerShape(8.dp)
             ) {
                 Icon(Icons.Default.Language, null, modifier = Modifier.size(18.dp))
@@ -124,7 +127,7 @@ fun AboutScreen(
                 shape = RoundedCornerShape(10.dp),
                 modifier = Modifier.fillMaxWidth(),
                 colors = CardDefaults.cardColors(
-                    containerColor = Navy.copy(alpha = 0.06f))
+                    containerColor = TealAccent.copy(alpha = 0.06f))
             ) {
                 Row(
                     modifier = Modifier.padding(16.dp),
@@ -133,7 +136,7 @@ fun AboutScreen(
                 ) {
                     Surface(
                         shape = RoundedCornerShape(10.dp),
-                        color = Navy,
+                        color = TealAccent,
                         modifier = Modifier.size(46.dp)
                     ) {
                         Box(contentAlignment = Alignment.Center) {
@@ -151,7 +154,7 @@ fun AboutScreen(
                             stringResource(R.string.developer_name),
                             fontWeight = FontWeight.Bold,
                             fontSize = 16.sp,
-                            color = Navy
+                            color = TealAccent
                         )
                         Text(
                             "অ্যান্ড্রয়েড অ্যাপ্লিকেশন",
@@ -169,11 +172,11 @@ fun AboutScreen(
                             }
                         ) {
                             Icon(Icons.Default.Email, null,
-                                tint = Navy, modifier = androidx.compose.ui.Modifier.size(14.dp))
+                                tint = TealAccent, modifier = androidx.compose.ui.Modifier.size(14.dp))
                             Text(
                                 "zobayer@du.ac.bd",
                                 fontSize = 12.sp,
-                                color = Navy
+                                color = TealAccent
                             )
                         }
                     }
@@ -218,6 +221,6 @@ fun InfoRow(label: String, value: String) {
             modifier = Modifier.weight(1f))
         Text(value, fontSize = 13.sp, fontWeight = FontWeight.Medium,
             modifier = Modifier.weight(1.2f),
-            textAlign = TextAlign.End, color = Navy)
+            textAlign = TextAlign.End, color = TealAccent)
     }
 }

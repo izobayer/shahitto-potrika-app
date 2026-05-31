@@ -17,7 +17,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import bd.du.bangla.shahittopotrika.ui.theme.Navy
+import bd.du.bangla.shahittopotrika.ui.theme.DarkSurface
+import bd.du.bangla.shahittopotrika.ui.theme.OnDarkHigh
+import bd.du.bangla.shahittopotrika.ui.theme.TealAccent
 import bd.du.bangla.shahittopotrika.viewmodel.SettingsViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -41,7 +43,7 @@ fun SettingsScreen(
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Navy, titleContentColor = Color.White)
+                    containerColor = DarkSurface, titleContentColor = Color.White)
             )
         }
     ) { padding ->
@@ -69,7 +71,7 @@ fun SettingsScreen(
                 Column(modifier = Modifier.padding(16.dp)) {
                     Row(verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                        Icon(Icons.Default.TextFields, null, tint = Navy,
+                        Icon(Icons.Default.TextFields, null, tint = TealAccent,
                             modifier = Modifier.size(22.dp))
                         Column(modifier = Modifier.weight(1f)) {
                             Text("টেক্সট আকার", fontWeight = FontWeight.Medium, fontSize = 14.sp)
@@ -85,7 +87,7 @@ fun SettingsScreen(
                             )
                         }
                         Text("${(fontScale * 100).toInt()}%",
-                            fontSize = 12.sp, color = Navy, fontWeight = FontWeight.Bold)
+                            fontSize = 12.sp, color = TealAccent, fontWeight = FontWeight.Bold)
                     }
                     Slider(
                         value = fontScale,
@@ -93,7 +95,7 @@ fun SettingsScreen(
                         valueRange = 0.85f..1.30f,
                         steps = 2,   // 0.85, 1.0, 1.15, 1.30
                         colors = SliderDefaults.colors(
-                            thumbColor = Navy, activeTrackColor = Navy)
+                            thumbColor = TealAccent, activeTrackColor = TealAccent)
                     )
                     Row(modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween) {
@@ -130,7 +132,7 @@ fun SettingsScreen(
 @Composable
 fun SettingsGroupHeader(title: String) {
     Text(title, fontWeight = FontWeight.Bold, fontSize = 12.sp,
-        color = Navy, modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp))
+        color = TealAccent, modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp))
 }
 
 @Composable
@@ -145,7 +147,7 @@ fun SettingsToggleRow(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            Icon(icon, null, tint = Navy, modifier = Modifier.size(22.dp))
+            Icon(icon, null, tint = TealAccent, modifier = Modifier.size(22.dp))
             Column(modifier = Modifier.weight(1f)) {
                 Text(title, fontWeight = FontWeight.Medium, fontSize = 14.sp)
                 Text(subtitle, fontSize = 12.sp,
@@ -154,7 +156,7 @@ fun SettingsToggleRow(
             Switch(checked = checked, onCheckedChange = { onToggle() },
                 colors = SwitchDefaults.colors(
                     checkedThumbColor = Color.White,
-                    checkedTrackColor = Navy))
+                    checkedTrackColor = TealAccent))
         }
     }
 }
