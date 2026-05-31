@@ -242,7 +242,7 @@ fun SearchScreen(
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            "উপরের বাক্সে লিখে প্রবন্ধ খুঁজুন",
+                            "ওপরের অনুসন্ধান বাক্সে লিখে প্রবন্ধ খুঁজুন",
                             color    = OnDarkLow,
                             fontSize = 14.sp
                         )

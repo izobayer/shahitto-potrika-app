@@ -21,15 +21,27 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
     val notificationsEnabled = prefs.notificationsEnabled
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), true)
 
-    fun toggleDarkMode() = viewModelScope.launch {
-        prefs.setDarkMode(!isDarkMode.value)
-    }
+    val notificationsAppUpdate = prefs.notificationsAppUpdate
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), true)
 
-    fun setFontScale(scale: Float) = viewModelScope.launch {
-        prefs.setFontScale(scale)
-    }
+    val offlineCacheEnabled = prefs.offlineCacheEnabled
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), true)
 
-    fun toggleNotifications() = viewModelScope.launch {
-        prefs.setNotificationsEnabled(!notificationsEnabled.value)
-    }
+    val historyTrackingEnabled = prefs.historyTrackingEnabled
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), true)
+
+    val openPdfExternal = prefs.openPdfExternal
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
+
+    val showAbstractInList = prefs.showAbstractInList
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), true)
+
+    fun toggleDarkMode()           = viewModelScope.launch { prefs.setDarkMode(!isDarkMode.value) }
+    fun setFontScale(scale: Float) = viewModelScope.launch { prefs.setFontScale(scale) }
+    fun toggleNotifications()      = viewModelScope.launch { prefs.setNotificationsEnabled(!notificationsEnabled.value) }
+    fun toggleNotifUpdate()        = viewModelScope.launch { prefs.setNotificationsAppUpdate(!notificationsAppUpdate.value) }
+    fun toggleOfflineCache()       = viewModelScope.launch { prefs.setOfflineCacheEnabled(!offlineCacheEnabled.value) }
+    fun toggleHistoryTracking()    = viewModelScope.launch { prefs.setHistoryTrackingEnabled(!historyTrackingEnabled.value) }
+    fun toggleOpenPdfExternal()    = viewModelScope.launch { prefs.setOpenPdfExternal(!openPdfExternal.value) }
+    fun toggleShowAbstract()       = viewModelScope.launch { prefs.setShowAbstractInList(!showAbstractInList.value) }
 }

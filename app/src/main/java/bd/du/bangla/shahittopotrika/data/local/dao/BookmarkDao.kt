@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface BookmarkDao {
-    @Query("SELECT * FROM bookmarks ORDER BY savedAt DESC")
+    @Query("SELECT * FROM bookmarks ORDER BY sortOrder ASC, savedAt DESC")
     fun getAllBookmarks(): Flow<List<BookmarkEntity>>
 
     @Query("SELECT EXISTS(SELECT 1 FROM bookmarks WHERE articleId = :articleId)")
@@ -17,4 +17,10 @@ interface BookmarkDao {
 
     @Query("DELETE FROM bookmarks WHERE articleId = :articleId")
     suspend fun delete(articleId: String)
+
+    @Update
+    suspend fun update(bookmark: BookmarkEntity)
+
+    @Query("UPDATE bookmarks SET sortOrder = :order WHERE articleId = :articleId")
+    suspend fun updateOrder(articleId: String, order: Int)
 }

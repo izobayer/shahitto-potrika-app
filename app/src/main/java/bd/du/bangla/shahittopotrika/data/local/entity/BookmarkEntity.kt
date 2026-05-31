@@ -10,5 +10,6 @@ data class BookmarkEntity(
     val authors: String,
     val url: String,
     val pdfUrl: String?,
-    val savedAt: Long = System.currentTimeMillis()
+    val savedAt: Long = System.currentTimeMillis(),
+    val sortOrder: Int = 0
 )

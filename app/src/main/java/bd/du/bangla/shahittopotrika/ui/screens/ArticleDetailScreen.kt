@@ -33,7 +33,7 @@ import bd.du.bangla.shahittopotrika.viewmodel.JournalViewModel
 import kotlinx.coroutines.launch
 import java.util.Locale
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun ArticleDetailScreen(
     articleUrl: String,

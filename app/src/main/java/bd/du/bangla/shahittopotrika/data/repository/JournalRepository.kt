@@ -78,6 +78,7 @@ class JournalRepository(context: Context) {
     }
 
     suspend fun removeBookmark(articleId: String) = bookmarkDao.delete(articleId)
+    suspend fun updateBookmarkOrder(articleId: String, order: Int) = bookmarkDao.updateOrder(articleId, order)
 
     // ── Reading history ────────────────────────────────────
     fun getReadHistory(): Flow<List<ReadHistoryEntity>> = historyDao.getAll()
