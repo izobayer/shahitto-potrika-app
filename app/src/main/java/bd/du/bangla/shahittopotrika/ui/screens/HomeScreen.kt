@@ -79,13 +79,21 @@ fun HomeScreen(
                     .background(DarkBg)
                     .verticalScroll(rememberScrollState())
             ) {
-                // ── Top icon row ──────────────────────────────
+                // ── Top icon row (brand + icons) ─────────────
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 8.dp, vertical = 4.dp),
-                    horizontalArrangement = Arrangement.End
+                        .padding(horizontal = 16.dp, vertical = 4.dp),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
+                    Text(
+                        "সাহিত্য পত্রিকা",
+                        fontFamily = QayyumBookFamily,
+                        fontWeight = FontWeight.Bold,
+                        fontSize   = 22.sp,
+                        color      = TealAccent,
+                        modifier   = Modifier.weight(1f)
+                    )
                     IconButton(onClick = onHistoryClick) {
                         Icon(Icons.Default.History, "ইতিহাস", tint = OnDarkMed)
                     }
@@ -230,16 +238,29 @@ fun HomeScreen(
 
                 Spacer(Modifier.height(24.dp))
 
-                // ── ISSN strip ────────────────────────────────
-                Text(
-                    "ISSN: 0304-9612  •  eISSN: 2959-5827  •  প্রতিষ্ঠা: ১৯৫৭",
-                    fontSize  = 11.sp,
-                    color     = OnDarkLow,
-                    textAlign = TextAlign.Center,
-                    modifier  = Modifier
+                // ── Footer strip ──────────────────────────────
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier
                         .fillMaxWidth()
-                        .padding(vertical = 8.dp, horizontal = 16.dp)
-                )
+                        .padding(vertical = 12.dp, horizontal = 16.dp)
+                ) {
+                    Text(
+                        "সাহিত্য পত্রিকা",
+                        fontFamily = QayyumBookFamily,
+                        fontWeight = FontWeight.Bold,
+                        fontSize   = 16.sp,
+                        color      = OnDarkMed,
+                        textAlign  = TextAlign.Center
+                    )
+                    Spacer(Modifier.height(4.dp))
+                    Text(
+                        "ISSN: 0304-9612  •  eISSN: 2959-5827  •  প্রতিষ্ঠা: ১৯৫৭",
+                        fontSize  = 11.sp,
+                        color     = OnDarkLow,
+                        textAlign = TextAlign.Center
+                    )
+                }
 
                 Spacer(Modifier.height(8.dp))
             }

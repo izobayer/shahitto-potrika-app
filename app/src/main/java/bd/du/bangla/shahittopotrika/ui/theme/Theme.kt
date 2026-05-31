@@ -22,6 +22,14 @@ import androidx.compose.ui.unit.sp
 import androidx.core.view.WindowCompat
 import bd.du.bangla.shahittopotrika.R
 
+// ── Qayyum Book — used for "সাহিত্য পত্রিকা" branding ────────────────────────
+val QayyumBookFamily = FontFamily(
+    Font(R.font.qayyum_book, FontWeight.Normal),
+    Font(R.font.qayyum_book, FontWeight.Medium),
+    Font(R.font.qayyum_book, FontWeight.SemiBold),
+    Font(R.font.qayyum_book, FontWeight.Bold),
+)
+
 // ── Kalpurush font family ─────────────────────────────────────────────────────
 val KalpurushFamily = FontFamily(
     Font(R.font.kalpurush, FontWeight.Thin),

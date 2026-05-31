@@ -27,9 +27,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import bd.du.bangla.shahittopotrika.R
 import bd.du.bangla.shahittopotrika.data.model.UiState
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.withStyle
 import bd.du.bangla.shahittopotrika.ui.theme.DarkSurface
 import bd.du.bangla.shahittopotrika.ui.theme.OnDarkHigh
 import bd.du.bangla.shahittopotrika.ui.theme.OnDarkMed
+import bd.du.bangla.shahittopotrika.ui.theme.QayyumBookFamily
 import bd.du.bangla.shahittopotrika.ui.theme.TealAccent
 import bd.du.bangla.shahittopotrika.viewmodel.JournalViewModel
 
@@ -75,7 +79,12 @@ fun AboutScreen(
                 is UiState.Success -> {
                     val info = state.data
                     InfoCard {
-                        InfoRow("পত্রিকার নাম", info.name)
+                        InfoRow(
+                            label           = "পত্রিকার নাম",
+                            value           = info.name,
+                            valueFontFamily = QayyumBookFamily,
+                            valueFontSize   = 15.sp
+                        )
                         HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
                         InfoRow("ISSN (মুদ্রণ)", info.issn)
                         HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
@@ -186,9 +195,21 @@ fun AboutScreen(
             Spacer(Modifier.height(20.dp))
 
             Text(
-                "© ১৯৫৭–২০২৬ সাহিত্য পত্রিকা\nবাংলা বিভাগ • ঢাকা বিশ্ববিদ্যালয়\nসর্বস্বত্ব সংরক্ষিত",
-                fontSize = 11.sp,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                text = buildAnnotatedString {
+                    append("© ১৯৫৭–২০২৬ ")
+                    withStyle(
+                        SpanStyle(
+                            fontFamily = QayyumBookFamily,
+                            fontWeight = FontWeight.Bold,
+                            fontSize   = 13.sp
+                        )
+                    ) {
+                        append("সাহিত্য পত্রিকা")
+                    }
+                    append("\nবাংলা বিভাগ • ঢাকা বিশ্ববিদ্যালয়\nসর্বস্বত্ব সংরক্ষিত")
+                },
+                fontSize  = 11.sp,
+                color     = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center
             )
 
@@ -210,7 +231,12 @@ fun InfoCard(content: @Composable ColumnScope.() -> Unit) {
 }
 
 @Composable
-fun InfoRow(label: String, value: String) {
+fun InfoRow(
+    label: String,
+    value: String,
+    valueFontFamily: androidx.compose.ui.text.font.FontFamily? = null,
+    valueFontSize: androidx.compose.ui.unit.TextUnit = 13.sp
+) {
     Row(
         modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -219,8 +245,14 @@ fun InfoRow(label: String, value: String) {
         Text(label, fontSize = 13.sp,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.weight(1f))
-        Text(value, fontSize = 13.sp, fontWeight = FontWeight.Medium,
-            modifier = Modifier.weight(1.2f),
-            textAlign = TextAlign.End, color = TealAccent)
+        Text(
+            value,
+            fontSize   = valueFontSize,
+            fontWeight = FontWeight.Medium,
+            fontFamily = valueFontFamily,
+            modifier   = Modifier.weight(1.2f),
+            textAlign  = TextAlign.End,
+            color      = TealAccent
+        )
     }
 }
