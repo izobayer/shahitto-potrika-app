@@ -4,10 +4,27 @@
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
-    <path
-        android:fillColor="#FFFFFF"
-        android:pathData="M54,20 C35.2,20 20,35.2 20,54 C20,72.8 35.2,88 54,88 C72.8,88 88,72.8 88,54 C88,35.2 72.8,20 54,20 Z M54,30 C67.3,30 78,40.7 78,54 C78,67.3 67.3,78 54,78 C40.7,78 30,67.3 30,54 C30,40.7 40.7,30 54,30 Z" />
-    <path
-        android:fillColor="#FFFFFF"
-        android:pathData="M44,42 L44,66 L48,66 L48,56 L60,56 L60,66 L64,66 L64,42 L60,42 L60,52 L48,52 L48,42 Z" />
+
+    <group
+        android:name="logoGroup"
+        android:pivotX="54"
+        android:pivotY="54">
+
+        <!-- Ring: outer CCW, inner CW → donut -->
+        <path
+            android:fillColor="#FFFFFF"
+            android:pathData="
+                M54,4 C26.4,4 4,26.4 4,54 C4,81.6 26.4,104 54,104
+                C81.6,104 104,81.6 104,54 C104,26.4 81.6,4 54,4 Z
+                M54,12 C77.2,12 96,30.8 96,54 C96,77.2 77.2,96 54,96
+                C30.8,96 12,77.2 12,54 C12,30.8 30.8,12 54,12 Z" />
+
+        <!-- Bengali "স" letter -->
+        <path
+            android:fillColor="#FFFFFF"
+            android:pathData="M36,30 L36,78 L42,78 L42,60 L66,60 L66,78 L72,78
+                              L72,30 L66,30 L66,54 L42,54 L42,30 Z" />
+
+    </group>
+
 </vector>

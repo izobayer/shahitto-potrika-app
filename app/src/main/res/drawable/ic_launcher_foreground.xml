@@ -5,14 +5,25 @@
     android:viewportWidth="108"
     android:viewportHeight="108">
 
-    <!-- Outer ring -->
-    <path
-        android:fillColor="#FFFFFF"
-        android:pathData="M54,18 C34.1,18 18,34.1 18,54 C18,73.9 34.1,90 54,90 C73.9,90 90,73.9 90,54 C90,34.1 73.9,18 54,18 Z M54,26 C69.5,26 82,38.5 82,54 C82,69.5 69.5,82 54,82 C38.5,82 26,69.5 26,54 C26,38.5 38.5,26 54,26 Z" />
+    <!--
+        Ring fills the full 108dp canvas (outer r=50, inner r=42, centre 54,54).
+        Two sub-paths in opposite winding directions → nonZero rule punches a hole
+        giving a true donut/ring shape.
+    -->
 
-    <!-- Bengali "স" letter stylised as H-bar (সাহিত্য) -->
+    <!-- Ring: outer CCW, inner CW → donut -->
     <path
         android:fillColor="#FFFFFF"
-        android:pathData="M42,38 L42,70 L46,70 L46,58 L62,58 L62,70 L66,70 L66,38 L62,38 L62,54 L46,54 L46,38 Z" />
+        android:pathData="
+            M54,4 C26.4,4 4,26.4 4,54 C4,81.6 26.4,104 54,104
+            C81.6,104 104,81.6 104,54 C104,26.4 81.6,4 54,4 Z
+            M54,12 C77.2,12 96,30.8 96,54 C96,77.2 77.2,96 54,96
+            C30.8,96 12,77.2 12,54 C12,30.8 30.8,12 54,12 Z" />
+
+    <!-- Bengali "স" letter scaled to fill the inner circle (r≈42) -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M36,30 L36,78 L42,78 L42,60 L66,60 L66,78 L72,78
+                          L72,30 L66,30 L66,54 L42,54 L42,30 Z" />
 
 </vector>
