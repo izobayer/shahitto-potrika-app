@@ -16,7 +16,7 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), true)
 
     val fontScale = prefs.fontScale
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 1.0f)
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 1.15f)
 
     val notificationsEnabled = prefs.notificationsEnabled
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), true)

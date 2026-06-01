@@ -13,8 +13,22 @@ android {
         applicationId = "bd.du.bangla.shahittopotrika"
         minSdk = 26
         targetSdk = 35
-        versionCode = 11
-        versionName = "1.8.0"
+        versionCode = 12
+        versionName = "2.0.0"
+
+        // Dynamically load Gemini key from system environment or local.properties
+        val localProperties = java.util.Properties().apply {
+            val file = rootProject.file("local.properties")
+            if (file.exists()) {
+                file.inputStream().use { load(it) }
+            }
+        }
+        val apiKey = System.getenv("GOOGLE_AI_API_KEY")
+            ?: localProperties.getProperty("GOOGLE_AI_API_KEY")
+            ?: localProperties.getProperty("googleAiApiKey")
+            ?: ""
+
+        buildConfigField("String", "GOOGLE_AI_API_KEY", "\"$apiKey\"")
     }
 
     signingConfigs {

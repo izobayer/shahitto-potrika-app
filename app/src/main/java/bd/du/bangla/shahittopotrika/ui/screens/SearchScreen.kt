@@ -18,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -286,7 +287,11 @@ fun SearchScreen(
                                 Modifier.fillMaxWidth().padding(32.dp),
                                 contentAlignment = Alignment.Center
                             ) {
-                                Text("কোনো ফলাফল পাওয়া যায়নি", color = OnDarkMed)
+                                Text(
+                                    "প্রবন্ধ/সংখ্যা লোড হচ্ছে। অনুগ্রহ করে অপেক্ষা করুন।",
+                                    color = OnDarkMed,
+                                    textAlign = TextAlign.Center
+                                )
                             }
                         }
                     } else {

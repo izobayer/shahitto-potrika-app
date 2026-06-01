@@ -47,7 +47,8 @@ fun HomeScreen(
     onAboutClick: () -> Unit,
     onBookmarksClick: () -> Unit,
     onSettingsClick: () -> Unit = {},
-    onHistoryClick: () -> Unit = {}
+    onHistoryClick: () -> Unit = {},
+    onChatClick: () -> Unit = {}
 ) {
     val currentIssueState by viewModel.currentIssue.collectAsState()
     val archiveState       by viewModel.issueArchive.collectAsState()
@@ -57,6 +58,23 @@ fun HomeScreen(
 
     Scaffold(
         containerColor = DarkBg,
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick          = onChatClick,
+                containerColor   = TealAccent,
+                contentColor     = Color(0xFF003730),
+                shape            = RoundedCornerShape(16.dp)
+            ) {
+                Row(
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                ) {
+                    Icon(Icons.Default.Chat, null, modifier = Modifier.size(20.dp))
+                    Text("সহকারী", fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
+                }
+            }
+        },
         bottomBar = {
             BlinkistBottomNav(
                 currentRoute     = "home",
@@ -67,11 +85,11 @@ fun HomeScreen(
                 onAboutClick     = onAboutClick
             )
         }
-    ) { paddingValues ->
+    ) { paddingValuesValues ->
         PullToRefreshBox(
             isRefreshing = isRefreshing,
             onRefresh    = { viewModel.loadCurrentIssue(forceRefresh = true) },
-            modifier     = Modifier.padding(paddingValues)
+            modifier     = Modifier.padding(paddingValuesValues)
         ) {
             Column(
                 modifier = Modifier
@@ -105,24 +123,7 @@ fun HomeScreen(
                     }
                 }
 
-                // ── Big heading ───────────────────────────────
-                Column(modifier = Modifier.padding(horizontal = 20.dp)) {
-                    Text(
-                        "আপনার জন্য",
-                        style = MaterialTheme.typography.headlineLarge,
-                        color = OnDarkHigh
-                    )
-                    Spacer(Modifier.height(6.dp))
-                    Box(
-                        modifier = Modifier
-                            .width(46.dp)
-                            .height(3.dp)
-                            .clip(RoundedCornerShape(2.dp))
-                            .background(TealAccent)
-                    )
-                }
-
-                Spacer(Modifier.height(20.dp))
+                Spacer(Modifier.height(12.dp))
 
                 // ── Hero current issue ────────────────────────
                 when (val state = currentIssueState) {
@@ -182,31 +183,25 @@ fun HomeScreen(
 
                 Spacer(Modifier.height(10.dp))
 
-                // ── Archive horizontal scroll ─────────────────
+                // ── Recent issues vertical list ─────────────────
                 when (val state = archiveState) {
                     is UiState.Loading -> {
-                        LazyRow(
-                            contentPadding        = PaddingValues(horizontal = 20.dp),
-                            horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        Column(
+                            modifier = Modifier.padding(horizontal = 20.dp),
+                            verticalArrangement = Arrangement.spacedBy(10.dp)
                         ) {
-                            items(5) {
-                                Box(
-                                    Modifier
-                                        .size(130.dp, 180.dp)
-                                        .clip(RoundedCornerShape(16.dp))
-                                ) {
-                                    ShimmerBox(Modifier.fillMaxSize())
-                                }
+                            repeat(3) {
+                                ShimmerIssueCard()
                             }
                         }
                     }
                     is UiState.Success -> {
-                        LazyRow(
-                            contentPadding        = PaddingValues(horizontal = 20.dp),
-                            horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        Column(
+                            modifier = Modifier.padding(horizontal = 20.dp),
+                            verticalArrangement = Arrangement.spacedBy(10.dp)
                         ) {
-                            items(state.data.take(12)) { issue ->
-                                RecentIssueCard(issue = issue, onClick = { onIssueClick(issue) })
+                            state.data.take(6).forEach { issue ->
+                                IssueCard(issue = issue, onClick = { onIssueClick(issue) })
                             }
                         }
                     }
@@ -277,36 +272,33 @@ fun HeroIssueCard(issue: Issue, onClick: () -> Unit, modifier: Modifier = Modifi
         modifier  = modifier.fillMaxWidth(),
         shape     = RoundedCornerShape(24.dp),
         colors    = CardDefaults.cardColors(containerColor = DarkSurface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
+        border    = BorderStroke(1.dp, DarkOutline)
     ) {
-        Box(modifier = Modifier.fillMaxWidth().height(230.dp)) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
             if (issue.coverImageUrl != null) {
-                // Cover image
+                // Cover image on the left, portrait aspect ratio fully shown
                 AsyncImage(
                     model              = issue.coverImageUrl,
                     contentDescription = issue.title,
-                    contentScale       = ContentScale.Crop,
-                    modifier           = Modifier.fillMaxSize()
+                    contentScale       = ContentScale.Fit,
+                    modifier           = Modifier
+                        .size(120.dp, 170.dp)
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(Color.Black.copy(alpha = 0.2f))
                 )
-                // Gradient overlay bottom-to-top
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(
-                            Brush.verticalGradient(
-                                colorStops = arrayOf(
-                                    0.0f to Color.Transparent,
-                                    0.45f to DarkBg.copy(alpha = 0.5f),
-                                    1.0f to DarkBg.copy(alpha = 0.97f)
-                                )
-                            )
-                        )
-                )
+                Spacer(Modifier.width(16.dp))
             } else {
                 // Placeholder gradient
                 Box(
                     modifier = Modifier
-                        .fillMaxSize()
+                        .size(120.dp, 170.dp)
+                        .clip(RoundedCornerShape(12.dp))
                         .background(
                             Brush.radialGradient(
                                 colors = listOf(
@@ -316,14 +308,13 @@ fun HeroIssueCard(issue: Issue, onClick: () -> Unit, modifier: Modifier = Modifi
                             )
                         )
                 )
+                Spacer(Modifier.width(16.dp))
             }
 
-            // Overlaid content at bottom
+            // Details on the right
             Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .align(Alignment.BottomStart)
-                    .padding(16.dp)
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.Center
             ) {
                 // "চলতি সংখ্যা" pill badge
                 Surface(
@@ -338,15 +329,16 @@ fun HeroIssueCard(issue: Issue, onClick: () -> Unit, modifier: Modifier = Modifi
                         modifier   = Modifier.padding(horizontal = 10.dp, vertical = 4.dp)
                     )
                 }
-                Spacer(Modifier.height(8.dp))
+                Spacer(Modifier.height(10.dp))
                 Text(
                     issue.title,
                     style    = MaterialTheme.typography.titleLarge,
                     color    = OnDarkHigh,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis
+                    maxLines = 3,
+                    overflow = TextOverflow.Ellipsis,
+                    lineHeight = 26.sp
                 )
-                Spacer(Modifier.height(8.dp))
+                Spacer(Modifier.height(10.dp))
                 Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                     if (issue.volume.isNotBlank()) {
                         PillBadge(
@@ -471,35 +463,35 @@ fun BlinkistBottomNav(
             selected = currentRoute == "home",
             onClick  = onHomeClick,
             icon     = { Icon(Icons.Default.Home, null) },
-            label    = { Text("হোম", fontSize = 11.sp) },
+            label    = { Text("হোম", fontSize = 11.sp, maxLines = 1, softWrap = false) },
             colors   = itemColors
         )
         NavigationBarItem(
             selected = currentRoute == "search",
             onClick  = onExploreClick,
             icon     = { Icon(Icons.Default.Search, null) },
-            label    = { Text("এক্সপ্লোর", fontSize = 11.sp) },
+            label    = { Text("এক্সপ্লোর", fontSize = 11.sp, maxLines = 1, softWrap = false) },
             colors   = itemColors
         )
         NavigationBarItem(
             selected = currentRoute == "issue_list",
             onClick  = onArchiveClick,
             icon     = { Icon(Icons.Default.List, null) },
-            label    = { Text("সংখ্যা", fontSize = 11.sp) },
+            label    = { Text("আর্কাইভ", fontSize = 10.sp, maxLines = 1, softWrap = false) },
             colors   = itemColors
         )
         NavigationBarItem(
             selected = currentRoute == "bookmarks",
             onClick  = onBookmarksClick,
             icon     = { Icon(Icons.Default.Bookmark, null) },
-            label    = { Text("সংরক্ষিত", fontSize = 11.sp) },
+            label    = { Text("সংরক্ষিত", fontSize = 11.sp, maxLines = 1, softWrap = false) },
             colors   = itemColors
         )
         NavigationBarItem(
             selected = currentRoute == "about",
             onClick  = onAboutClick,
             icon     = { Icon(Icons.Default.Info, null) },
-            label    = { Text("সম্পর্কে", fontSize = 11.sp) },
+            label    = { Text("সম্পর্কে", fontSize = 11.sp, maxLines = 1, softWrap = false) },
             colors   = itemColors
         )
     }

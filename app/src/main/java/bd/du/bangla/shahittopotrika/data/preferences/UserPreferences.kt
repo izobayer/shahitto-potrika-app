@@ -30,7 +30,7 @@ class UserPreferences(private val context: Context) {
 
     val fontScale: Flow<Float> = context.dataStore.data
         .catch { emit(emptyPreferences()) }
-        .map { it[Keys.FONT_SCALE] ?: 1.0f }
+        .map { it[Keys.FONT_SCALE] ?: 1.15f }
 
     val notificationsEnabled: Flow<Boolean> = context.dataStore.data
         .catch { emit(emptyPreferences()) }

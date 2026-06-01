@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -99,7 +100,12 @@ fun ArticleListScreen(
                                 .background(DarkBg),
                             contentAlignment = Alignment.Center
                         ) {
-                            Text("কোনো প্রবন্ধ পাওয়া যায়নি", color = OnDarkMed)
+                            Text(
+                                "প্রবন্ধ/সংখ্যা লোড হচ্ছে। অনুগ্রহ করে অপেক্ষা করুন।",
+                                color = OnDarkMed,
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier.padding(horizontal = 24.dp)
+                            )
                         }
                     } else {
                         LazyColumn(
@@ -178,8 +184,8 @@ fun ArticleCard(article: Article, onClick: () -> Unit, modifier: Modifier = Modi
                 if (article.pdfUrl != null) {
                     PillBadge(
                         text           = "PDF",
-                        containerColor = Color(0xFF2A1010),
-                        textColor      = Color(0xFFFF6B6B)
+                        containerColor = TealAccent.copy(alpha = 0.15f),
+                        textColor      = TealAccent
                     )
                 }
             }
