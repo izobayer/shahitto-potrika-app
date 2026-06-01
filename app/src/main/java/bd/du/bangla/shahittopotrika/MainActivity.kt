@@ -1,6 +1,10 @@
 package bd.du.bangla.shahittopotrika
 
+import android.animation.Animator
+import android.animation.ObjectAnimator
 import android.os.Bundle
+import android.view.View
+import android.view.animation.LinearInterpolator
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -19,22 +23,38 @@ import bd.du.bangla.shahittopotrika.viewmodel.SettingsViewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
-        installSplashScreen()
+
+        // ── Splash screen: show logo then spin it out ─────────────────────
+        val splash = installSplashScreen()
+        splash.setOnExitAnimationListener { provider ->
+            val icon = provider.iconView
+            ObjectAnimator.ofFloat(icon, View.ROTATION, 0f, 360f).apply {
+                duration       = 700
+                interpolator   = LinearInterpolator()
+                addListener(object : Animator.AnimatorListener {
+                    override fun onAnimationEnd(a: Animator)    { provider.remove() }
+                    override fun onAnimationStart(a: Animator)  {}
+                    override fun onAnimationCancel(a: Animator) { provider.remove() }
+                    override fun onAnimationRepeat(a: Animator) {}
+                })
+                start()
+            }
+        }
+
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        // Capture deep-link URL from the intent (may be null for normal launches)
         val deepLinkUrl = intent?.data?.toString()
 
         setContent {
             val settingsVm: SettingsViewModel = viewModel()
-            val isDark     by settingsVm.isDarkMode.collectAsState()
-            val fontScale  by settingsVm.fontScale.collectAsState()
+            val isDark    by settingsVm.isDarkMode.collectAsState()
+            val fontScale by settingsVm.fontScale.collectAsState()
 
             ShahittoPotrikaTheme(darkTheme = isDark, fontScale = fontScale) {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
+                    color    = MaterialTheme.colorScheme.background
                 ) {
                     val navController = rememberNavController()
                     AppNavigation(

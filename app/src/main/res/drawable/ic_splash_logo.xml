@@ -1,4 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+    Fallback vector logo used only when the PNG drawable is unavailable.
+    The splash screen uses ic_launcher_foreground_img (PNG) directly.
+-->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="108dp"
     android:height="108dp"
@@ -10,7 +14,6 @@
         android:pivotX="54"
         android:pivotY="54">
 
-        <!-- Ring: outer CCW, inner CW → donut -->
         <path
             android:fillColor="#FFFFFF"
             android:pathData="
@@ -19,7 +22,6 @@
                 M54,12 C77.2,12 96,30.8 96,54 C96,77.2 77.2,96 54,96
                 C30.8,96 12,77.2 12,54 C12,30.8 30.8,12 54,12 Z" />
 
-        <!-- Bengali "স" letter -->
         <path
             android:fillColor="#FFFFFF"
             android:pathData="M36,30 L36,78 L42,78 L42,60 L66,60 L66,78 L72,78

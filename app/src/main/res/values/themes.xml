@@ -2,9 +2,12 @@
 <resources>
     <style name="Theme.ShahittoPotrika" parent="android:Theme.Material.Light.NoActionBar" />
     <style name="Theme.ShahittoPotrika.Splash" parent="Theme.SplashScreen">
+        <!-- App dark background -->
         <item name="windowSplashScreenBackground">#0D1F2D</item>
-        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_splash_logo_animated</item>
-        <item name="windowSplashScreenAnimationDuration">900</item>
+        <!-- Real logo PNG as splash icon -->
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_launcher_foreground_img</item>
+        <!-- Duration the icon is visible before exit animation starts -->
+        <item name="windowSplashScreenAnimationDuration">600</item>
         <item name="postSplashScreenTheme">@style/Theme.ShahittoPotrika</item>
     </style>
 </resources>
