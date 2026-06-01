@@ -44,15 +44,44 @@ val KalpurushFamily = FontFamily(
 )
 
 // ── Dark palette (Blinkist-style Navy-Teal) ───────────────────────────────────
-val DarkBg        = Color(0xFF0D1F2D)
-val DarkSurface   = Color(0xFF112535)
-val DarkSurface2  = Color(0xFF0A1820)
-val TealAccent    = Color(0xFF00D4B1)
-val TealAccentDim = Color(0xFF009E85)
-val OnDarkHigh    = Color(0xFFFFFFFF)
-val OnDarkMed     = Color(0xFFB0C8D4)
-val OnDarkLow     = Color(0xFF5A8090)
-val DarkOutline   = Color(0xFF1E3A4A)
+val StaticDarkBg        = Color(0xFF0D1F2D)
+val StaticDarkSurface   = Color(0xFF112535)
+val StaticDarkSurface2  = Color(0xFF0A1820)
+val TealAccent          = Color(0xFF00D4B1)
+val TealAccentDim       = Color(0xFF009E85)
+val StaticOnDarkHigh    = Color(0xFFFFFFFF)
+val StaticOnDarkMed     = Color(0xFFB0C8D4)
+val StaticOnDarkLow     = Color(0xFF5A8090)
+val StaticDarkOutline   = Color(0xFF1E3A4A)
+
+// ── Dynamic Color Lookups (Theme-Aware) ───────────────────────────────────────
+val DarkBg: Color
+    @Composable
+    get() = MaterialTheme.colorScheme.background
+
+val DarkSurface: Color
+    @Composable
+    get() = MaterialTheme.colorScheme.surface
+
+val DarkSurface2: Color
+    @Composable
+    get() = MaterialTheme.colorScheme.surfaceVariant
+
+val OnDarkHigh: Color
+    @Composable
+    get() = MaterialTheme.colorScheme.onBackground
+
+val OnDarkMed: Color
+    @Composable
+    get() = MaterialTheme.colorScheme.onSurfaceVariant
+
+val OnDarkLow: Color
+    @Composable
+    get() = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+
+val DarkOutline: Color
+    @Composable
+    get() = MaterialTheme.colorScheme.outline
 
 // ── Light palette (kept for settings toggle) ──────────────────────────────────
 val Navy        = Color(0xFF101E5A)
@@ -172,18 +201,18 @@ private val BlinkistDarkColors = darkColorScheme(
     primary              = TealAccent,
     onPrimary            = Color(0xFF003730),
     primaryContainer     = TealAccentDim,
-    onPrimaryContainer   = OnDarkHigh,
+    onPrimaryContainer   = StaticOnDarkHigh,
     secondary            = TealAccentDim,
     onSecondary          = Color.White,
     secondaryContainer   = Color(0xFF0A2A25),
     onSecondaryContainer = TealAccent,
-    background           = DarkBg,
-    onBackground         = OnDarkHigh,
-    surface              = DarkSurface,
-    onSurface            = OnDarkHigh,
-    surfaceVariant       = DarkSurface2,
-    onSurfaceVariant     = OnDarkMed,
-    outline              = DarkOutline,
+    background           = StaticDarkBg,
+    onBackground         = StaticOnDarkHigh,
+    surface              = StaticDarkSurface,
+    onSurface            = StaticOnDarkHigh,
+    surfaceVariant       = StaticDarkSurface2,
+    onSurfaceVariant     = StaticOnDarkMed,
+    outline              = StaticDarkOutline,
     error                = Color(0xFFFFB4AB),
     onError              = Color(0xFF690005),
     errorContainer       = Color(0xFF2A1A1A),
@@ -191,29 +220,29 @@ private val BlinkistDarkColors = darkColorScheme(
 )
 
 private val LightColors = lightColorScheme(
-    primary              = Navy,
+    primary              = Color(0xFF102334),
     onPrimary            = Color.White,
-    primaryContainer     = NavyLight,
-    onPrimaryContainer   = Color.White,
-    secondary            = AccentBlue,
+    primaryContainer     = Color(0xFFEEF2F6),
+    onPrimaryContainer   = Color(0xFF102334),
+    secondary            = Color(0xFF2563EB),
     onSecondary          = Color.White,
-    secondaryContainer   = Color(0xFFD6E4FF),
-    onSecondaryContainer = Color(0xFF001846),
-    background           = Color(0xFFF6F8FC),
-    onBackground         = TextPrimary,
+    secondaryContainer   = Color(0xFFEEF2F6),
+    onSecondaryContainer = Color(0xFF102334),
+    background           = Color(0xFFEEF2F6),
+    onBackground         = Color(0xFF102334),
     surface              = Color.White,
-    onSurface            = TextPrimary,
-    surfaceVariant       = Color(0xFFE8EDF2),
-    onSurfaceVariant     = TextSub,
-    outline              = Color(0xFFB0BCC8),
+    onSurface            = Color(0xFF102334),
+    surfaceVariant       = Color(0xFFF6F8FB),
+    onSurfaceVariant     = Color(0xFF4F6574),
+    outline              = Color(0xFFCEDAE2),
     error                = Color(0xFFBA1A1A),
     onError              = Color.White,
 )
 
 @Composable
 fun ShahittoPotrikaTheme(
-    darkTheme: Boolean = true,
-    fontScale: Float   = 1.0f,
+    darkTheme: Boolean = false,
+    fontScale: Float   = 1.15f,
     content: @Composable () -> Unit
 ) {
     val colorScheme = if (darkTheme) BlinkistDarkColors else LightColors
@@ -223,8 +252,8 @@ fun ShahittoPotrikaTheme(
         SideEffect {
             val window = (view.context as Activity).window
             @Suppress("DEPRECATION")
-            window.statusBarColor = DarkBg.toArgb()
-            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = false
+            window.statusBarColor = colorScheme.background.toArgb()
+            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !darkTheme
         }
     }
 

@@ -128,35 +128,6 @@ fun ArticleDetailScreen(
                                 containerColor   = DarkSurface
                             ) {
                                 DropdownMenuItem(
-                                    text = {
-                                        Text(
-                                            if (isSpeaking) "পড়া থামান" else "পড়ে শোনান",
-                                            color = OnDarkHigh
-                                        )
-                                    },
-                                    leadingIcon = {
-                                        Icon(
-                                            if (isSpeaking) Icons.Default.VolumeOff
-                                            else Icons.Default.VolumeUp,
-                                            null,
-                                            tint = OnDarkMed
-                                        )
-                                    },
-                                    onClick = {
-                                        showMenu = false
-                                        if (isSpeaking) {
-                                            tts?.stop(); isSpeaking = false
-                                        } else {
-                                            tts?.speak(
-                                                buildSpeechText(article),
-                                                TextToSpeech.QUEUE_FLUSH,
-                                                null, "sp_utterance"
-                                            )
-                                            isSpeaking = true
-                                        }
-                                    }
-                                )
-                                DropdownMenuItem(
                                     text = { Text("উদ্ধৃতি কপি করুন", color = OnDarkHigh) },
                                     leadingIcon = {
                                         Icon(Icons.Default.ContentCopy, null, tint = OnDarkMed)
@@ -327,6 +298,53 @@ fun ArticleDetailScreen(
                     HorizontalDivider(color = DarkOutline, modifier = Modifier.padding(vertical = 4.dp))
                     Spacer(Modifier.height(12.dp))
 
+                    // ── AI Audio Narration Button ───────────────────────────────
+                    Button(
+                        onClick = {
+                            if (isSpeaking) {
+                                tts?.stop()
+                                isSpeaking = false
+                            } else {
+                                tts?.speak(
+                                    buildSpeechText(article),
+                                    TextToSpeech.QUEUE_FLUSH,
+                                    null, "sp_utterance"
+                                )
+                                isSpeaking = true
+                            }
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        shape    = RoundedCornerShape(50.dp),
+                        colors   = ButtonDefaults.buttonColors(
+                            containerColor = if (androidx.compose.foundation.isSystemInDarkTheme()) TealAccent.copy(alpha = 0.12f) else Color(0xFFEEF2F6),
+                            contentColor   = if (androidx.compose.foundation.isSystemInDarkTheme()) TealAccent else Color(0xFF2563EB)
+                        ),
+                        border = androidx.compose.foundation.BorderStroke(
+                            1.dp,
+                            if (androidx.compose.foundation.isSystemInDarkTheme()) TealAccent.copy(alpha = 0.5f) else Color(0xFF78C4FF)
+                        )
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.Center
+                        ) {
+                            Icon(
+                                if (isSpeaking) Icons.Default.VolumeOff else Icons.Default.VolumeUp,
+                                contentDescription = null,
+                                modifier = Modifier.size(20.dp),
+                                tint     = if (androidx.compose.foundation.isSystemInDarkTheme()) TealAccent else Color(0xFF2563EB)
+                            )
+                            Spacer(Modifier.width(8.dp))
+                            Text(
+                                if (isSpeaking) "পড়া থামান" else "প্রবন্ধটি শুনুন (AI অডিও)",
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 14.sp
+                            )
+                        }
+                    }
+
+                    Spacer(Modifier.height(12.dp))
+
                     // Primary action buttons
                     Row(
                         modifier              = Modifier.fillMaxWidth(),
@@ -341,10 +359,12 @@ fun ArticleDetailScreen(
                             modifier = Modifier.weight(1f),
                             shape    = RoundedCornerShape(50.dp),
                             colors   = ButtonDefaults.outlinedButtonColors(
-                                contentColor = TealAccent
+                                containerColor = if (androidx.compose.foundation.isSystemInDarkTheme()) TealAccent.copy(alpha = 0.12f) else Color(0xFFEEF2F6),
+                                contentColor   = if (androidx.compose.foundation.isSystemInDarkTheme()) TealAccent else Color(0xFF2563EB)
                             ),
                             border   = androidx.compose.foundation.BorderStroke(
-                                1.dp, TealAccent.copy(alpha = 0.5f)
+                                1.dp,
+                                if (androidx.compose.foundation.isSystemInDarkTheme()) TealAccent.copy(alpha = 0.5f) else Color(0xFF78C4FF)
                             )
                         ) {
                             Text("ওয়েবে পড়ুন", fontWeight = FontWeight.SemiBold)
@@ -356,8 +376,8 @@ fun ArticleDetailScreen(
                                 modifier = Modifier.weight(1f),
                                 shape    = RoundedCornerShape(50.dp),
                                 colors   = ButtonDefaults.buttonColors(
-                                    containerColor = TealAccent,
-                                    contentColor   = Color(0xFF003730)
+                                    containerColor = if (androidx.compose.foundation.isSystemInDarkTheme()) TealAccent else Color(0xFF102334),
+                                    contentColor   = if (androidx.compose.foundation.isSystemInDarkTheme()) Color(0xFF003730) else Color.White
                                 )
                             ) {
                                 Text("PDF পড়ুন", fontWeight = FontWeight.Bold)
@@ -365,7 +385,7 @@ fun ArticleDetailScreen(
                         }
                     }
 
-                    Spacer(Modifier.height(10.dp))
+                    Spacer(Modifier.height(12.dp))
 
                     // Secondary action row
                     Row(
@@ -377,16 +397,18 @@ fun ArticleDetailScreen(
                             modifier = Modifier.weight(1f),
                             shape    = RoundedCornerShape(50.dp),
                             colors   = ButtonDefaults.outlinedButtonColors(
-                                contentColor = OnDarkMed
+                                containerColor = if (androidx.compose.foundation.isSystemInDarkTheme()) TealAccent.copy(alpha = 0.12f) else Color(0xFFEEF2F6),
+                                contentColor   = if (androidx.compose.foundation.isSystemInDarkTheme()) TealAccent else Color(0xFF2563EB)
                             ),
                             border   = androidx.compose.foundation.BorderStroke(
-                                1.dp, DarkOutline
+                                1.dp,
+                                if (androidx.compose.foundation.isSystemInDarkTheme()) TealAccent.copy(alpha = 0.5f) else Color(0xFF78C4FF)
                             )
                         ) {
                             Icon(
                                 Icons.Default.EditNote, null,
-                                modifier = Modifier.size(16.dp),
-                                tint     = OnDarkMed
+                                modifier = Modifier.size(18.dp),
+                                tint     = if (androidx.compose.foundation.isSystemInDarkTheme()) TealAccent else Color(0xFF2563EB)
                             )
                             Spacer(Modifier.width(4.dp))
                             Text("নোট")
@@ -402,16 +424,18 @@ fun ArticleDetailScreen(
                                 modifier = Modifier.weight(1f),
                                 shape    = RoundedCornerShape(50.dp),
                                 colors   = ButtonDefaults.outlinedButtonColors(
-                                    contentColor = OnDarkMed
+                                    containerColor = if (androidx.compose.foundation.isSystemInDarkTheme()) TealAccent.copy(alpha = 0.12f) else Color(0xFFEEF2F6),
+                                    contentColor   = if (androidx.compose.foundation.isSystemInDarkTheme()) TealAccent else Color(0xFF2563EB)
                                 ),
                                 border   = androidx.compose.foundation.BorderStroke(
-                                    1.dp, DarkOutline
+                                    1.dp,
+                                    if (androidx.compose.foundation.isSystemInDarkTheme()) TealAccent.copy(alpha = 0.5f) else Color(0xFF78C4FF)
                                 )
                             ) {
                                 Icon(
                                     Icons.Default.Download, null,
-                                    modifier = Modifier.size(16.dp),
-                                    tint     = OnDarkMed
+                                    modifier = Modifier.size(18.dp),
+                                    tint     = if (androidx.compose.foundation.isSystemInDarkTheme()) TealAccent else Color(0xFF2563EB)
                                 )
                                 Spacer(Modifier.width(4.dp))
                                 Text("ডাউনলোড")

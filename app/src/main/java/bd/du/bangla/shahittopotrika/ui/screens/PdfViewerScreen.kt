@@ -138,7 +138,17 @@ fun PdfViewerScreen(
                             style = MaterialTheme.typography.bodyLarge)
                         Spacer(Modifier.height(16.dp))
                         Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                            OutlinedButton(onClick = { retryKey++ }) {
+                            OutlinedButton(
+                                onClick = { retryKey++ },
+                                colors   = ButtonDefaults.outlinedButtonColors(
+                                    containerColor = if (androidx.compose.foundation.isSystemInDarkTheme()) TealAccent.copy(alpha = 0.12f) else Color(0xFFEEF2F6),
+                                    contentColor   = if (androidx.compose.foundation.isSystemInDarkTheme()) TealAccent else Color(0xFF2563EB)
+                                ),
+                                border   = androidx.compose.foundation.BorderStroke(
+                                    1.dp,
+                                    if (androidx.compose.foundation.isSystemInDarkTheme()) TealAccent.copy(alpha = 0.5f) else Color(0xFF78C4FF)
+                                )
+                            ) {
                                 Text("আবার চেষ্টা")
                             }
                             Button(
@@ -147,7 +157,10 @@ fun PdfViewerScreen(
                                         Intent(Intent.ACTION_VIEW, Uri.parse(pdfUrl))
                                     )
                                 },
-                                colors = ButtonDefaults.buttonColors(containerColor = DarkSurface)
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = if (androidx.compose.foundation.isSystemInDarkTheme()) TealAccent else Color(0xFF102334),
+                                    contentColor   = if (androidx.compose.foundation.isSystemInDarkTheme()) Color(0xFF003730) else Color.White
+                                )
                             ) { Text("ব্রাউজারে খুলুন") }
                         }
                     }

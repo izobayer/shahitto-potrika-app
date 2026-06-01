@@ -26,7 +26,7 @@ class UserPreferences(private val context: Context) {
 
     val isDarkMode: Flow<Boolean> = context.dataStore.data
         .catch { emit(emptyPreferences()) }
-        .map { it[Keys.DARK_MODE] ?: true }
+        .map { it[Keys.DARK_MODE] ?: false }
 
     val fontScale: Flow<Float> = context.dataStore.data
         .catch { emit(emptyPreferences()) }
