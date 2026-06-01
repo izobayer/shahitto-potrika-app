@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -17,16 +19,16 @@ android {
         versionName = "2.0.0"
 
         // Dynamically load Gemini key from system environment or local.properties
-        val localProperties = java.util.Properties().apply {
-            val file = rootProject.file("local.properties")
-            if (file.exists()) {
-                file.inputStream().use { load(it) }
-            }
+        val localProperties = Properties()
+        val file = rootProject.file("local.properties")
+        if (file.exists()) {
+            file.inputStream().use { localProperties.load(it) }
         }
-        val apiKey = System.getenv("GOOGLE_AI_API_KEY")
-            ?: localProperties.getProperty("GOOGLE_AI_API_KEY")
-            ?: localProperties.getProperty("googleAiApiKey")
-            ?: ""
+        val envKey = System.getenv("GOOGLE_AI_API_KEY") ?: ""
+        val propKey = localProperties.getProperty("GOOGLE_AI_API_KEY") ?: ""
+        val propKey2 = localProperties.getProperty("googleAiApiKey") ?: ""
+
+        val apiKey = envKey.ifBlank { propKey }.ifBlank { propKey2 }
 
         buildConfigField("String", "GOOGLE_AI_API_KEY", "\"$apiKey\"")
     }
