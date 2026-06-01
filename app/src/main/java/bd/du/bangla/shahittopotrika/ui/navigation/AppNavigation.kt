@@ -62,14 +62,7 @@ fun AppNavigation(
                 onAboutClick     = { navController.navigate(Routes.ABOUT) },
                 onBookmarksClick = { navController.navigate(Routes.BOOKMARKS) },
                 onSettingsClick  = { navController.navigate(Routes.SETTINGS) },
-                onHistoryClick   = { navController.navigate(Routes.READ_HISTORY) },
-                onChatClick      = { navController.navigate(Routes.CHAT) }
-            )
-        }
-
-        composable(Routes.CHAT) {
-            ChatScreen(
-                onBack = { navController.popBackStack() }
+                onHistoryClick   = { navController.navigate(Routes.READ_HISTORY) }
             )
         }
 

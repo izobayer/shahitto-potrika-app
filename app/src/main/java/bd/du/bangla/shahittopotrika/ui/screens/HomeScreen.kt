@@ -47,8 +47,7 @@ fun HomeScreen(
     onAboutClick: () -> Unit,
     onBookmarksClick: () -> Unit,
     onSettingsClick: () -> Unit = {},
-    onHistoryClick: () -> Unit = {},
-    onChatClick: () -> Unit = {}
+    onHistoryClick: () -> Unit = {}
 ) {
     val currentIssueState by viewModel.currentIssue.collectAsState()
     val archiveState       by viewModel.issueArchive.collectAsState()
@@ -58,23 +57,6 @@ fun HomeScreen(
 
     Scaffold(
         containerColor = DarkBg,
-        floatingActionButton = {
-            FloatingActionButton(
-                onClick          = onChatClick,
-                containerColor   = TealAccent,
-                contentColor     = Color(0xFF003730),
-                shape            = RoundedCornerShape(16.dp)
-            ) {
-                Row(
-                    modifier = Modifier.padding(horizontal = 16.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(6.dp)
-                ) {
-                    Icon(Icons.Default.Chat, null, modifier = Modifier.size(20.dp))
-                    Text("সহকারী", fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
-                }
-            }
-        },
         bottomBar = {
             BlinkistBottomNav(
                 currentRoute     = "home",
