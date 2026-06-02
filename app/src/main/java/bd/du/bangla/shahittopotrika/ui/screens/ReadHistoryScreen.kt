@@ -139,7 +139,7 @@ fun ReadHistoryScreen(
                                         modifier = Modifier.fillMaxWidth()
                                     ) {
                                         LinearProgressIndicator(
-                                            progress = item.progress,
+                                            progress = { item.progress },
                                             modifier = Modifier
                                                 .weight(1f)
                                                 .height(4.dp),
