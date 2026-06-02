@@ -5,6 +5,7 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
+import androidx.compose.ui.platform.LocalContext
 import android.net.Uri
 import android.os.Environment
 import android.speech.tts.TextToSpeech
@@ -1122,9 +1123,6 @@ fun CommentCard(
         }
     }
 }
-
-import androidx.compose.ui.platform.LocalContext
-import android.content.Intent
 
 @Composable
 fun CitationDialog(
