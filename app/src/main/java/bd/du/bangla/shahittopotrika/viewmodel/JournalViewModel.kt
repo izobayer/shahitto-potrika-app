@@ -59,16 +59,72 @@ class JournalViewModel(app: Application) : AndroidViewModel(app) {
             .flatMapLatest { repo.isBookmarked(it) }
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
 
+    val currentArticleFolders: StateFlow<List<String>> =
+        _currentArticleId.filter { it.isNotBlank() }
+            .flatMapLatest { repo.getFoldersForArticleFlow(it) }
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+    val allFolderNames: StateFlow<List<String>> =
+        repo.getAllFolderNames()
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+    val folderMetadata: StateFlow<String> = repo.prefs.folderMetadata
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "{}")
+
+    fun updateFolderMetadata(folderName: String, emoji: String, colorHex: String) {
+        viewModelScope.launch {
+            val currentJson = folderMetadata.value
+            val newJson = try {
+                val jsonObject = org.json.JSONObject(currentJson)
+                val folderObj = org.json.JSONObject().apply {
+                    put("emoji", emoji)
+                    put("colorHex", colorHex)
+                }
+                jsonObject.put(folderName, folderObj)
+                jsonObject.toString()
+            } catch (e: Exception) {
+                val jsonObject = org.json.JSONObject()
+                val folderObj = org.json.JSONObject().apply {
+                    put("emoji", emoji)
+                    put("colorHex", colorHex)
+                }
+                jsonObject.put(folderName, folderObj)
+                jsonObject.toString()
+            }
+            repo.prefs.setFolderMetadata(newJson)
+        }
+    }
+
+    // ── Note for current article ────────────────────────────
     // ── Note for current article ────────────────────────────
     val currentNote: StateFlow<ArticleNoteEntity?> =
         _currentArticleId.filter { it.isNotBlank() }
             .flatMapLatest { repo.getNoteForArticle(it) }
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
 
+    val currentArticleComments: StateFlow<List<bd.du.bangla.shahittopotrika.data.local.entity.ArticleCommentEntity>> =
+        _currentArticleId.filter { it.isNotBlank() }
+            .flatMapLatest { repo.getCommentsForArticle(it) }
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+    val isUserLoggedIn: StateFlow<Boolean> = repo.prefs.isUserLoggedIn
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
+
+    val userName: StateFlow<String> = repo.prefs.userName
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "")
+
+    val userEmail: StateFlow<String> = repo.prefs.userEmail
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "")
+
     // ── Read history ────────────────────────────────────────
     val readHistory: StateFlow<List<ReadHistoryEntity>> =
         repo.getReadHistory()
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+    val currentArticleHistory: StateFlow<ReadHistoryEntity?> =
+        _currentArticleId.filter { it.isNotBlank() }
+            .flatMapLatest { repo.getHistoryForArticle(it) }
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
 
     // ── Journal info ────────────────────────────────────────
     private val _journalInfo = MutableStateFlow<UiState<JournalInfo>>(UiState.Loading)
@@ -139,6 +195,11 @@ class JournalViewModel(app: Application) : AndroidViewModel(app) {
         if (isBookmarked.value) repo.removeBookmark(article.id) else repo.addBookmark(article)
     }
 
+    fun updateArticleBookmarks(article: Article, checkedFolders: List<String>, uncheckedFolders: List<String>) =
+        viewModelScope.launch(Dispatchers.IO) {
+            repo.updateArticleBookmarks(article, checkedFolders, uncheckedFolders)
+        }
+
     fun removeBookmark(articleId: String) = viewModelScope.launch(Dispatchers.IO) {
         repo.removeBookmark(articleId)
     }
@@ -157,6 +218,15 @@ class JournalViewModel(app: Application) : AndroidViewModel(app) {
         _currentArticleId.value = id
     }
 
+    fun addComment(articleId: String, userName: String, userEmail: String, commentText: String) =
+        viewModelScope.launch(Dispatchers.IO) {
+            repo.addComment(articleId, userName, userEmail, commentText)
+        }
+
+    fun deleteComment(commentId: String) = viewModelScope.launch(Dispatchers.IO) {
+        repo.deleteComment(commentId)
+    }
+
     fun deleteFromHistory(id: String) = viewModelScope.launch(Dispatchers.IO) {
         repo.deleteFromHistory(id)
     }
@@ -164,6 +234,11 @@ class JournalViewModel(app: Application) : AndroidViewModel(app) {
     fun clearHistory() = viewModelScope.launch(Dispatchers.IO) {
         repo.clearHistory()
     }
+
+    fun updateReadingProgress(articleId: String, progress: Float, offset: Int) =
+        viewModelScope.launch(Dispatchers.IO) {
+            repo.updateReadingProgress(articleId, progress, offset)
+        }
 
     fun loadJournalInfo() {
         viewModelScope.launch(Dispatchers.IO) {

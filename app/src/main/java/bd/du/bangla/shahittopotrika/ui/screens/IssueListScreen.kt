@@ -185,7 +185,7 @@ private fun ArchiveHeader() {
     Column(modifier = Modifier.padding(horizontal = 20.dp, vertical = 16.dp)) {
         Text(
             "আর্কাইভ",
-            style = MaterialTheme.typography.headlineLarge,
+            style = MaterialTheme.typography.headlineMedium,
             color = OnDarkHigh
         )
         Spacer(Modifier.height(6.dp))

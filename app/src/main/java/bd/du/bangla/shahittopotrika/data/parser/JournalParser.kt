@@ -23,6 +23,12 @@ object JournalParser {
         return Jsoup.parse(html, url)
     }
 
+    private fun cleanIssueTitle(raw: String): String {
+        return raw.replace("সাহিত্য পত্রিকা:", "")
+                  .replace("সাহিত্য পত্রিকা :", "")
+                  .trim()
+    }
+
     // ── Issues ──────────────────────────────────────────────
     fun fetchIssueArchive(): List<Issue> {
         val doc = fetch("$BASE_URL/issue/archive")
@@ -32,7 +38,7 @@ object JournalParser {
             val id = url.substringAfterLast("/").ifBlank { idx.toString() }
             val cover = el.selectFirst(".cover img")?.absUrl("src")
             val seriesEl = el.selectFirst(".series, .volume, .pkp_vol_no")
-            val title = titleEl?.text() ?: "সংখ্যা ${idx + 1}"
+            val title = cleanIssueTitle(titleEl?.text() ?: "সংখ্যা ${idx + 1}")
             val volumeText = seriesEl?.text() ?: ""
             val year = el.selectFirst(".date, .published")?.text()?.take(4) ?: ""
             Issue(
@@ -49,7 +55,7 @@ object JournalParser {
         val titleEl = doc.selectFirst(".obj_issue_toc .heading h2, h1.title")
         val cover = doc.selectFirst(".cover img, .pkp_structure_main img.cover")?.absUrl("src")
         val url = "$BASE_URL/issue/current"
-        val title = titleEl?.text() ?: "চলতি সংখ্যা"
+        val title = cleanIssueTitle(titleEl?.text() ?: "চলতি সংখ্যা")
         val id = doc.selectFirst("link[rel=canonical]")?.attr("href")
             ?.substringAfterLast("/") ?: "current"
         return Issue(id = id, title = title, volume = "", number = "", year = "", coverImageUrl = cover, url = url)

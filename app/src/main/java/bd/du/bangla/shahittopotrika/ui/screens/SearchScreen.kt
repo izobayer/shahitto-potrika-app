@@ -1,10 +1,12 @@
 package bd.du.bangla.shahittopotrika.ui.screens
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -36,6 +38,8 @@ fun SearchScreen(
     journalVm: JournalViewModel,
     onArticleClick: (Article) -> Unit,
     onBack: () -> Unit,
+    initialQuery: String? = null,
+    onIssueClick: (bd.du.bangla.shahittopotrika.data.model.Issue) -> Unit = {},
     onHomeClick: () -> Unit = onBack,
     onIssueListClick: () -> Unit = {},
     onBookmarksClick: () -> Unit = {},
@@ -50,6 +54,13 @@ fun SearchScreen(
     var selectedCategory by remember { mutableStateOf<String?>(null) }
 
     LaunchedEffect(Unit) { journalVm.loadIssueArchive() }
+
+    LaunchedEffect(initialQuery) {
+        if (!initialQuery.isNullOrBlank()) {
+            viewModel.onQueryChange(initialQuery)
+            viewModel.search()
+        }
+    }
 
     Scaffold(
         containerColor = DarkBg,
@@ -75,8 +86,8 @@ fun SearchScreen(
             item {
                 Column(modifier = Modifier.padding(horizontal = 20.dp, vertical = 16.dp)) {
                     Text(
-                        "এক্সপ্লোর",
-                        style = MaterialTheme.typography.headlineLarge,
+                        "অনুসন্ধান",
+                        style = MaterialTheme.typography.headlineMedium,
                         color = OnDarkHigh
                     )
                     Spacer(Modifier.height(6.dp))
@@ -217,15 +228,35 @@ fun SearchScreen(
                             }
                         }
                         is UiState.Success -> {
-                            LazyRow(
-                                contentPadding        = PaddingValues(horizontal = 20.dp),
-                                horizontalArrangement = Arrangement.spacedBy(10.dp)
-                            ) {
-                                items(state.data.take(8)) { issue ->
-                                    RecentIssueCard(
-                                        issue   = issue,
-                                        onClick = { /* navigate to issue articles */ }
-                                    )
+                            val infiniteIssues = remember(state.data) {
+                                val list = state.data.take(8)
+                                if (list.isEmpty()) emptyList() else List(100) { list }.flatten()
+                            }
+                            if (infiniteIssues.isNotEmpty()) {
+                                val listState = rememberLazyListState(initialFirstVisibleItemIndex = 400)
+                                LaunchedEffect(listState.isScrollInProgress) {
+                                    if (!listState.isScrollInProgress) {
+                                        while (true) {
+                                            kotlinx.coroutines.delay(35)
+                                            try {
+                                                listState.scrollBy(1f)
+                                            } catch (e: Exception) {
+                                                // Ignore scroll exceptions
+                                            }
+                                        }
+                                    }
+                                }
+                                LazyRow(
+                                    state                 = listState,
+                                    contentPadding        = PaddingValues(horizontal = 20.dp),
+                                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                                ) {
+                                    items(infiniteIssues) { issue ->
+                                        RecentIssueCard(
+                                            issue   = issue,
+                                            onClick = { onIssueClick(issue) }
+                                        )
+                                    }
                                 }
                             }
                         }

@@ -12,6 +12,9 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
 
     private val prefs = (app as ShahittoPotrikaApplication).repository.prefs
 
+    val themeMode = prefs.themeMode
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "LIGHT")
+
     val isDarkMode = prefs.isDarkMode
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
 
@@ -36,6 +39,19 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
     val showAbstractInList = prefs.showAbstractInList
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), true)
 
+    val isUserLoggedIn = prefs.isUserLoggedIn
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
+
+    val userName = prefs.userName
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "")
+
+    val userEmail = prefs.userEmail
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "")
+
+    val userPhotoUrl = prefs.userPhotoUrl
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "")
+
+    fun setThemeMode(mode: String) = viewModelScope.launch { prefs.setThemeMode(mode) }
     fun toggleDarkMode()           = viewModelScope.launch { prefs.setDarkMode(!isDarkMode.value) }
     fun setFontScale(scale: Float) = viewModelScope.launch { prefs.setFontScale(scale) }
     fun toggleNotifications()      = viewModelScope.launch { prefs.setNotificationsEnabled(!notificationsEnabled.value) }
@@ -44,4 +60,12 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
     fun toggleHistoryTracking()    = viewModelScope.launch { prefs.setHistoryTrackingEnabled(!historyTrackingEnabled.value) }
     fun toggleOpenPdfExternal()    = viewModelScope.launch { prefs.setOpenPdfExternal(!openPdfExternal.value) }
     fun toggleShowAbstract()       = viewModelScope.launch { prefs.setShowAbstractInList(!showAbstractInList.value) }
+
+    fun loginUser(name: String, email: String, photoUrl: String) = viewModelScope.launch {
+        prefs.saveUserSession(name, email, photoUrl)
+    }
+
+    fun logoutUser() = viewModelScope.launch {
+        prefs.clearUserSession()
+    }
 }

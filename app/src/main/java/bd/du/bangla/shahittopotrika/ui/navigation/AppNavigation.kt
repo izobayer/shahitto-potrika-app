@@ -18,7 +18,7 @@ object Routes {
     const val ISSUE_LIST     = "issue_list"
     const val ARTICLE_LIST   = "article_list/{issueUrl}"
     const val ARTICLE_DETAIL = "article_detail/{articleUrl}"
-    const val SEARCH         = "search"
+    const val SEARCH         = "search?query={query}"
     const val ABOUT          = "about"
     const val BOOKMARKS      = "bookmarks"
     const val PDF_VIEWER     = "pdf_viewer/{pdfUrl}/{title}"
@@ -35,6 +35,8 @@ object Routes {
         "pdf_viewer/${URLEncoder.encode(pdfUrl, "UTF-8")}/${URLEncoder.encode(title, "UTF-8")}"
     fun notes(articleId: String, articleTitle: String) =
         "notes/${URLEncoder.encode(articleId, "UTF-8")}/${URLEncoder.encode(articleTitle, "UTF-8")}"
+    fun search(query: String? = null) =
+        if (query != null) "search?query=${URLEncoder.encode(query, "UTF-8")}" else "search"
 }
 
 @Composable
@@ -101,14 +103,29 @@ fun AppNavigation(
                 },
                 onNotesClick = { id, title ->
                     navController.navigate(Routes.notes(id, title))
+                },
+                onAuthorClick = { authorName ->
+                    navController.navigate(Routes.search(authorName))
                 }
             )
         }
 
-        composable(Routes.SEARCH) {
+        composable(
+            route = Routes.SEARCH,
+            arguments = listOf(
+                androidx.navigation.navArgument("query") {
+                    type = androidx.navigation.NavType.StringType
+                    nullable = true
+                    defaultValue = null
+                }
+            )
+        ) { backStackEntry ->
+            val query = backStackEntry.arguments?.getString("query")
+                ?.let { URLDecoder.decode(it, "UTF-8") }
             SearchScreen(
                 viewModel        = searchVm,
                 journalVm        = journalVm,
+                initialQuery     = query,
                 onArticleClick   = { navController.navigate(Routes.articleDetail(it.url)) },
                 onBack           = { navController.popBackStack() },
                 onHomeClick      = { navController.popBackStack(Routes.HOME, inclusive = false) },

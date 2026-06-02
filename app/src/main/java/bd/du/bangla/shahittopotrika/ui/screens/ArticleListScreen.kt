@@ -155,7 +155,7 @@ fun ArticleCard(article: Article, onClick: () -> Unit, modifier: Modifier = Modi
                     color      = TealAccent,
                     maxLines   = 1,
                     overflow   = TextOverflow.Ellipsis,
-                    fontWeight = FontWeight.Medium
+                    fontWeight = FontWeight.Bold
                 )
             }
             if (article.abstract.isNotBlank()) {

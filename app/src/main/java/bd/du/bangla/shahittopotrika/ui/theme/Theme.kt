@@ -47,14 +47,22 @@ val KalpurushFamily = FontFamily(
 val StaticDarkBg        = Color(0xFF0D1F2D)
 val StaticDarkSurface   = Color(0xFF112535)
 val StaticDarkSurface2  = Color(0xFF0A1820)
-val TealAccent          = Color(0xFF00D4B1)
-val TealAccentDim       = Color(0xFF009E85)
+val StaticTealAccent    = Color(0xFF00D4B1)
+val StaticTealAccentDim = Color(0xFF009E85)
 val StaticOnDarkHigh    = Color(0xFFFFFFFF)
 val StaticOnDarkMed     = Color(0xFFB0C8D4)
 val StaticOnDarkLow     = Color(0xFF5A8090)
 val StaticDarkOutline   = Color(0xFF1E3A4A)
 
 // ── Dynamic Color Lookups (Theme-Aware) ───────────────────────────────────────
+val TealAccent: Color
+    @Composable
+    get() = if (androidx.compose.foundation.isSystemInDarkTheme()) Color(0xFF00D4B1) else Color(0xFF2563EB)
+
+val TealAccentDim: Color
+    @Composable
+    get() = if (androidx.compose.foundation.isSystemInDarkTheme()) Color(0xFF009E85) else Color(0xFF1E3A8A)
+
 val DarkBg: Color
     @Composable
     get() = MaterialTheme.colorScheme.background
@@ -198,14 +206,14 @@ val KalpurushTypography = Typography(
 
 // ── Color schemes ─────────────────────────────────────────────────────────────
 private val BlinkistDarkColors = darkColorScheme(
-    primary              = TealAccent,
+    primary              = StaticTealAccent,
     onPrimary            = Color(0xFF003730),
-    primaryContainer     = TealAccentDim,
+    primaryContainer     = StaticTealAccentDim,
     onPrimaryContainer   = StaticOnDarkHigh,
-    secondary            = TealAccentDim,
+    secondary            = StaticTealAccentDim,
     onSecondary          = Color.White,
     secondaryContainer   = Color(0xFF0A2A25),
-    onSecondaryContainer = TealAccent,
+    onSecondaryContainer = StaticTealAccent,
     background           = StaticDarkBg,
     onBackground         = StaticOnDarkHigh,
     surface              = StaticDarkSurface,
@@ -239,13 +247,61 @@ private val LightColors = lightColorScheme(
     onError              = Color.White,
 )
 
+private val SepiaColors = lightColorScheme(
+    primary              = Color(0xFF8B4513), // SaddleBrown Accent
+    onPrimary            = Color.White,
+    primaryContainer     = Color(0xFFEFE6CE),
+    onPrimaryContainer   = Color(0xFF3C2C1E),
+    secondary            = Color(0xFF5C4C3E),
+    onSecondary          = Color.White,
+    secondaryContainer   = Color(0xFFE8DCBE),
+    onSecondaryContainer = Color(0xFF3C2C1E),
+    background           = Color(0xFFF4ECD8),
+    onBackground         = Color(0xFF3C2C1E),
+    surface              = Color(0xFFEFE6CE),
+    onSurface            = Color(0xFF3C2C1E),
+    surfaceVariant       = Color(0xFFE8DCBE),
+    onSurfaceVariant     = Color(0xFF5C4C3E),
+    outline              = Color(0xFFDFD0B0),
+    error                = Color(0xFFBA1A1A),
+    onError              = Color.White,
+)
+
+private val OledBlackColors = darkColorScheme(
+    primary              = Color(0xFF4ADE80), // Vibrant Green Accent for OLED Black contrast
+    onPrimary            = Color.Black,
+    primaryContainer     = Color(0xFF0A2A1A),
+    onPrimaryContainer   = Color(0xFF4ADE80),
+    secondary            = Color(0xFF00D4B1),
+    onSecondary          = Color.Black,
+    secondaryContainer   = Color(0xFF0C0C0C),
+    onSecondaryContainer = Color.White,
+    background           = Color(0xFF000000),
+    onBackground         = Color(0xFFFFFFFF),
+    surface              = Color(0xFF0C0C0C),
+    onSurface            = Color(0xFFFFFFFF),
+    surfaceVariant       = Color(0xFF141414),
+    onSurfaceVariant     = Color(0xFFCCCCCC),
+    outline              = Color(0xFF222222),
+    error                = Color(0xFFFFB4AB),
+    onError              = Color(0xFF690005),
+)
+
 @Composable
 fun ShahittoPotrikaTheme(
-    darkTheme: Boolean = false,
+    themeMode: String = "LIGHT",
     fontScale: Float   = 1.15f,
     content: @Composable () -> Unit
 ) {
-    val colorScheme = if (darkTheme) BlinkistDarkColors else LightColors
+    val colorScheme = when (themeMode) {
+        "LIGHT" -> LightColors
+        "DARK" -> BlinkistDarkColors
+        "SEPIA" -> SepiaColors
+        "OLED" -> OledBlackColors
+        else -> LightColors
+    }
+
+    val isDark = themeMode == "DARK" || themeMode == "OLED"
 
     val view = LocalView.current
     if (!view.isInEditMode) {
@@ -253,7 +309,7 @@ fun ShahittoPotrikaTheme(
             val window = (view.context as Activity).window
             @Suppress("DEPRECATION")
             window.statusBarColor = colorScheme.background.toArgb()
-            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !darkTheme
+            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !isDark
         }
     }
 

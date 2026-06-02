@@ -9,5 +9,7 @@ data class ReadHistoryEntity(
     val title: String,
     val authors: String,
     val url: String,
-    val readAt: Long = System.currentTimeMillis()
+    val readAt: Long = System.currentTimeMillis(),
+    val progress: Float = 0f,
+    val scrollOffset: Int = 0
 )

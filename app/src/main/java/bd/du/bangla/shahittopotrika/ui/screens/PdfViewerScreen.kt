@@ -199,6 +199,10 @@ fun PdfPagesView(file: File, pageCount: Int) {
     }
 }
 
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.ColorMatrix
+import androidx.compose.foundation.isSystemInDarkTheme
+
 @Composable
 fun PdfPage(
     file: File,
@@ -207,6 +211,7 @@ fun PdfPage(
     modifier: Modifier = Modifier
 ) {
     var bitmap by remember(pageIndex) { mutableStateOf<Bitmap?>(null) }
+    val isDark = isSystemInDarkTheme()
 
     LaunchedEffect(pageIndex, screenWidth) {
         withContext(Dispatchers.IO) {
@@ -233,10 +238,23 @@ fun PdfPage(
     }
 
     if (bitmap != null) {
+        val colorFilter = if (isDark) {
+            val matrix = floatArrayOf(
+                -1.0f, 0.0f, 0.0f, 0.0f, 255.0f,
+                0.0f, -1.0f, 0.0f, 0.0f, 255.0f,
+                0.0f, 0.0f, -1.0f, 0.0f, 255.0f,
+                0.0f, 0.0f, 0.0f, 1.0f, 0.0f
+            )
+            ColorFilter.colorMatrix(ColorMatrix(matrix))
+        } else {
+            null
+        }
+
         Image(
             bitmap          = bitmap!!.asImageBitmap(),
             contentDescription = "পৃষ্ঠা ${pageIndex + 1}",
             contentScale    = ContentScale.FillWidth,
+            colorFilter     = colorFilter,
             modifier        = modifier
         )
     } else {

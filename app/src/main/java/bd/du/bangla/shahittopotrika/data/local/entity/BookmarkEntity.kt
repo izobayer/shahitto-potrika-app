@@ -1,11 +1,14 @@
 package bd.du.bangla.shahittopotrika.data.local.entity
 
 import androidx.room.Entity
-import androidx.room.PrimaryKey
 
-@Entity(tableName = "bookmarks")
+@Entity(
+    tableName = "bookmarks",
+    primaryKeys = ["articleId", "folderName"]
+)
 data class BookmarkEntity(
-    @PrimaryKey val articleId: String,
+    val articleId: String,
+    val folderName: String = "পছন্দসমূহ",
     val title: String,
     val authors: String,
     val url: String,

@@ -13,9 +13,10 @@ import bd.du.bangla.shahittopotrika.data.local.entity.*
         ArticleEntity::class,
         BookmarkEntity::class,
         ReadHistoryEntity::class,
-        ArticleNoteEntity::class
+        ArticleNoteEntity::class,
+        ArticleCommentEntity::class
     ],
-    version = 3,
+    version = 6,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -24,6 +25,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun bookmarkDao(): BookmarkDao
     abstract fun readHistoryDao(): ReadHistoryDao
     abstract fun articleNoteDao(): ArticleNoteDao
+    abstract fun articleCommentDao(): ArticleCommentDao
 
     companion object {
         @Volatile private var INSTANCE: AppDatabase? = null
@@ -58,6 +60,7 @@ abstract class AppDatabase : RoomDatabase() {
                     "shahitto_potrika.db"
                 )
                 .addMigrations(MIGRATION_1_2, MIGRATION_2_3)
+                .fallbackToDestructiveMigration()
                 .build().also { INSTANCE = it }
             }
     }

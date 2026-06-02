@@ -86,14 +86,22 @@ fun HomeScreen(
                         .padding(horizontal = 16.dp, vertical = 4.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(
-                        "সাহিত্য পত্রিকা",
-                        fontFamily = QayyumBookFamily,
-                        fontWeight = FontWeight.Bold,
-                        fontSize   = 22.sp,
-                        color      = TealAccent,
-                        modifier   = Modifier.weight(1f)
-                    )
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            "সাহিত্য পত্রিকা",
+                            fontFamily = QayyumBookFamily,
+                            fontWeight = FontWeight.Bold,
+                            fontSize   = 22.sp,
+                            color      = TealAccent
+                        )
+                        Spacer(Modifier.height(1.dp))
+                        Text(
+                            "বাংলা বিভাগ, ঢাকা বিশ্ববিদ্যালয়",
+                            fontSize   = 10.sp,
+                            color      = OnDarkLow,
+                            fontWeight = FontWeight.Normal
+                        )
+                    }
                     IconButton(onClick = onHistoryClick) {
                         Icon(Icons.Default.History, "ইতিহাস", tint = OnDarkMed)
                     }
@@ -445,35 +453,35 @@ fun BlinkistBottomNav(
             selected = currentRoute == "home",
             onClick  = onHomeClick,
             icon     = { Icon(Icons.Default.Home, null) },
-            label    = { Text("হোম", fontSize = 11.sp, maxLines = 1, softWrap = false) },
+            label    = { Text("হোম", fontSize = 9.sp, maxLines = 1, softWrap = false) },
             colors   = itemColors
         )
         NavigationBarItem(
             selected = currentRoute == "search",
             onClick  = onExploreClick,
             icon     = { Icon(Icons.Default.Search, null) },
-            label    = { Text("এক্সপ্লোর", fontSize = 11.sp, maxLines = 1, softWrap = false) },
+            label    = { Text("অনুসন্ধান", fontSize = 9.sp, maxLines = 1, softWrap = false) },
             colors   = itemColors
         )
         NavigationBarItem(
             selected = currentRoute == "issue_list",
             onClick  = onArchiveClick,
             icon     = { Icon(Icons.Default.List, null) },
-            label    = { Text("আর্কাইভ", fontSize = 10.sp, maxLines = 1, softWrap = false) },
+            label    = { Text("আর্কাইভ", fontSize = 9.sp, maxLines = 1, softWrap = false) },
             colors   = itemColors
         )
         NavigationBarItem(
             selected = currentRoute == "bookmarks",
             onClick  = onBookmarksClick,
             icon     = { Icon(Icons.Default.Bookmark, null) },
-            label    = { Text("সংরক্ষিত", fontSize = 11.sp, maxLines = 1, softWrap = false) },
+            label    = { Text("সংরক্ষিত", fontSize = 9.sp, maxLines = 1, softWrap = false) },
             colors   = itemColors
         )
         NavigationBarItem(
             selected = currentRoute == "about",
             onClick  = onAboutClick,
             icon     = { Icon(Icons.Default.Info, null) },
-            label    = { Text("সম্পর্কে", fontSize = 11.sp, maxLines = 1, softWrap = false) },
+            label    = { Text("সম্পর্কে", fontSize = 9.sp, maxLines = 1, softWrap = false) },
             colors   = itemColors
         )
     }

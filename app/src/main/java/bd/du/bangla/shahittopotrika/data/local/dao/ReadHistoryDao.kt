@@ -17,4 +17,10 @@ interface ReadHistoryDao {
 
     @Query("DELETE FROM read_history")
     suspend fun clearAll()
+
+    @Query("SELECT * FROM read_history WHERE articleId = :id LIMIT 1")
+    fun getHistoryByIdFlow(id: String): Flow<ReadHistoryEntity?>
+
+    @Query("UPDATE read_history SET progress = :progress, scrollOffset = :offset WHERE articleId = :id")
+    suspend fun updateProgress(id: String, progress: Float, offset: Int)
 }

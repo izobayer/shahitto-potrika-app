@@ -17,9 +17,16 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.draw.clip
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import bd.du.bangla.shahittopotrika.BuildConfig
 import bd.du.bangla.shahittopotrika.ui.theme.DarkSurface
 import bd.du.bangla.shahittopotrika.ui.theme.OnDarkHigh
@@ -42,7 +49,41 @@ fun SettingsScreen(
     val historyOn           by vm.historyTrackingEnabled.collectAsState()
     val pdfExternal         by vm.openPdfExternal.collectAsState()
     val showAbstract        by vm.showAbstractInList.collectAsState()
+    
+    val isLoggedIn          by vm.isUserLoggedIn.collectAsState()
+    val userName            by vm.userName.collectAsState()
+    val userEmail           by vm.userEmail.collectAsState()
+    val userPhotoUrl        by vm.userPhotoUrl.collectAsState()
+
     val context = LocalContext.current
+    var showDemoDialog by remember { mutableStateOf(false) }
+
+    val gso = remember {
+        GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+            .requestEmail()
+            .requestProfile()
+            .build()
+    }
+    val googleSignInClient = remember { GoogleSignIn.getClient(context, gso) }
+
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
+        try {
+            val account = task.getResult(com.google.android.gms.common.api.ApiException::class.java)
+            if (account != null) {
+                val name = account.displayName ?: "ইউজার"
+                val email = account.email ?: ""
+                val photo = account.photoUrl?.toString() ?: ""
+                vm.loginUser(name, email, photo)
+            } else {
+                showDemoDialog = true
+            }
+        } catch (e: Exception) {
+            showDemoDialog = true
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -59,6 +100,30 @@ fun SettingsScreen(
             )
         }
     ) { padding ->
+        if (showDemoDialog) {
+            AlertDialog(
+                onDismissRequest = { showDemoDialog = false },
+                title = { Text("কনফিগারেশন অনুপস্থিত", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = OnDarkHigh) },
+                text = { Text("গুগল প্লে সার্ভিস বা ডেভেলপার ক্লায়েন্ট আইডি কনফিগার করা নেই। আপনি কি ডেমো অ্যাকাউন্ট দিয়ে সাইন-ইন করতে চান?", color = OnDarkMed) },
+                confirmButton = {
+                    TextButton(
+                        onClick = {
+                            vm.loginUser("বাংলা গবেষক", "researcher@du.ac.bd", "")
+                            showDemoDialog = false
+                        }
+                    ) {
+                        Text("হ্যাঁ", color = TealAccent, fontWeight = FontWeight.Bold)
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { showDemoDialog = false }) {
+                        Text("বাতিল", color = OnDarkLow)
+                    }
+                },
+                containerColor = DarkSurface
+            )
+        }
+
         Column(
             modifier = Modifier
                 .padding(padding).fillMaxSize()
@@ -67,16 +132,184 @@ fun SettingsScreen(
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
 
+            // ── ইউজার অ্যাকাউন্ট ──────────────────────────────
+            SettingsGroupHeader("ইউজার অ্যাকাউন্ট")
+
+            if (isLoggedIn) {
+                Card(
+                    shape = RoundedCornerShape(10.dp),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+                ) {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(14.dp),
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            if (userPhotoUrl.isNotBlank()) {
+                                coil.compose.AsyncImage(
+                                    model = userPhotoUrl,
+                                    contentDescription = "প্রোফাইল ছবি",
+                                    modifier = Modifier
+                                        .size(54.dp)
+                                        .background(DarkSurface, CircleShape)
+                                        .clip(CircleShape),
+                                    contentScale = androidx.compose.ui.layout.ContentScale.Crop
+                                )
+                            } else {
+                                val initials = getInitials(userName)
+                                Box(
+                                    modifier = Modifier
+                                        .size(54.dp)
+                                        .background(
+                                            brush = androidx.compose.ui.graphics.Brush.linearGradient(
+                                                colors = listOf(TealAccent, TealAccent.copy(alpha = 0.7f))
+                                            ),
+                                            shape = CircleShape
+                                        ),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Text(
+                                        text = initials,
+                                        color = Color.White,
+                                        fontSize = 18.sp,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                }
+                            }
+
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text(
+                                    text = userName,
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 16.sp,
+                                    color = OnDarkHigh
+                                )
+                                Text(
+                                    text = userEmail,
+                                    fontSize = 12.sp,
+                                    color = OnDarkMed
+                                )
+                            }
+                        }
+
+                        Spacer(Modifier.height(14.dp))
+
+                        Button(
+                            onClick = {
+                                googleSignInClient.signOut()
+                                vm.logoutUser()
+                            },
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.8f),
+                                contentColor = MaterialTheme.colorScheme.onErrorContainer
+                            ),
+                            shape = RoundedCornerShape(8.dp)
+                        ) {
+                            Icon(Icons.Default.Logout, null, modifier = Modifier.size(18.dp))
+                            Spacer(Modifier.width(8.dp))
+                            Text("লগআউট", fontWeight = FontWeight.Bold)
+                        }
+                    }
+                }
+            } else {
+                Card(
+                    shape = RoundedCornerShape(10.dp),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+                ) {
+                    Column(
+                        modifier = Modifier.padding(16.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            text = "আপনার পছন্দসমূহ সিঙ্ক করতে এবং মন্তব্য করতে লগইন করুন",
+                            fontSize = 13.sp,
+                            color = OnDarkMed,
+                            textAlign = TextAlign.Center
+                        )
+                        Spacer(Modifier.height(14.dp))
+                        Button(
+                            onClick = {
+                                launcher.launch(googleSignInClient.signInIntent)
+                            },
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = ButtonDefaults.buttonColors(containerColor = TealAccent),
+                            shape = RoundedCornerShape(8.dp)
+                        ) {
+                            Icon(Icons.Default.Login, null, modifier = Modifier.size(18.dp))
+                            Spacer(Modifier.width(8.dp))
+                            Text("গুগল অ্যাকাউন্ট দিয়ে লগইন করুন", fontWeight = FontWeight.Bold, color = Color.White)
+                        }
+                    }
+                }
+            }
+
+            Spacer(Modifier.height(4.dp))
+
             // ── চেহারা ───────────────────────────────────
             SettingsGroupHeader("চেহারা")
 
-            SettingsToggleRow(
-                icon     = Icons.Default.DarkMode,
-                title    = "ডার্ক মোড",
-                subtitle = "রাতে পড়ার জন্য অন্ধকার থিম",
-                checked  = isDark,
-                onToggle = { vm.toggleDarkMode() }
-            )
+            val currentThemeMode by vm.themeMode.collectAsState()
+
+            Card(
+                shape  = RoundedCornerShape(10.dp),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        Icon(Icons.Default.Palette, null, tint = TealAccent, modifier = Modifier.size(22.dp))
+                        Text("অ্যাপ থিম", fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                    }
+                    Spacer(Modifier.height(14.dp))
+                    
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        ThemeOptionButton(
+                            name = "দিন",
+                            themeCode = "LIGHT",
+                            isSelected = currentThemeMode == "LIGHT",
+                            colorBg = Color(0xFFEEF2F6),
+                            colorBorder = Color(0xFF2563EB),
+                            textColor = Color(0xFF102334),
+                            onClick = { vm.setThemeMode("LIGHT") }
+                        )
+                        ThemeOptionButton(
+                            name = "রাত",
+                            themeCode = "DARK",
+                            isSelected = currentThemeMode == "DARK",
+                            colorBg = Color(0xFF0D1F2D),
+                            colorBorder = Color(0xFF00D4B1),
+                            textColor = Color.White,
+                            onClick = { vm.setThemeMode("DARK") }
+                        )
+                        ThemeOptionButton(
+                            name = "সেপিয়া",
+                            themeCode = "SEPIA",
+                            isSelected = currentThemeMode == "SEPIA",
+                            colorBg = Color(0xFFF4ECD8),
+                            colorBorder = Color(0xFF8B4513),
+                            textColor = Color(0xFF3C2C1E),
+                            onClick = { vm.setThemeMode("SEPIA") }
+                        )
+                        ThemeOptionButton(
+                            name = "ব্ল্যাক",
+                            themeCode = "OLED",
+                            isSelected = currentThemeMode == "OLED",
+                            colorBg = Color(0xFF000000),
+                            colorBorder = Color(0xFF4ADE80),
+                            textColor = Color.White,
+                            onClick = { vm.setThemeMode("OLED") }
+                        )
+                    }
+                }
+            }
 
             // Font scale slider
             Card(
@@ -278,5 +511,57 @@ fun SettingsToggleRow(
                 )
             )
         }
+    }
+}
+
+private fun getInitials(name: String): String {
+    val cleanName = name.replace(Regex("[।.,]"), " ").trim()
+    val parts = cleanName.split(Regex("\\s+")).filter { it.isNotBlank() }
+    if (parts.isEmpty()) return ""
+    if (parts.size == 1) return parts[0].take(1)
+    return parts[0].take(1) + parts[1].take(1)
+}
+
+@Composable
+fun ThemeOptionButton(
+    name: String,
+    themeCode: String,
+    isSelected: Boolean,
+    colorBg: Color,
+    colorBorder: Color,
+    textColor: Color,
+    onClick: () -> Unit
+) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.clickable { onClick() }
+    ) {
+        Box(
+            modifier = Modifier
+                .size(44.dp)
+                .background(colorBg, CircleShape)
+                .border(
+                    width = if (isSelected) 3.dp else 1.dp,
+                    color = if (isSelected) colorBorder else Color.Gray.copy(alpha = 0.3f),
+                    shape = CircleShape
+                ),
+            contentAlignment = Alignment.Center
+        ) {
+            if (isSelected) {
+                Icon(
+                    imageVector = Icons.Default.Check,
+                    contentDescription = null,
+                    tint = colorBorder,
+                    modifier = Modifier.size(18.dp)
+                )
+            }
+        }
+        Spacer(Modifier.height(4.dp))
+        Text(
+            text = name,
+            fontSize = 11.sp,
+            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+            color = OnDarkHigh
+        )
     }
 }

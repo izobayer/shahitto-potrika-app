@@ -87,5 +87,6 @@ dependencies {
     ksp(libs.room.compiler)
     implementation(libs.datastore.preferences)
     implementation(libs.work.runtime.ktx)
+    implementation(libs.google.play.services.auth)
     debugImplementation(libs.androidx.ui.tooling)
 }

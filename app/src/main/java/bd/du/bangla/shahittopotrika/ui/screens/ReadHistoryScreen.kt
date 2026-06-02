@@ -13,6 +13,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -119,7 +120,8 @@ fun ReadHistoryScreen(
                                 if (item.authors.isNotBlank()) {
                                     Spacer(Modifier.height(2.dp))
                                     Text(item.authors, fontSize = 11.sp,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        color = TealAccent,
+                                        fontWeight = FontWeight.Bold,
                                         maxLines = 1, overflow = TextOverflow.Ellipsis)
                                 }
                                 Spacer(Modifier.height(4.dp))
@@ -129,6 +131,30 @@ fun ReadHistoryScreen(
                                     fontSize = 10.sp,
                                     color = MaterialTheme.colorScheme.outline
                                 )
+                                if (item.progress > 0f) {
+                                    Spacer(Modifier.height(6.dp))
+                                    val pct = (item.progress * 100).toInt().coerceIn(0, 100)
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        modifier = Modifier.fillMaxWidth()
+                                    ) {
+                                        LinearProgressIndicator(
+                                            progress = item.progress,
+                                            modifier = Modifier
+                                                .weight(1f)
+                                                .height(4.dp),
+                                            color = TealAccent,
+                                            trackColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f),
+                                            strokeCap = StrokeCap.Round
+                                        )
+                                        Spacer(Modifier.width(8.dp))
+                                        Text(
+                                            text = "পঠিত: ${pct.toBanglaDigits()}%",
+                                            fontSize = 10.sp,
+                                            color = MaterialTheme.colorScheme.outline
+                                        )
+                                    }
+                                }
                             }
                             IconButton(
                                 onClick = { viewModel.deleteFromHistory(item.articleId) },
@@ -144,4 +170,25 @@ fun ReadHistoryScreen(
             }
         }
     }
+}
+
+private fun Int.toBanglaDigits(): String {
+    val english = this.toString()
+    val bangla = StringBuilder()
+    for (char in english) {
+        when (char) {
+            '0' -> bangla.append('০')
+            '1' -> bangla.append('১')
+            '2' -> bangla.append('২')
+            '3' -> bangla.append('৩')
+            '4' -> bangla.append('৪')
+            '5' -> bangla.append('৫')
+            '6' -> bangla.append('৬')
+            '7' -> bangla.append('৭')
+            '8' -> bangla.append('৮')
+            '9' -> bangla.append('৯')
+            else -> bangla.append(char)
+        }
+    }
+    return bangla.toString()
 }

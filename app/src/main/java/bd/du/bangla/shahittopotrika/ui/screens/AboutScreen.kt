@@ -68,7 +68,7 @@ fun AboutScreen(
                 .padding(paddingValues)
                 .verticalScroll(rememberScrollState())
                 .fillMaxSize()
-                .padding(16.dp),
+                .padding(horizontal = 14.dp, vertical = 8.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             // ── Journal info ───────────────────────────────
@@ -94,25 +94,30 @@ fun AboutScreen(
                     }
 
                     if (info.description.isNotBlank()) {
-                        Spacer(Modifier.height(12.dp))
+                        Spacer(Modifier.height(8.dp))
                         Card(
                             shape = RoundedCornerShape(10.dp),
                             modifier = Modifier.fillMaxWidth(),
                             colors = CardDefaults.cardColors(
                                 containerColor = MaterialTheme.colorScheme.surface)
                         ) {
-                            Column(modifier = Modifier.padding(14.dp)) {
+                            Column(modifier = Modifier.padding(12.dp)) {
                                 Text("পরিচিতি", fontWeight = FontWeight.SemiBold,
                                     color = TealAccent, fontSize = 14.sp)
                                 Spacer(Modifier.height(6.dp))
-                                Text(info.description, fontSize = 14.sp, lineHeight = 22.sp)
+                                Text(
+                                    info.description,
+                                    fontSize = 13.sp,
+                                    lineHeight = 19.sp,
+                                    textAlign = TextAlign.Justify
+                                )
                             }
                         }
                     }
                 }
             }
 
-            Spacer(Modifier.height(16.dp))
+            Spacer(Modifier.height(10.dp))
 
             // ── Website button ─────────────────────────────
             Button(
@@ -129,7 +134,7 @@ fun AboutScreen(
                 Text("ওয়েবসাইট দেখুন")
             }
 
-            Spacer(Modifier.height(24.dp))
+            Spacer(Modifier.height(16.dp))
 
             // ── Developer section ──────────────────────────
             Card(
@@ -139,7 +144,7 @@ fun AboutScreen(
                     containerColor = TealAccent.copy(alpha = 0.06f))
             ) {
                 Row(
-                    modifier = Modifier.padding(16.dp),
+                    modifier = Modifier.padding(12.dp),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(14.dp)
                 ) {
@@ -192,7 +197,7 @@ fun AboutScreen(
                 }
             }
 
-            Spacer(Modifier.height(20.dp))
+            Spacer(Modifier.height(14.dp))
 
             Text(
                 text = buildAnnotatedString {
@@ -226,7 +231,7 @@ fun InfoCard(content: @Composable ColumnScope.() -> Unit) {
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
     ) {
-        Column(modifier = Modifier.padding(14.dp), content = content)
+        Column(modifier = Modifier.padding(12.dp), content = content)
     }
 }
 
