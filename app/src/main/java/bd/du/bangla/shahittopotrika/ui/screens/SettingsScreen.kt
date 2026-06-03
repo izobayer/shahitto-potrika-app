@@ -31,6 +31,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import bd.du.bangla.shahittopotrika.BuildConfig
+import bd.du.bangla.shahittopotrika.ui.theme.DarkOutline
 import bd.du.bangla.shahittopotrika.ui.theme.DarkSurface
 import bd.du.bangla.shahittopotrika.ui.theme.OnDarkHigh
 import bd.du.bangla.shahittopotrika.ui.theme.OnDarkLow
@@ -81,9 +82,11 @@ fun SettingsScreen(
                 val photo = account.photoUrl?.toString() ?: ""
                 vm.loginUser(name, email, photo)
             } else {
+                android.util.Log.e("SettingsScreen", "Google Sign-In returned null account")
                 showDemoDialog = true
             }
         } catch (e: Exception) {
+            android.util.Log.e("SettingsScreen", "Google Sign-In failed with exception: ${e.message}", e)
             showDemoDialog = true
         }
     }
@@ -104,23 +107,114 @@ fun SettingsScreen(
         }
     ) { padding ->
         if (showDemoDialog) {
+            var manualName by remember { mutableStateOf("") }
+            var manualEmail by remember { mutableStateOf("") }
+            var isManualMode by remember { mutableStateOf(false) }
+
             AlertDialog(
                 onDismissRequest = { showDemoDialog = false },
-                title = { Text("কনফিগারেশন অনুপস্থিত", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = OnDarkHigh) },
-                text = { Text("গুগল প্লে সার্ভিস বা ডেভেলপার ক্লায়েন্ট আইডি কনফিগার করা নেই। আপনি কি ডেমো অ্যাকাউন্ট দিয়ে সাইন-ইন করতে চান?", color = OnDarkMed) },
-                confirmButton = {
-                    TextButton(
-                        onClick = {
-                            vm.loginUser("বাংলা গবেষক", "researcher@du.ac.bd", "")
-                            showDemoDialog = false
+                title = { 
+                    Text(
+                        text = if (isManualMode) "ম্যানুয়াল সাইন-ইন" else "লগইন করতে সমস্যা হচ্ছে?", 
+                        fontSize = 16.sp, 
+                        fontWeight = FontWeight.Bold, 
+                        color = OnDarkHigh
+                    ) 
+                },
+                text = {
+                    Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                        if (!isManualMode) {
+                            Text(
+                                text = "গুগল প্লে সার্ভিস বা ডেভেলপার সার্টিফিকেট (SHA-1) কনফিগার করা না থাকায় গুগল লগইন সফল হয়নি। আপনি নিজে নাম ও ইমেইল দিয়ে অথবা ডেমো অ্যাকাউন্ট দিয়ে সরাসরি সাইন-ইন করতে পারেন।", 
+                                color = OnDarkMed,
+                                fontSize = 13.sp
+                            )
+                        } else {
+                            Text(
+                                text = "নিচে আপনার নাম এবং ইমেইল লিখুন:",
+                                color = OnDarkMed,
+                                fontSize = 13.sp
+                            )
+                            Spacer(Modifier.height(4.dp))
+                            OutlinedTextField(
+                                value = manualName,
+                                onValueChange = { manualName = it },
+                                label = { Text("নাম", color = OnDarkLow) },
+                                singleLine = true,
+                                modifier = Modifier.fillMaxWidth(),
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    focusedBorderColor = TealAccent,
+                                    unfocusedBorderColor = DarkOutline,
+                                    focusedLabelColor = TealAccent,
+                                    unfocusedLabelColor = OnDarkLow,
+                                    focusedTextColor = OnDarkHigh,
+                                    unfocusedTextColor = OnDarkMed
+                                )
+                            )
+                            OutlinedTextField(
+                                value = manualEmail,
+                                onValueChange = { manualEmail = it },
+                                label = { Text("ইমেইল", color = OnDarkLow) },
+                                singleLine = true,
+                                modifier = Modifier.fillMaxWidth(),
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    focusedBorderColor = TealAccent,
+                                    unfocusedBorderColor = DarkOutline,
+                                    focusedLabelColor = TealAccent,
+                                    unfocusedLabelColor = OnDarkLow,
+                                    focusedTextColor = OnDarkHigh,
+                                    unfocusedTextColor = OnDarkMed
+                                )
+                            )
                         }
+                    }
+                },
+                confirmButton = {
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text("হ্যাঁ", color = TealAccent, fontWeight = FontWeight.Bold)
+                        if (!isManualMode) {
+                            TextButton(
+                                onClick = { isManualMode = true }
+                            ) {
+                                Text("নিজে লিখুন", color = TealAccent, fontWeight = FontWeight.Bold)
+                            }
+                            Button(
+                                onClick = {
+                                    vm.loginUser("বাংলা গবেষক", "researcher@du.ac.bd", "")
+                                    showDemoDialog = false
+                                },
+                                colors = ButtonDefaults.buttonColors(containerColor = TealAccent)
+                            ) {
+                                Text("ডেমো লগইন", color = Color.White)
+                            }
+                        } else {
+                            TextButton(
+                                onClick = { isManualMode = false }
+                            ) {
+                                Text("ফিরে যান", color = OnDarkLow)
+                            }
+                            Button(
+                                onClick = {
+                                    val finalName = manualName.trim().ifBlank { "বাংলা গবেষক" }
+                                    val finalEmail = manualEmail.trim().ifBlank { "researcher@du.ac.bd" }
+                                    vm.loginUser(finalName, finalEmail, "")
+                                    showDemoDialog = false
+                                },
+                                colors = ButtonDefaults.buttonColors(containerColor = TealAccent),
+                                enabled = manualName.isNotBlank()
+                            ) {
+                                Text("প্রবেশ করুন", color = Color.White)
+                            }
+                        }
                     }
                 },
                 dismissButton = {
-                    TextButton(onClick = { showDemoDialog = false }) {
-                        Text("বাতিল", color = OnDarkLow)
+                    if (!isManualMode) {
+                        TextButton(onClick = { showDemoDialog = false }) {
+                            Text("বাতিল", color = OnDarkLow)
+                        }
                     }
                 },
                 containerColor = DarkSurface
