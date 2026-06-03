@@ -64,6 +64,7 @@ fun SettingsScreen(
 
     val gso = remember {
         GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+            .requestIdToken("109118287940-ivtj5amrtmcgvnvou2s2b5inlbop77hn.apps.googleusercontent.com")
             .requestEmail()
             .requestProfile()
             .build()
