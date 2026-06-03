@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.text.font.FontWeight
 import bd.du.bangla.shahittopotrika.data.model.Issue
 import bd.du.bangla.shahittopotrika.data.model.UiState
 import bd.du.bangla.shahittopotrika.ui.components.ShimmerIssueCard
@@ -95,17 +96,36 @@ fun IssueListScreen(
                     }
                 }
                 is UiState.Success -> {
-                    // Filter issues by year range
-                    val filtered = remember(state.data, selectedFilter) {
-                        when (selectedFilter) {
-                            "২০২০–২০২৪" -> state.data.filter { it.year.toIntOrNull() in 2020..2024 }
-                            "২০১০–২০১৯" -> state.data.filter { it.year.toIntOrNull() in 2010..2019 }
-                            "২০০০–২০০৯" -> state.data.filter { it.year.toIntOrNull() in 2000..2009 }
-                            "১৯৫৭–১৯৯৯" -> state.data.filter {
-                                it.year.toIntOrNull()?.let { y -> y in 1957..1999 } == true
-                            }
-                            else -> state.data
+                    // Group issues by year range
+                    val groupedIssues = remember(state.data) {
+                        val g20_24 = state.data.filter { it.year.toIntOrNull() in 2020..2024 }
+                        val g10_19 = state.data.filter { it.year.toIntOrNull() in 2010..2019 }
+                        val g00_09 = state.data.filter { it.year.toIntOrNull() in 2000..2009 }
+                        val g57_99 = state.data.filter { it.year.toIntOrNull() in 1957..1999 }
+                        val others = state.data.filter {
+                            val y = it.year.toIntOrNull()
+                            y == null || (y !in 2020..2024 && y !in 2010..2019 && y !in 2000..2009 && y !in 1957..1999)
                         }
+
+                        listOf(
+                            GroupData("২০২০–২০২৪", g20_24),
+                            GroupData("২০১০–২০১৯", g10_19),
+                            GroupData("২০০০–২০০৯", g00_09),
+                            GroupData("১৯৫৭–১৯৯৯", g57_99),
+                            GroupData("অন্যান্য বছর", others)
+                        ).filter { it.issues.isNotEmpty() }
+                    }
+
+                    val displayGroups = remember(groupedIssues, selectedFilter) {
+                        if (selectedFilter == "সব বছর") {
+                            groupedIssues
+                        } else {
+                            groupedIssues.filter { it.title == selectedFilter }
+                        }
+                    }
+
+                    val totalCount = remember(displayGroups) {
+                        displayGroups.sumOf { it.issues.size }
                     }
 
                     LazyColumn(
@@ -148,14 +168,14 @@ fun IssueListScreen(
                             }
                             Spacer(Modifier.height(8.dp))
                             Text(
-                                "${filtered.size}টি সংখ্যা",
+                                "${totalCount}টি সংখ্যা",
                                 style    = MaterialTheme.typography.bodySmall,
                                 color    = OnDarkLow,
                                 modifier = Modifier.padding(horizontal = 20.dp, vertical = 4.dp)
                             )
                         }
 
-                        if (filtered.isEmpty()) {
+                        if (displayGroups.isEmpty()) {
                             item {
                                 Box(
                                     Modifier.fillMaxWidth().padding(32.dp),
@@ -165,18 +185,57 @@ fun IssueListScreen(
                                 }
                             }
                         } else {
-                            items(filtered) { issue ->
-                                IssueCard(
-                                    issue    = issue,
-                                    onClick  = { onIssueClick(issue) },
-                                    modifier = Modifier.padding(horizontal = 16.dp)
-                                )
+                            displayGroups.forEach { group ->
+                                item(key = group.title) {
+                                    GroupHeader(title = group.title, count = group.issues.size)
+                                }
+                                items(group.issues, key = { it.id }) { issue ->
+                                    IssueCard(
+                                        issue    = issue,
+                                        onClick  = { onIssueClick(issue) },
+                                        modifier = Modifier.padding(horizontal = 16.dp)
+                                    )
+                                }
                             }
                         }
                     }
                 }
             }
         }
+    }
+}
+
+private data class GroupData(val title: String, val issues: List<Issue>)
+
+@Composable
+private fun GroupHeader(title: String, count: Int) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 20.dp, vertical = 6.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Box(
+                modifier = Modifier
+                    .size(width = 4.dp, height = 16.dp)
+                    .clip(RoundedCornerShape(2.dp))
+                    .background(TealAccent)
+            )
+            Spacer(Modifier.width(8.dp))
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                color = OnDarkHigh
+            )
+        }
+        Text(
+            text = "${count}টি সংখ্যা",
+            style = MaterialTheme.typography.bodySmall,
+            color = OnDarkLow
+        )
     }
 }
 

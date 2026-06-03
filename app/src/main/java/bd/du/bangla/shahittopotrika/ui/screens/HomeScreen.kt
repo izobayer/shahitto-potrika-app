@@ -190,7 +190,7 @@ fun HomeScreen(
                             modifier = Modifier.padding(horizontal = 20.dp),
                             verticalArrangement = Arrangement.spacedBy(10.dp)
                         ) {
-                            state.data.take(6).forEach { issue ->
+                            state.data.take(5).forEach { issue ->
                                 IssueCard(issue = issue, onClick = { onIssueClick(issue) })
                             }
                         }
