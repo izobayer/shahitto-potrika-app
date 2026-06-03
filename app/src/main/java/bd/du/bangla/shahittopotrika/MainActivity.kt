@@ -40,13 +40,13 @@ class MainActivity : ComponentActivity() {
             
             val iconWidth = if (icon.width > 0) icon.width else (108 * context.resources.displayMetrics.density).toInt()
             val iconHeight = if (icon.height > 0) icon.height else (108 * context.resources.displayMetrics.density).toInt()
-            val borderSize = (iconWidth * 1.25f).toInt()
+            val borderSize = (iconWidth * 1.15f).toInt()
 
             val borderView = object : View(context) {
                 val paint = Paint().apply {
-                    color = Color.parseColor("#4ADE80") // Bold light green
+                    color = Color.parseColor("#00D4B1") // Brand TealAccent
                     style = Paint.Style.STROKE
-                    strokeWidth = 14f // Bold border
+                    strokeWidth = 10f // Premium thinner border
                     isAntiAlias = true
                     strokeCap = Paint.Cap.ROUND
                 }
@@ -54,10 +54,10 @@ class MainActivity : ComponentActivity() {
                 override fun onDraw(canvas: Canvas) {
                     super.onDraw(canvas)
                     val size = width.coerceAtMost(height).toFloat()
-                    val padding = paint.strokeWidth / 2f + 6f
+                    val padding = paint.strokeWidth / 2f + 4f
                     val rect = RectF(padding, padding, size - padding, size - padding)
-                    // Draw a circular segment (280 degrees arc) for spinning effect
-                    canvas.drawArc(rect, 0f, 280f, false, paint)
+                    // Draw a 260 degrees arc for a very premium look
+                    canvas.drawArc(rect, -90f, 260f, false, paint)
                 }
             }
 
@@ -69,18 +69,61 @@ class MainActivity : ComponentActivity() {
             val root = provider.view as? ViewGroup
             root?.addView(borderView)
 
-            // Spin the border twice (720 degrees) in 800ms
-            val rotateAnimator = ObjectAnimator.ofFloat(borderView, View.ROTATION, 0f, 720f).apply {
-                duration = 800
-                interpolator = LinearInterpolator()
+            // Setup initial states for the "creamy" scale animation
+            icon.scaleX = 0.5f
+            icon.scaleY = 0.5f
+            borderView.scaleX = 0.5f
+            borderView.scaleY = 0.5f
+            borderView.alpha = 0f
+
+            // Buttery-smooth decelerate interpolator
+            val cubicInterpolator = android.view.animation.PathInterpolator(0.2f, 0.8f, 0.2f, 1.0f)
+
+            // 1. Scale icon from 0.5f to 0.65f (making it smaller as requested)
+            val iconScaleX = ObjectAnimator.ofFloat(icon, View.SCALE_X, 0.5f, 0.65f).apply {
+                duration = 1000
+                interpolator = cubicInterpolator
+            }
+            val iconScaleY = ObjectAnimator.ofFloat(icon, View.SCALE_Y, 0.5f, 0.65f).apply {
+                duration = 1000
+                interpolator = cubicInterpolator
             }
 
-            // Smoothly fade out the entire splash screen
-            val alphaAnimator = ObjectAnimator.ofFloat(provider.view, View.ALPHA, 1f, 0f).apply {
-                duration = 800
+            // 2. Scale border from 0.5f to 0.68f (to match the smaller logo size)
+            val borderScaleX = ObjectAnimator.ofFloat(borderView, View.SCALE_X, 0.5f, 0.68f).apply {
+                duration = 1100
+                interpolator = cubicInterpolator
+            }
+            val borderScaleY = ObjectAnimator.ofFloat(borderView, View.SCALE_Y, 0.5f, 0.68f).apply {
+                duration = 1100
+                interpolator = cubicInterpolator
+            }
+            val borderAlpha = ObjectAnimator.ofFloat(borderView, View.ALPHA, 0f, 1f).apply {
+                duration = 400
+                interpolator = cubicInterpolator
             }
 
-            rotateAnimator.addListener(object : Animator.AnimatorListener {
+            // 3. Spin the border slowly (360 degrees) in 1200ms
+            val borderRotate = ObjectAnimator.ofFloat(borderView, View.ROTATION, 0f, 360f).apply {
+                duration = 1200
+                interpolator = cubicInterpolator
+            }
+
+            // 4. Smoothly fade out the entire splash screen
+            val fadeOut = ObjectAnimator.ofFloat(provider.view, View.ALPHA, 1f, 0f).apply {
+                startDelay = 800
+                duration = 500
+                interpolator = android.view.animation.AccelerateInterpolator()
+            }
+
+            val animSet = android.animation.AnimatorSet()
+            animSet.playTogether(
+                iconScaleX, iconScaleY,
+                borderScaleX, borderScaleY, borderAlpha,
+                borderRotate, fadeOut
+            )
+
+            animSet.addListener(object : Animator.AnimatorListener {
                 override fun onAnimationEnd(a: Animator) {
                     provider.remove()
                 }
@@ -91,8 +134,7 @@ class MainActivity : ComponentActivity() {
                 override fun onAnimationRepeat(a: Animator) {}
             })
 
-            rotateAnimator.start()
-            alphaAnimator.start()
+            animSet.start()
         }
 
         super.onCreate(savedInstanceState)

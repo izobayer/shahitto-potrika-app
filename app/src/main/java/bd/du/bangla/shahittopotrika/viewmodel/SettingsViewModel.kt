@@ -69,6 +69,28 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
         prefs.clearUserSession()
     }
 
+    fun loginUserOnWebsite(
+        username: String,
+        password: String,
+        onResult: (Result<Unit>) -> Unit
+    ) = viewModelScope.launch(kotlinx.coroutines.Dispatchers.IO) {
+        val result = bd.du.bangla.shahittopotrika.data.parser.JournalParser.loginUserOnWebsite(
+            username = username,
+            password = password
+        )
+        if (result.isSuccess) {
+            val (name, email) = result.getOrThrow()
+            prefs.saveUserSession(name, email, "")
+        }
+        viewModelScope.launch(kotlinx.coroutines.Dispatchers.Main) {
+            if (result.isSuccess) {
+                onResult(Result.success(Unit))
+            } else {
+                onResult(Result.failure(result.exceptionOrNull() ?: Exception("লগইন ব্যর্থ হয়েছে")))
+            }
+        }
+    }
+
     fun registerUserOnWebsite(
         name: String,
         email: String,

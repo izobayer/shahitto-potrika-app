@@ -26,10 +26,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
-import com.google.android.gms.auth.api.signin.GoogleSignIn
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import bd.du.bangla.shahittopotrika.BuildConfig
 import bd.du.bangla.shahittopotrika.ui.theme.DarkOutline
 import bd.du.bangla.shahittopotrika.ui.theme.DarkSurface
@@ -60,37 +56,17 @@ fun SettingsScreen(
     val userPhotoUrl        by vm.userPhotoUrl.collectAsState()
 
     val context = LocalContext.current
-    var showDemoDialog by remember { mutableStateOf(false) }
-
-    val gso = remember {
-        GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            .requestIdToken("109118287940-ivtj5amrtmcgvnvou2s2b5inlbop77hn.apps.googleusercontent.com")
-            .requestEmail()
-            .requestProfile()
-            .build()
-    }
-    val googleSignInClient = remember { GoogleSignIn.getClient(context, gso) }
-
-    val launcher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.StartActivityForResult()
-    ) { result ->
-        val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
-        try {
-            val account = task.getResult(com.google.android.gms.common.api.ApiException::class.java)
-            if (account != null) {
-                val name = account.displayName ?: "ইউজার"
-                val email = account.email ?: ""
-                val photo = account.photoUrl?.toString() ?: ""
-                vm.loginUser(name, email, photo)
-            } else {
-                android.util.Log.e("SettingsScreen", "Google Sign-In returned null account")
-                showDemoDialog = true
-            }
-        } catch (e: Exception) {
-            android.util.Log.e("SettingsScreen", "Google Sign-In failed with exception: ${e.message}", e)
-            showDemoDialog = true
-        }
-    }
+    var isRegisterMode by remember { mutableStateOf(false) }
+    var loginUsername by remember { mutableStateOf("") }
+    var loginPassword by remember { mutableStateOf("") }
+    
+    var regName by remember { mutableStateOf("") }
+    var regEmail by remember { mutableStateOf("") }
+    var regUsername by remember { mutableStateOf("") }
+    var regPassword by remember { mutableStateOf("") }
+    
+    var isLoading by remember { mutableStateOf(false) }
+    var errorMessage by remember { mutableStateOf<String?>(null) }
 
     Scaffold(
         topBar = {
@@ -107,186 +83,6 @@ fun SettingsScreen(
             )
         }
     ) { padding ->
-        if (showDemoDialog) {
-            var manualName by remember { mutableStateOf("") }
-            var manualEmail by remember { mutableStateOf("") }
-            var manualUsername by remember { mutableStateOf("") }
-            var manualPassword by remember { mutableStateOf("") }
-            var isRegisterMode by remember { mutableStateOf(false) }
-            var isLoading by remember { mutableStateOf(false) }
-            var errorMessage by remember { mutableStateOf<String?>(null) }
-
-            AlertDialog(
-                onDismissRequest = { if (!isLoading) showDemoDialog = false },
-                title = { 
-                    Text(
-                        text = if (isRegisterMode) "ম্যানুয়াল রেজিস্ট্রেশন" else "লগইন করতে সমস্যা হচ্ছে?", 
-                        fontSize = 16.sp, 
-                        fontWeight = FontWeight.Bold, 
-                        color = OnDarkHigh
-                    ) 
-                },
-                text = {
-                    Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                        if (!isRegisterMode) {
-                            Text(
-                                text = "গুগল প্লে সার্ভিস বা ডেভেলপার সার্টিফিকেট (SHA-1) কনফিগার করা না থাকায় গুগল লগইন সফল হয়নি। আপনি নিজে তথ্য দিয়ে ওয়েবসাইট অ্যাকাউন্টে রেজিস্ট্রেশন করতে পারেন, অথবা ডেমো অ্যাকাউন্ট দিয়ে সরাসরি সাইন-ইন করতে পারেন।", 
-                                color = OnDarkMed,
-                                fontSize = 13.sp
-                            )
-                        } else {
-                            Text(
-                                text = "নিচে তথ্যগুলো দিয়ে ওয়েবসাইটের সাথে রেজিস্ট্রেশন করুন:",
-                                color = OnDarkMed,
-                                fontSize = 12.sp
-                            )
-                            if (errorMessage != null) {
-                                Text(
-                                    text = errorMessage!!,
-                                    color = MaterialTheme.colorScheme.error,
-                                    fontSize = 12.sp,
-                                    fontWeight = FontWeight.Bold
-                                )
-                            }
-                            OutlinedTextField(
-                                value = manualName,
-                                onValueChange = { manualName = it; errorMessage = null },
-                                label = { Text("পূর্ণ নাম (ইংরেজি)", color = OnDarkLow) },
-                                singleLine = true,
-                                enabled = !isLoading,
-                                modifier = Modifier.fillMaxWidth(),
-                                colors = OutlinedTextFieldDefaults.colors(
-                                    focusedBorderColor = TealAccent,
-                                    unfocusedBorderColor = DarkOutline,
-                                    focusedTextColor = OnDarkHigh,
-                                    unfocusedTextColor = OnDarkMed
-                                )
-                            )
-                            OutlinedTextField(
-                                value = manualEmail,
-                                onValueChange = { manualEmail = it; errorMessage = null },
-                                label = { Text("ইমেইল অ্যাড্রেস", color = OnDarkLow) },
-                                singleLine = true,
-                                enabled = !isLoading,
-                                modifier = Modifier.fillMaxWidth(),
-                                colors = OutlinedTextFieldDefaults.colors(
-                                    focusedBorderColor = TealAccent,
-                                    unfocusedBorderColor = DarkOutline,
-                                    focusedTextColor = OnDarkHigh,
-                                    unfocusedTextColor = OnDarkMed
-                                )
-                            )
-                            OutlinedTextField(
-                                value = manualUsername,
-                                onValueChange = { manualUsername = it; errorMessage = null },
-                                label = { Text("ইউজারনেম (username)", color = OnDarkLow) },
-                                singleLine = true,
-                                enabled = !isLoading,
-                                modifier = Modifier.fillMaxWidth(),
-                                colors = OutlinedTextFieldDefaults.colors(
-                                    focusedBorderColor = TealAccent,
-                                    unfocusedBorderColor = DarkOutline,
-                                    focusedTextColor = OnDarkHigh,
-                                    unfocusedTextColor = OnDarkMed
-                                )
-                            )
-                            OutlinedTextField(
-                                value = manualPassword,
-                                onValueChange = { manualPassword = it; errorMessage = null },
-                                label = { Text("পাসওয়ার্ড (Password)", color = OnDarkLow) },
-                                singleLine = true,
-                                enabled = !isLoading,
-                                modifier = Modifier.fillMaxWidth(),
-                                visualTransformation = androidx.compose.ui.text.input.PasswordVisualTransformation(),
-                                colors = OutlinedTextFieldDefaults.colors(
-                                    focusedBorderColor = TealAccent,
-                                    unfocusedBorderColor = DarkOutline,
-                                    focusedTextColor = OnDarkHigh,
-                                    unfocusedTextColor = OnDarkMed
-                                )
-                            )
-                        }
-                    }
-                },
-                confirmButton = {
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        if (isLoading) {
-                            CircularProgressIndicator(
-                                modifier = Modifier.size(20.dp),
-                                color = TealAccent,
-                                strokeWidth = 2.dp
-                            )
-                            Spacer(Modifier.width(6.dp))
-                            Text("প্রক্রিয়াকরণ হচ্ছে...", color = OnDarkMed, fontSize = 13.sp)
-                        } else {
-                            if (!isRegisterMode) {
-                                TextButton(
-                                    onClick = { isRegisterMode = true }
-                                ) {
-                                    Text("রেজিস্ট্রেশন করুন", color = TealAccent, fontWeight = FontWeight.Bold)
-                                }
-                                Button(
-                                    onClick = {
-                                        vm.loginUser("বাংলা গবেষক", "researcher@du.ac.bd", "")
-                                        showDemoDialog = false
-                                    },
-                                    colors = ButtonDefaults.buttonColors(containerColor = TealAccent)
-                                ) {
-                                    Text("ডেমো লগইন", color = Color.White)
-                                }
-                            } else {
-                                TextButton(
-                                    onClick = { isRegisterMode = false; errorMessage = null }
-                                ) {
-                                    Text("ফিরে যান", color = OnDarkLow)
-                                }
-                                Button(
-                                    onClick = {
-                                        if (manualName.isBlank() || manualEmail.isBlank() || manualUsername.isBlank() || manualPassword.isBlank()) {
-                                            errorMessage = "সবগুলো ফিল্ড সঠিকভাবে পূরণ করুন"
-                                            return@Button
-                                        }
-                                        isLoading = true
-                                        errorMessage = null
-                                        vm.registerUserOnWebsite(
-                                            name = manualName.trim(),
-                                            email = manualEmail.trim(),
-                                            username = manualUsername.trim(),
-                                            password = manualPassword,
-                                            affiliation = "App Client",
-                                            onResult = { result ->
-                                                isLoading = false
-                                                if (result.isSuccess) {
-                                                    showDemoDialog = false
-                                                } else {
-                                                    errorMessage = result.exceptionOrNull()?.message ?: "রেজিস্ট্রেশন ব্যর্থ হয়েছে"
-                                                }
-                                            }
-                                        )
-                                    },
-                                    colors = ButtonDefaults.buttonColors(containerColor = TealAccent),
-                                    enabled = manualName.isNotBlank() && manualEmail.isNotBlank() && manualUsername.isNotBlank() && manualPassword.isNotBlank()
-                                ) {
-                                    Text("নিবন্ধন সম্পন্ন করুন", color = Color.White)
-                                }
-                            }
-                        }
-                    }
-                },
-                dismissButton = {
-                    if (!isRegisterMode && !isLoading) {
-                        TextButton(onClick = { showDemoDialog = false }) {
-                            Text("বাতিল", color = OnDarkLow)
-                        }
-                    }
-                },
-                containerColor = DarkSurface
-            )
-        }
-
         Column(
             modifier = Modifier
                 .padding(padding).fillMaxSize()
@@ -360,7 +156,6 @@ fun SettingsScreen(
 
                         Button(
                             onClick = {
-                                googleSignInClient.signOut()
                                 vm.logoutUser()
                             },
                             modifier = Modifier.fillMaxWidth(),
@@ -383,26 +178,222 @@ fun SettingsScreen(
                 ) {
                     Column(
                         modifier = Modifier.padding(16.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
-                        Text(
-                            text = "আপনার পছন্দসমূহ সিঙ্ক করতে এবং মন্তব্য করতে লগইন করুন",
-                            fontSize = 13.sp,
-                            color = OnDarkMed,
-                            textAlign = TextAlign.Center
-                        )
-                        Spacer(Modifier.height(14.dp))
-                        Button(
-                            onClick = {
-                                launcher.launch(googleSignInClient.signInIntent)
-                            },
-                            modifier = Modifier.fillMaxWidth(),
-                            colors = ButtonDefaults.buttonColors(containerColor = TealAccent),
-                            shape = RoundedCornerShape(8.dp)
+                        // Inline Tab selection
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .background(DarkSurface, RoundedCornerShape(8.dp))
+                                .padding(4.dp),
+                            horizontalArrangement = Arrangement.SpaceEvenly
                         ) {
-                            Icon(Icons.Default.Login, null, modifier = Modifier.size(18.dp))
-                            Spacer(Modifier.width(8.dp))
-                            Text("গুগল অ্যাকাউন্ট দিয়ে লগইন করুন", fontWeight = FontWeight.Bold, color = Color.White)
+                            Box(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .clip(RoundedCornerShape(6.dp))
+                                    .background(if (!isRegisterMode) TealAccent else Color.Transparent)
+                                    .clickable { isRegisterMode = false; errorMessage = null }
+                                    .padding(vertical = 8.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text("লগইন", color = if (!isRegisterMode) Color.White else OnDarkMed, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                            }
+                            Box(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .clip(RoundedCornerShape(6.dp))
+                                    .background(if (isRegisterMode) TealAccent else Color.Transparent)
+                                    .clickable { isRegisterMode = true; errorMessage = null }
+                                    .padding(vertical = 8.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text("নিবন্ধন", color = if (isRegisterMode) Color.White else OnDarkMed, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                            }
+                        }
+
+                        if (errorMessage != null) {
+                            Text(
+                                text = errorMessage!!,
+                                color = MaterialTheme.colorScheme.error,
+                                fontSize = 13.sp,
+                                fontWeight = FontWeight.SemiBold,
+                                modifier = Modifier.padding(horizontal = 4.dp)
+                            )
+                        }
+
+                        if (!isRegisterMode) {
+                            // Login Form
+                            OutlinedTextField(
+                                value = loginUsername,
+                                onValueChange = { loginUsername = it; errorMessage = null },
+                                label = { Text("ইউজারনেম বা ইমেইল", color = OnDarkLow) },
+                                singleLine = true,
+                                enabled = !isLoading,
+                                modifier = Modifier.fillMaxWidth(),
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    focusedBorderColor = TealAccent,
+                                    unfocusedBorderColor = DarkOutline,
+                                    focusedTextColor = OnDarkHigh,
+                                    unfocusedTextColor = OnDarkMed
+                                )
+                            )
+                            OutlinedTextField(
+                                value = loginPassword,
+                                onValueChange = { loginPassword = it; errorMessage = null },
+                                label = { Text("পাসওয়ার্ড", color = OnDarkLow) },
+                                singleLine = true,
+                                enabled = !isLoading,
+                                modifier = Modifier.fillMaxWidth(),
+                                visualTransformation = androidx.compose.ui.text.input.PasswordVisualTransformation(),
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    focusedBorderColor = TealAccent,
+                                    unfocusedBorderColor = DarkOutline,
+                                    focusedTextColor = OnDarkHigh,
+                                    unfocusedTextColor = OnDarkMed
+                                )
+                            )
+                            Spacer(Modifier.height(4.dp))
+                            Button(
+                                onClick = {
+                                    if (loginUsername.isBlank() || loginPassword.isBlank()) {
+                                        errorMessage = "সবগুলো ফিল্ড সঠিকভাবে পূরণ করুন"
+                                        return@Button
+                                    }
+                                    isLoading = true
+                                    errorMessage = null
+                                    vm.loginUserOnWebsite(
+                                        username = loginUsername.trim(),
+                                        password = loginPassword,
+                                        onResult = { result ->
+                                            isLoading = false
+                                            if (result.isFailure) {
+                                                errorMessage = result.exceptionOrNull()?.message ?: "লগইন ব্যর্থ হয়েছে"
+                                            }
+                                        }
+                                    )
+                                },
+                                modifier = Modifier.fillMaxWidth(),
+                                colors = ButtonDefaults.buttonColors(containerColor = TealAccent),
+                                shape = RoundedCornerShape(8.dp),
+                                enabled = !isLoading && loginUsername.isNotBlank() && loginPassword.isNotBlank()
+                            ) {
+                                if (isLoading) {
+                                    CircularProgressIndicator(
+                                        modifier = Modifier.size(20.dp),
+                                        color = Color.White,
+                                        strokeWidth = 2.dp
+                                    )
+                                } else {
+                                    Text("লগইন করুন", fontWeight = FontWeight.Bold, color = Color.White)
+                                }
+                            }
+                            TextButton(
+                                onClick = {
+                                    vm.loginUser("বাংলা গবেষক", "researcher@du.ac.bd", "")
+                                },
+                                enabled = !isLoading,
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Text("ডেমো অ্যাকাউন্ট দিয়ে সরাসরি লগইন", color = OnDarkLow, fontSize = 12.sp)
+                            }
+                        } else {
+                            // Register Form
+                            OutlinedTextField(
+                                value = regName,
+                                onValueChange = { regName = it; errorMessage = null },
+                                label = { Text("পূর্ণ নাম (ইংরেজি)", color = OnDarkLow) },
+                                singleLine = true,
+                                enabled = !isLoading,
+                                modifier = Modifier.fillMaxWidth(),
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    focusedBorderColor = TealAccent,
+                                    unfocusedBorderColor = DarkOutline,
+                                    focusedTextColor = OnDarkHigh,
+                                    unfocusedTextColor = OnDarkMed
+                                )
+                            )
+                            OutlinedTextField(
+                                value = regEmail,
+                                onValueChange = { regEmail = it; errorMessage = null },
+                                label = { Text("ইমেইল অ্যাড্রেস", color = OnDarkLow) },
+                                singleLine = true,
+                                enabled = !isLoading,
+                                modifier = Modifier.fillMaxWidth(),
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    focusedBorderColor = TealAccent,
+                                    unfocusedBorderColor = DarkOutline,
+                                    focusedTextColor = OnDarkHigh,
+                                    unfocusedTextColor = OnDarkMed
+                                )
+                            )
+                            OutlinedTextField(
+                                value = regUsername,
+                                onValueChange = { regUsername = it; errorMessage = null },
+                                label = { Text("ইউজারনেম (username)", color = OnDarkLow) },
+                                singleLine = true,
+                                enabled = !isLoading,
+                                modifier = Modifier.fillMaxWidth(),
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    focusedBorderColor = TealAccent,
+                                    unfocusedBorderColor = DarkOutline,
+                                    focusedTextColor = OnDarkHigh,
+                                    unfocusedTextColor = OnDarkMed
+                                )
+                            )
+                            OutlinedTextField(
+                                value = regPassword,
+                                onValueChange = { regPassword = it; errorMessage = null },
+                                label = { Text("পাসওয়ার্ড", color = OnDarkLow) },
+                                singleLine = true,
+                                enabled = !isLoading,
+                                modifier = Modifier.fillMaxWidth(),
+                                visualTransformation = androidx.compose.ui.text.input.PasswordVisualTransformation(),
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    focusedBorderColor = TealAccent,
+                                    unfocusedBorderColor = DarkOutline,
+                                    focusedTextColor = OnDarkHigh,
+                                    unfocusedTextColor = OnDarkMed
+                                )
+                            )
+                            Spacer(Modifier.height(4.dp))
+                            Button(
+                                onClick = {
+                                    if (regName.isBlank() || regEmail.isBlank() || regUsername.isBlank() || regPassword.isBlank()) {
+                                        errorMessage = "সবগুলো ফিল্ড সঠিকভাবে পূরণ করুন"
+                                        return@Button
+                                    }
+                                    isLoading = true
+                                    errorMessage = null
+                                    vm.registerUserOnWebsite(
+                                        name = regName.trim(),
+                                        email = regEmail.trim(),
+                                        username = regUsername.trim(),
+                                        password = regPassword,
+                                        affiliation = "App Client",
+                                        onResult = { result ->
+                                            isLoading = false
+                                            if (result.isFailure) {
+                                                errorMessage = result.exceptionOrNull()?.message ?: "নিবন্ধন ব্যর্থ হয়েছে"
+                                            }
+                                        }
+                                    )
+                                },
+                                modifier = Modifier.fillMaxWidth(),
+                                colors = ButtonDefaults.buttonColors(containerColor = TealAccent),
+                                shape = RoundedCornerShape(8.dp),
+                                enabled = !isLoading && regName.isNotBlank() && regEmail.isNotBlank() && regUsername.isNotBlank() && regPassword.isNotBlank()
+                            ) {
+                                if (isLoading) {
+                                    CircularProgressIndicator(
+                                        modifier = Modifier.size(20.dp),
+                                        color = Color.White,
+                                        strokeWidth = 2.dp
+                                    )
+                                } else {
+                                    Text("নিবন্ধন সম্পন্ন করুন", fontWeight = FontWeight.Bold, color = Color.White)
+                                }
+                            }
                         }
                     }
                 }
@@ -431,7 +422,7 @@ fun SettingsScreen(
                     
                     Row(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
+                        horizontalArrangement = Arrangement.spacedBy(32.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         ThemeOptionButton(
@@ -451,24 +442,6 @@ fun SettingsScreen(
                             colorBorder = Color(0xFF00D4B1),
                             textColor = Color.White,
                             onClick = { vm.setThemeMode("DARK") }
-                        )
-                        ThemeOptionButton(
-                            name = "সেপিয়া",
-                            themeCode = "SEPIA",
-                            isSelected = currentThemeMode == "SEPIA",
-                            colorBg = Color(0xFFF4ECD8),
-                            colorBorder = Color(0xFF8B4513),
-                            textColor = Color(0xFF3C2C1E),
-                            onClick = { vm.setThemeMode("SEPIA") }
-                        )
-                        ThemeOptionButton(
-                            name = "ব্ল্যাক",
-                            themeCode = "OLED",
-                            isSelected = currentThemeMode == "OLED",
-                            colorBg = Color(0xFF000000),
-                            colorBorder = Color(0xFF4ADE80),
-                            textColor = Color.White,
-                            onClick = { vm.setThemeMode("OLED") }
                         )
                     }
                 }

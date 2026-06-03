@@ -304,8 +304,8 @@ fun ShahittoPotrikaTheme(
     val colorScheme = when (themeMode) {
         "LIGHT" -> LightColors
         "DARK"  -> BlinkistDarkColors
-        "SEPIA" -> SepiaColors
-        "OLED"  -> OledBlackColors
+        "SEPIA" -> LightColors
+        "OLED"  -> BlinkistDarkColors
         else    -> LightColors
     }
 

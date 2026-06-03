@@ -104,7 +104,7 @@ fun HomeScreen(
                                 fontFamily = QayyumBookFamily,
                                 fontWeight = FontWeight.Bold,
                                 fontSize   = 22.sp,
-                                color      = AccentBlue
+                                color      = TealAccent
                             )
                             Spacer(Modifier.height(1.dp))
                             Text(
@@ -270,7 +270,7 @@ fun HomeScreen(
                         fontFamily = QayyumBookFamily,
                         fontWeight = FontWeight.Bold,
                         fontSize   = 16.sp,
-                        color      = AccentBlue,
+                        color      = TealAccent,
                         textAlign  = TextAlign.Center
                     )
                     Spacer(Modifier.height(4.dp))

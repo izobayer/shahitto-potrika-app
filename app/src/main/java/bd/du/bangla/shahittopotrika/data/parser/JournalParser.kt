@@ -276,6 +276,71 @@ object JournalParser {
         }
     }
 
+    // ── Manual User Login on Website ──────────────────────────────
+    fun loginUserOnWebsite(
+        username: String,
+        password: String
+    ): Result<Pair<String, String>> = kotlin.runCatching {
+        val loginUrl = "$BASE_URL/login"
+        val signInUrl = "$BASE_URL/login/signIn"
+        
+        val getRequest = Request.Builder()
+            .url(loginUrl)
+            .header("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36")
+            .header("Accept", "text/html,application/xhtml+xml")
+            .build()
+            
+        val getResponse = client.newCall(getRequest).execute()
+        val cookies = getResponse.headers("Set-Cookie")
+        val html = getResponse.body?.string() ?: ""
+        val doc = Jsoup.parse(html, loginUrl)
+        
+        val csrfToken = doc.selectFirst("input[name=csrfToken]")?.attr("value")
+            ?: throw Exception("CSRF token not found on login page")
+            
+        val formBuilder = okhttp3.FormBody.Builder()
+            .add("csrfToken", csrfToken)
+            .add("username", username)
+            .add("password", password)
+            .add("remember", "1")
+            
+        val postRequest = Request.Builder()
+            .url(signInUrl)
+            .post(formBuilder.build())
+            .header("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36")
+            .header("Accept", "text/html,application/xhtml+xml")
+            
+        cookies.forEach { cookie ->
+            val cookieValue = cookie.substringBefore(";")
+            postRequest.addHeader("Cookie", cookieValue)
+        }
+        
+        val postResponse = client.newCall(postRequest.build()).execute()
+        val postHtml = postResponse.body?.string() ?: ""
+        
+        if (postHtml.contains("error") || postHtml.contains("invalid") || postHtml.contains("ভুল") || postHtml.contains("অকার্যকর")) {
+            val errDoc = Jsoup.parse(postHtml)
+            val errorMsg = errDoc.select(".pkp_form_error, .error, .notification-error, .alert-danger").text().trim()
+            if (errorMsg.isNotBlank()) {
+                throw Exception(errorMsg)
+            }
+        }
+        
+        val isStillOnLoginPage = postHtml.contains("name=\"password\"") || postHtml.contains("id=\"password\"")
+        if (isStillOnLoginPage) {
+            throw Exception("ইউজারনেম বা পাসওয়ার্ড ভুল হয়েছে।")
+        }
+        
+        val postDoc = Jsoup.parse(postHtml)
+        var name = postDoc.select(".pkp_structure_head .menu-user a, .profile_name, .username").text().trim()
+        if (name.isBlank()) {
+            name = username
+        }
+        val email = "$username@journal.bangla.du.ac.bd"
+        Pair(name, email)
+    }
+
+
     // ── Authors List & Details Scraper ──────────────────────────
     fun fetchAuthorList(): List<Author> {
         val doc = fetch("https://journal.bangla.du.ac.bd/author")

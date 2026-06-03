@@ -85,7 +85,7 @@ fun AboutScreen(
                             value           = info.name,
                             valueFontFamily = QayyumBookFamily,
                             valueFontSize   = 15.sp,
-                            valueColor      = AccentBlue
+                            valueColor      = TealAccent
                         )
                         HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
                         InfoRow("ISSN (মুদ্রণ)", info.issn)
@@ -209,7 +209,7 @@ fun AboutScreen(
                             fontFamily = QayyumBookFamily,
                             fontWeight = FontWeight.Bold,
                             fontSize   = 13.sp,
-                            color      = AccentBlue
+                            color      = TealAccent
                         )
                     ) {
                         append("সাহিত্য পত্রিকা")
