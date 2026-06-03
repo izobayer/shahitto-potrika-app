@@ -22,7 +22,7 @@ import androidx.compose.ui.unit.sp
 import androidx.core.view.WindowCompat
 import bd.du.bangla.shahittopotrika.R
 
-// ── Qayyum Book — used for "সাহিত্য পত্রিকা" branding ────────────────────────
+// ── Qayyum Book — used ONLY for "সাহিত্য পত্রিকা" branding ──────────────────
 val QayyumBookFamily = FontFamily(
     Font(R.font.qayyum_book, FontWeight.Normal),
     Font(R.font.qayyum_book, FontWeight.Medium),
@@ -30,17 +30,17 @@ val QayyumBookFamily = FontFamily(
     Font(R.font.qayyum_book, FontWeight.Bold),
 )
 
-// ── Kalpurush font family ─────────────────────────────────────────────────────
-val KalpurushFamily = FontFamily(
-    Font(R.font.kalpurush, FontWeight.Thin),
-    Font(R.font.kalpurush, FontWeight.ExtraLight),
-    Font(R.font.kalpurush, FontWeight.Light),
-    Font(R.font.kalpurush, FontWeight.Normal),
-    Font(R.font.kalpurush, FontWeight.Medium),
-    Font(R.font.kalpurush, FontWeight.SemiBold),
-    Font(R.font.kalpurush, FontWeight.Bold),
-    Font(R.font.kalpurush, FontWeight.ExtraBold),
-    Font(R.font.kalpurush, FontWeight.Black),
+// ── Noto Sans Bengali — matches journal.bangla.du.ac.bd website ──────────────
+val NotoSansBengaliFamily = FontFamily(
+    Font(R.font.noto_sans_bengali, FontWeight.Thin),
+    Font(R.font.noto_sans_bengali, FontWeight.ExtraLight),
+    Font(R.font.noto_sans_bengali, FontWeight.Light),
+    Font(R.font.noto_sans_bengali, FontWeight.Normal),
+    Font(R.font.noto_sans_bengali, FontWeight.Medium),
+    Font(R.font.noto_sans_bengali, FontWeight.SemiBold),
+    Font(R.font.noto_sans_bengali, FontWeight.Bold),
+    Font(R.font.noto_sans_bengali, FontWeight.ExtraBold),
+    Font(R.font.noto_sans_bengali, FontWeight.Black),
 )
 
 // ── Dark palette (Blinkist-style Navy-Teal) ───────────────────────────────────
@@ -57,11 +57,11 @@ val StaticDarkOutline   = Color(0xFF1E3A4A)
 // ── Dynamic Color Lookups (Theme-Aware) ───────────────────────────────────────
 val TealAccent: Color
     @Composable
-    get() = if (androidx.compose.foundation.isSystemInDarkTheme()) Color(0xFF00D4B1) else Color(0xFF2563EB)
+    get() = if (isSystemInDarkTheme()) Color(0xFF00D4B1) else Color(0xFF2563EB)
 
 val TealAccentDim: Color
     @Composable
-    get() = if (androidx.compose.foundation.isSystemInDarkTheme()) Color(0xFF009E85) else Color(0xFF1E3A8A)
+    get() = if (isSystemInDarkTheme()) Color(0xFF009E85) else Color(0xFF1E3A8A)
 
 val DarkBg: Color
     @Composable
@@ -91,7 +91,7 @@ val DarkOutline: Color
     @Composable
     get() = MaterialTheme.colorScheme.outline
 
-// ── Light palette (kept for settings toggle) ──────────────────────────────────
+// ── Light palette ─────────────────────────────────────────────────────────────
 val Navy        = Color(0xFF101E5A)
 val NavyLight   = Color(0xFF2B3E9E)
 val NavyDark    = Color(0xFF080F2E)
@@ -100,103 +100,103 @@ val AccentBlue  = Color(0xFF2563EB)
 val TextPrimary = Color(0xFF1B2C3D)
 val TextSub     = Color(0xFF5A6A7A)
 
-// ── Typography (Kalpurush everywhere) ────────────────────────────────────────
-val KalpurushTypography = Typography(
+// ── Typography (Noto Sans Bengali everywhere except branding) ─────────────────
+val AppTypography = Typography(
     displayLarge = TextStyle(
-        fontFamily   = KalpurushFamily,
-        fontWeight   = FontWeight.Black,
-        fontSize     = 57.sp,
-        lineHeight   = 64.sp,
+        fontFamily    = NotoSansBengaliFamily,
+        fontWeight    = FontWeight.Black,
+        fontSize      = 57.sp,
+        lineHeight    = 64.sp,
         letterSpacing = (-0.25).sp
     ),
     displayMedium = TextStyle(
-        fontFamily = KalpurushFamily,
+        fontFamily = NotoSansBengaliFamily,
         fontWeight = FontWeight.ExtraBold,
         fontSize   = 45.sp,
         lineHeight = 52.sp
     ),
     displaySmall = TextStyle(
-        fontFamily = KalpurushFamily,
+        fontFamily = NotoSansBengaliFamily,
         fontWeight = FontWeight.Bold,
         fontSize   = 36.sp,
         lineHeight = 44.sp
     ),
     headlineLarge = TextStyle(
-        fontFamily    = KalpurushFamily,
+        fontFamily    = NotoSansBengaliFamily,
         fontWeight    = FontWeight.ExtraBold,
         fontSize      = 30.sp,
         lineHeight    = 38.sp,
         letterSpacing = (-0.5).sp
     ),
     headlineMedium = TextStyle(
-        fontFamily = KalpurushFamily,
+        fontFamily = NotoSansBengaliFamily,
         fontWeight = FontWeight.Bold,
         fontSize   = 24.sp,
         lineHeight = 32.sp
     ),
     headlineSmall = TextStyle(
-        fontFamily = KalpurushFamily,
+        fontFamily = NotoSansBengaliFamily,
         fontWeight = FontWeight.Bold,
         fontSize   = 20.sp,
         lineHeight = 28.sp
     ),
     titleLarge = TextStyle(
-        fontFamily = KalpurushFamily,
+        fontFamily = NotoSansBengaliFamily,
         fontWeight = FontWeight.Bold,
         fontSize   = 18.sp,
         lineHeight = 26.sp
     ),
     titleMedium = TextStyle(
-        fontFamily    = KalpurushFamily,
+        fontFamily    = NotoSansBengaliFamily,
         fontWeight    = FontWeight.SemiBold,
         fontSize      = 15.sp,
         lineHeight    = 22.sp,
         letterSpacing = 0.15.sp
     ),
     titleSmall = TextStyle(
-        fontFamily    = KalpurushFamily,
+        fontFamily    = NotoSansBengaliFamily,
         fontWeight    = FontWeight.Medium,
         fontSize      = 13.sp,
         lineHeight    = 20.sp,
         letterSpacing = 0.1.sp
     ),
     bodyLarge = TextStyle(
-        fontFamily    = KalpurushFamily,
+        fontFamily    = NotoSansBengaliFamily,
         fontWeight    = FontWeight.Normal,
-        fontSize      = 14.sp,
-        lineHeight    = 22.sp,
+        fontSize      = 15.sp,
+        lineHeight    = 24.sp,
         letterSpacing = 0.15.sp
     ),
     bodyMedium = TextStyle(
-        fontFamily    = KalpurushFamily,
+        fontFamily    = NotoSansBengaliFamily,
         fontWeight    = FontWeight.Normal,
-        fontSize      = 13.sp,
-        lineHeight    = 20.sp,
+        fontSize      = 14.sp,
+        lineHeight    = 22.sp,
         letterSpacing = 0.25.sp
     ),
     bodySmall = TextStyle(
-        fontFamily    = KalpurushFamily,
+        fontFamily    = NotoSansBengaliFamily,
         fontWeight    = FontWeight.Normal,
         fontSize      = 12.sp,
-        lineHeight    = 18.sp,
+        lineHeight    = 19.sp,
         letterSpacing = 0.4.sp
     ),
     labelLarge = TextStyle(
-        fontFamily    = KalpurushFamily,
+        fontFamily    = NotoSansBengaliFamily,
         fontWeight    = FontWeight.SemiBold,
         fontSize      = 13.sp,
         lineHeight    = 20.sp,
         letterSpacing = 0.1.sp
     ),
     labelMedium = TextStyle(
-        fontFamily    = KalpurushFamily,
+        fontFamily    = NotoSansBengaliFamily,
         fontWeight    = FontWeight.Medium,
         fontSize      = 11.sp,
         lineHeight    = 16.sp,
         letterSpacing = 0.5.sp
     ),
     labelSmall = TextStyle(
-        fontFamily    = KalpurushFamily,
+        fontFamily    = NotoSansBengaliFamily,
         fontWeight    = FontWeight.Normal,
         fontSize      = 10.sp,
         lineHeight    = 14.sp,
@@ -204,85 +204,93 @@ val KalpurushTypography = Typography(
     ),
 )
 
+// Backward compat alias
+val KalpurushTypography = AppTypography
+
 // ── Color schemes ─────────────────────────────────────────────────────────────
+
+// DARK: Navy-Teal — high contrast whites on deep navy
 private val BlinkistDarkColors = darkColorScheme(
-    primary              = StaticTealAccent,
+    primary              = Color(0xFF00D4B1),  // Teal accent
     onPrimary            = Color(0xFF003730),
-    primaryContainer     = StaticTealAccentDim,
-    onPrimaryContainer   = StaticOnDarkHigh,
-    secondary            = StaticTealAccentDim,
-    onSecondary          = Color.White,
+    primaryContainer     = Color(0xFF009E85),
+    onPrimaryContainer   = Color(0xFFFFFFFF),
+    secondary            = Color(0xFF00D4B1),
+    onSecondary          = Color(0xFF003730),
     secondaryContainer   = Color(0xFF0A2A25),
-    onSecondaryContainer = StaticTealAccent,
-    background           = StaticDarkBg,
-    onBackground         = StaticOnDarkHigh,
-    surface              = StaticDarkSurface,
-    onSurface            = StaticOnDarkHigh,
-    surfaceVariant       = StaticDarkSurface2,
-    onSurfaceVariant     = StaticOnDarkMed,
-    outline              = StaticDarkOutline,
+    onSecondaryContainer = Color(0xFF00D4B1),
+    background           = Color(0xFF0D1F2D),
+    onBackground         = Color(0xFFFFFFFF),   // ✅ Pure white — readable
+    surface              = Color(0xFF112535),
+    onSurface            = Color(0xFFFFFFFF),   // ✅ Pure white — readable
+    surfaceVariant       = Color(0xFF0A1820),
+    onSurfaceVariant     = Color(0xFFCCE4F0),   // ✅ Light blue-white — readable
+    outline              = Color(0xFF2A4A5A),
     error                = Color(0xFFFFB4AB),
     onError              = Color(0xFF690005),
     errorContainer       = Color(0xFF2A1A1A),
     onErrorContainer     = Color(0xFFFF8A80),
 )
 
+// LIGHT: Website-inspired — #eef2f6 background, #102334 text (exact match)
 private val LightColors = lightColorScheme(
     primary              = Color(0xFF102334),
     onPrimary            = Color.White,
-    primaryContainer     = Color(0xFFEEF2F6),
-    onPrimaryContainer   = Color(0xFF102334),
+    primaryContainer     = Color(0xFFDCE8F5),
+    onPrimaryContainer   = Color(0xFF0A1828),
     secondary            = Color(0xFF2563EB),
     onSecondary          = Color.White,
-    secondaryContainer   = Color(0xFFEEF2F6),
+    secondaryContainer   = Color(0xFFDCE8F5),
     onSecondaryContainer = Color(0xFF102334),
-    background           = Color(0xFFEEF2F6),
-    onBackground         = Color(0xFF102334),
-    surface              = Color.White,
-    onSurface            = Color(0xFF102334),
-    surfaceVariant       = Color(0xFFF6F8FB),
-    onSurfaceVariant     = Color(0xFF4F6574),
-    outline              = Color(0xFFCEDAE2),
+    background           = Color(0xFFEEF2F6),   // ✅ Exact website bg
+    onBackground         = Color(0xFF0F2435),   // ✅ Very dark navy — max contrast
+    surface              = Color(0xFFFFFFFF),
+    onSurface            = Color(0xFF102334),   // ✅ Dark navy on white
+    surfaceVariant       = Color(0xFFF0F4F8),
+    onSurfaceVariant     = Color(0xFF3D5268),   // ✅ Medium navy — readable
+    outline              = Color(0xFFB8C8D8),
     error                = Color(0xFFBA1A1A),
     onError              = Color.White,
 )
 
+// SEPIA: Warm cream — dark brown text for max readability
 private val SepiaColors = lightColorScheme(
-    primary              = Color(0xFF8B4513), // SaddleBrown Accent
-    onPrimary            = Color.White,
-    primaryContainer     = Color(0xFFEFE6CE),
-    onPrimaryContainer   = Color(0xFF3C2C1E),
-    secondary            = Color(0xFF5C4C3E),
-    onSecondary          = Color.White,
-    secondaryContainer   = Color(0xFFE8DCBE),
-    onSecondaryContainer = Color(0xFF3C2C1E),
-    background           = Color(0xFFF4ECD8),
-    onBackground         = Color(0xFF3C2C1E),
-    surface              = Color(0xFFEFE6CE),
-    onSurface            = Color(0xFF3C2C1E),
-    surfaceVariant       = Color(0xFFE8DCBE),
-    onSurfaceVariant     = Color(0xFF5C4C3E),
-    outline              = Color(0xFFDFD0B0),
+    primary              = Color(0xFF5C3317),   // Dark brown
+    onPrimary            = Color(0xFFFFF8EE),
+    primaryContainer     = Color(0xFFE8D4B0),
+    onPrimaryContainer   = Color(0xFF2A1500),
+    secondary            = Color(0xFF7B4A2A),
+    onSecondary          = Color(0xFFFFF8EE),
+    secondaryContainer   = Color(0xFFE4CCAA),
+    onSecondaryContainer = Color(0xFF2A1500),
+    background           = Color(0xFFF5E6C8),   // ✅ Warm cream
+    onBackground         = Color(0xFF1E1000),   // ✅ Very dark brown — max contrast
+    surface              = Color(0xFFFAF0DC),   // ✅ Lighter cream surface
+    onSurface            = Color(0xFF221408),   // ✅ Dark brown on cream
+    surfaceVariant       = Color(0xFFEED8B0),
+    onSurfaceVariant     = Color(0xFF4A2E12),   // ✅ Medium brown — readable
+    outline              = Color(0xFFCCB080),
     error                = Color(0xFFBA1A1A),
     onError              = Color.White,
 )
 
+// OLED: Pure Black — bright white/green on pure black for AMOLED
 private val OledBlackColors = darkColorScheme(
-    primary              = Color(0xFF4ADE80), // Vibrant Green Accent for OLED Black contrast
-    onPrimary            = Color.Black,
-    primaryContainer     = Color(0xFF0A2A1A),
+    primary              = Color(0xFF4ADE80),   // Vibrant green
+    onPrimary            = Color(0xFF001A08),
+    primaryContainer     = Color(0xFF0A2A14),
     onPrimaryContainer   = Color(0xFF4ADE80),
     secondary            = Color(0xFF00D4B1),
-    onSecondary          = Color.Black,
+    onSecondary          = Color(0xFF000000),
     secondaryContainer   = Color(0xFF0C0C0C),
-    onSecondaryContainer = Color.White,
-    background           = Color(0xFF000000),
-    onBackground         = Color(0xFFFFFFFF),
+    onSecondaryContainer = Color(0xFFFFFFFF),
+    background           = Color(0xFF000000),   // ✅ Pure OLED black
+    onBackground         = Color(0xFFFFFFFF),   // ✅ Pure white — max contrast
     surface              = Color(0xFF0C0C0C),
-    onSurface            = Color(0xFFFFFFFF),
+    onSurface            = Color(0xFFF0F0F0),   // ✅ Near-white — readable
     surfaceVariant       = Color(0xFF141414),
-    onSurfaceVariant     = Color(0xFFCCCCCC),
-    outline              = Color(0xFF222222),
+    onSurfaceVariant     = Color(0xFFD0D0D0),   // ✅ Light gray — readable
+    outline              = Color(0xFF2A2A2A),
     error                = Color(0xFFFFB4AB),
     onError              = Color(0xFF690005),
 )
@@ -295,10 +303,10 @@ fun ShahittoPotrikaTheme(
 ) {
     val colorScheme = when (themeMode) {
         "LIGHT" -> LightColors
-        "DARK" -> BlinkistDarkColors
+        "DARK"  -> BlinkistDarkColors
         "SEPIA" -> SepiaColors
-        "OLED" -> OledBlackColors
-        else -> LightColors
+        "OLED"  -> OledBlackColors
+        else    -> LightColors
     }
 
     val isDark = themeMode == "DARK" || themeMode == "OLED"
@@ -322,7 +330,7 @@ fun ShahittoPotrikaTheme(
     CompositionLocalProvider(LocalDensity provides scaledDensity) {
         MaterialTheme(
             colorScheme = colorScheme,
-            typography  = KalpurushTypography,
+            typography  = AppTypography,
             content     = content
         )
     }
