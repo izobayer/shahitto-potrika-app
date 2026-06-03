@@ -18,6 +18,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.border
+import androidx.compose.ui.draw.clip
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -289,56 +290,95 @@ fun ArticleDetailScreen(
 
                     // Author profile card
                     if (article.authors.isNotBlank()) {
-                        val authorName = article.authors.trim()
-                        val initials = getInitials(authorName)
-                        Surface(
-                            shape = RoundedCornerShape(12.dp),
-                            color = TealAccent.copy(alpha = 0.07f),
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clickable { onAuthorClick(authorName) }
-                        ) {
-                            Row(
-                                modifier = Modifier.padding(horizontal = 14.dp, vertical = 10.dp),
-                                verticalAlignment = Alignment.CenterVertically
+                        val authorList = article.authors.split(",").map { it.trim() }.filter { it.isNotBlank() }
+                        authorList.forEachIndexed { index, authorName ->
+                            val initials = getInitials(authorName)
+                            // Only first author may have a photo from the parser
+                            val photoUrl = if (index == 0) article.authorPhotoUrl else null
+                            Surface(
+                                shape = RoundedCornerShape(12.dp),
+                                color = TealAccent.copy(alpha = 0.07f),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clickable { onAuthorClick(authorName) }
                             ) {
-                                Box(
-                                    modifier = Modifier
-                                        .size(42.dp)
-                                        .background(
-                                            brush = androidx.compose.ui.graphics.Brush.linearGradient(
-                                                colors = listOf(TealAccent, TealAccent.copy(alpha = 0.7f))
-                                            ),
-                                            shape = CircleShape
-                                        ),
-                                    contentAlignment = Alignment.Center
+                                Row(
+                                    modifier = Modifier.padding(horizontal = 14.dp, vertical = 12.dp),
+                                    verticalAlignment = Alignment.CenterVertically
                                 ) {
-                                    Text(
-                                        text = initials,
-                                        color = Color.White,
-                                        fontSize = 15.sp,
-                                        fontWeight = FontWeight.Bold
-                                    )
-                                }
-                                Spacer(Modifier.width(12.dp))
-                                Column {
-                                    Text(
-                                        text = "লেখক",
-                                        fontSize = 11.sp,
-                                        color = OnDarkLow
-                                    )
-                                    Text(
-                                        text = authorName,
-                                        fontSize = 14.sp,
-                                        fontWeight = FontWeight.Bold,
-                                        color = TealAccent,
-                                        maxLines = 2
+                                    // Avatar: real photo if available, else gradient initials
+                                    Box(
+                                        modifier = Modifier
+                                            .size(50.dp)
+                                            .clip(CircleShape)
+                                            .background(
+                                                brush = androidx.compose.ui.graphics.Brush.linearGradient(
+                                                    colors = listOf(TealAccent, TealAccent.copy(alpha = 0.6f))
+                                                )
+                                            ),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        // Render initials as fallback in the background
+                                        Text(
+                                            text = initials,
+                                            color = Color.White,
+                                            fontSize = 16.sp,
+                                            fontWeight = FontWeight.Bold
+                                        )
+                                        if (!photoUrl.isNullOrBlank()) {
+                                            coil.compose.AsyncImage(
+                                                model = photoUrl,
+                                                contentDescription = authorName,
+                                                contentScale = androidx.compose.ui.layout.ContentScale.Crop,
+                                                modifier = Modifier
+                                                    .fillMaxSize()
+                                                    .clip(CircleShape),
+                                                error = null,
+                                                onError = {}
+                                            )
+                                        }
+                                    }
+                                    Spacer(Modifier.width(14.dp))
+                                    Column(modifier = Modifier.weight(1f)) {
+                                        Text(
+                                            text = "লেখক",
+                                            fontSize = 10.sp,
+                                            color = OnDarkLow,
+                                            fontWeight = FontWeight.Medium
+                                        )
+                                        Spacer(Modifier.height(2.dp))
+                                        Text(
+                                            text = authorName,
+                                            fontSize = 14.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            color = TealAccent,
+                                            maxLines = 2
+                                        )
+                                        // Affiliation — only show for first author
+                                        if (index == 0 && !article.authorAffiliation.isNullOrBlank()) {
+                                            Spacer(Modifier.height(2.dp))
+                                            Text(
+                                                text = article.authorAffiliation,
+                                                fontSize = 11.sp,
+                                                color = OnDarkLow,
+                                                maxLines = 2
+                                            )
+                                        }
+                                    }
+                                    // Tap hint icon
+                                    Icon(
+                                        imageVector = androidx.compose.material.icons.Icons.Default.Search,
+                                        contentDescription = null,
+                                        tint = TealAccent.copy(alpha = 0.4f),
+                                        modifier = Modifier.size(16.dp)
                                     )
                                 }
                             }
+                            if (index < authorList.lastIndex) Spacer(Modifier.height(6.dp))
                         }
                         Spacer(Modifier.height(10.dp))
                     }
+
 
                     // DOI
                     if (article.doi != null) {

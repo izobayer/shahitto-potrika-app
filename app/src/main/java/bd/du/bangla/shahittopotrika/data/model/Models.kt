@@ -19,7 +19,9 @@ data class Article(
     val url: String,
     val pdfUrl: String?,
     val keywords: List<String> = emptyList(),
-    val doi: String? = null
+    val doi: String? = null,
+    val authorPhotoUrl: String? = null,
+    val authorAffiliation: String? = null
 )
 
 data class JournalInfo(

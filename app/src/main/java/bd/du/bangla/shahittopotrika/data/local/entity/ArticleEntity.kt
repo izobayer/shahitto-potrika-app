@@ -15,18 +15,24 @@ data class ArticleEntity(
     val keywords: String = "",          // comma-separated
     val doi: String? = null,
     val issueUrl: String = "",
-    val cachedAt: Long = System.currentTimeMillis()
+    val cachedAt: Long = System.currentTimeMillis(),
+    val authorPhotoUrl: String? = null,
+    val authorAffiliation: String? = null
 )
 
 fun ArticleEntity.toArticle() = Article(
     id, title, authors, abstract, url, pdfUrl,
     keywords = if (keywords.isBlank()) emptyList() else keywords.split(","),
-    doi = doi
+    doi = doi,
+    authorPhotoUrl = authorPhotoUrl,
+    authorAffiliation = authorAffiliation
 )
 
 fun Article.toEntity(issueUrl: String = "") = ArticleEntity(
     id, title, authors, abstract, url, pdfUrl,
     keywords = keywords.joinToString(","),
     doi = doi,
-    issueUrl = issueUrl
+    issueUrl = issueUrl,
+    authorPhotoUrl = authorPhotoUrl,
+    authorAffiliation = authorAffiliation
 )

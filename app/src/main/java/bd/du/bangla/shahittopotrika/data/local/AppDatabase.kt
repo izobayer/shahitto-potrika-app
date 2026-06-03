@@ -16,7 +16,7 @@ import bd.du.bangla.shahittopotrika.data.local.entity.*
         ArticleNoteEntity::class,
         ArticleCommentEntity::class
     ],
-    version = 6,
+    version = 7,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -52,6 +52,13 @@ abstract class AppDatabase : RoomDatabase() {
             }
         }
 
+        private val MIGRATION_6_7 = object : Migration(6, 7) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE articles ADD COLUMN authorPhotoUrl TEXT")
+                db.execSQL("ALTER TABLE articles ADD COLUMN authorAffiliation TEXT")
+            }
+        }
+
         fun get(context: Context): AppDatabase =
             INSTANCE ?: synchronized(this) {
                 INSTANCE ?: Room.databaseBuilder(
@@ -59,7 +66,7 @@ abstract class AppDatabase : RoomDatabase() {
                     AppDatabase::class.java,
                     "shahitto_potrika.db"
                 )
-                .addMigrations(MIGRATION_1_2, MIGRATION_2_3)
+                .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_6_7)
                 .fallbackToDestructiveMigration()
                 .build().also { INSTANCE = it }
             }

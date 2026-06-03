@@ -86,10 +86,33 @@ object JournalParser {
     fun fetchArticleDetail(articleUrl: String): Article {
         val doc = fetch(articleUrl)
         val title = doc.selectFirst("h1.title, .page_article h1")?.text() ?: ""
-        val authors = cleanAuthors(
-            doc.select(".authors .name").joinToString(", ") { it.text() }
-                .ifBlank { doc.selectFirst(".authors")?.text() ?: "" }
-        )
+
+        // Authors block — try detailed author elements first
+        val authorElements = doc.select(".authors .author")
+        val authors = if (authorElements.isNotEmpty()) {
+            cleanAuthors(
+                authorElements.joinToString(", ") { el ->
+                    el.selectFirst(".name")?.text() ?: el.text()
+                }
+            )
+        } else {
+            cleanAuthors(
+                doc.select(".authors .name").joinToString(", ") { it.text() }
+                    .ifBlank { doc.selectFirst(".authors")?.text() ?: "" }
+            )
+        }
+
+        // Author photo — OJS puts it in .author .photo img or figure.photo img
+        val firstAuthorEl = doc.selectFirst(".authors .author")
+        val authorPhotoUrl = firstAuthorEl?.selectFirst(
+            "img.photo, .photo img, figure.photo img, .author-photo img"
+        )?.absUrl("src")?.takeIf { it.isNotBlank() }
+
+        // Author affiliation
+        val authorAffiliation = firstAuthorEl?.selectFirst(
+            ".affiliation, span.affiliation"
+        )?.text()?.takeIf { it.isNotBlank() }
+
         val abstract = doc.selectFirst(".abstract p, .abstract")?.text() ?: ""
         val pdfLink = doc.select("a.obj_galley_link.pdf").firstOrNull()?.absUrl("href")
             ?: doc.select("a.obj_galley_link").firstOrNull()?.absUrl("href")
@@ -98,7 +121,8 @@ object JournalParser {
         val id = articleUrl.substringAfterLast("/")
         return Article(
             id = id, title = title, authors = authors, abstract = abstract,
-            url = articleUrl, pdfUrl = pdfLink, keywords = keywords, doi = doi
+            url = articleUrl, pdfUrl = pdfLink, keywords = keywords, doi = doi,
+            authorPhotoUrl = authorPhotoUrl, authorAffiliation = authorAffiliation
         )
     }
 
