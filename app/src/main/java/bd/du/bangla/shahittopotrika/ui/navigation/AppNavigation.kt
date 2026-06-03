@@ -19,6 +19,7 @@ object Routes {
     const val ARTICLE_LIST   = "article_list/{issueUrl}"
     const val ARTICLE_DETAIL = "article_detail/{articleUrl}"
     const val SEARCH         = "search?query={query}"
+    const val SEARCH_BASE     = "search"
     const val ABOUT          = "about"
     const val BOOKMARKS      = "bookmarks"
     const val PDF_VIEWER     = "pdf_viewer/{pdfUrl}/{title}"
@@ -59,7 +60,7 @@ fun AppNavigation(
             HomeScreen(
                 viewModel        = journalVm,
                 onIssueClick     = { navController.navigate(Routes.articleList(it.url)) },
-                onSearchClick    = { navController.navigate(Routes.SEARCH) },
+                onSearchClick    = { navController.navigate(Routes.search()) },
                 onIssueListClick = { navController.navigate(Routes.ISSUE_LIST) },
                 onAboutClick     = { navController.navigate(Routes.ABOUT) },
                 onBookmarksClick = { navController.navigate(Routes.BOOKMARKS) },
@@ -74,7 +75,7 @@ fun AppNavigation(
                 onIssueClick     = { navController.navigate(Routes.articleList(it.url)) },
                 onBack           = { navController.popBackStack() },
                 onHomeClick      = { navController.popBackStack(Routes.HOME, inclusive = false) },
-                onSearchClick    = { navController.navigate(Routes.SEARCH) },
+                onSearchClick    = { navController.navigate(Routes.search()) },
                 onBookmarksClick = { navController.navigate(Routes.BOOKMARKS) },
                 onAboutClick     = { navController.navigate(Routes.ABOUT) }
             )

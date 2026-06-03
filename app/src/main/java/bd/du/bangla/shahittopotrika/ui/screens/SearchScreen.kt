@@ -59,6 +59,9 @@ fun SearchScreen(
         if (!initialQuery.isNullOrBlank()) {
             viewModel.onQueryChange(initialQuery)
             viewModel.search()
+        } else {
+            // No query passed → clear any leftover state from previous session
+            viewModel.clear()
         }
     }
 
