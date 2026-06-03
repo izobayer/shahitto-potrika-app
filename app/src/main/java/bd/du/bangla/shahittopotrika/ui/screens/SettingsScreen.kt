@@ -109,13 +109,17 @@ fun SettingsScreen(
         if (showDemoDialog) {
             var manualName by remember { mutableStateOf("") }
             var manualEmail by remember { mutableStateOf("") }
-            var isManualMode by remember { mutableStateOf(false) }
+            var manualUsername by remember { mutableStateOf("") }
+            var manualPassword by remember { mutableStateOf("") }
+            var isRegisterMode by remember { mutableStateOf(false) }
+            var isLoading by remember { mutableStateOf(false) }
+            var errorMessage by remember { mutableStateOf<String?>(null) }
 
             AlertDialog(
-                onDismissRequest = { showDemoDialog = false },
+                onDismissRequest = { if (!isLoading) showDemoDialog = false },
                 title = { 
                     Text(
-                        text = if (isManualMode) "ম্যানুয়াল সাইন-ইন" else "লগইন করতে সমস্যা হচ্ছে?", 
+                        text = if (isRegisterMode) "ম্যানুয়াল রেজিস্ট্রেশন" else "লগইন করতে সমস্যা হচ্ছে?", 
                         fontSize = 16.sp, 
                         fontWeight = FontWeight.Bold, 
                         color = OnDarkHigh
@@ -123,45 +127,79 @@ fun SettingsScreen(
                 },
                 text = {
                     Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                        if (!isManualMode) {
+                        if (!isRegisterMode) {
                             Text(
-                                text = "গুগল প্লে সার্ভিস বা ডেভেলপার সার্টিফিকেট (SHA-1) কনফিগার করা না থাকায় গুগল লগইন সফল হয়নি। আপনি নিজে নাম ও ইমেইল দিয়ে অথবা ডেমো অ্যাকাউন্ট দিয়ে সরাসরি সাইন-ইন করতে পারেন।", 
+                                text = "গুগল প্লে সার্ভিস বা ডেভেলপার সার্টিফিকেট (SHA-1) কনফিগার করা না থাকায় গুগল লগইন সফল হয়নি। আপনি নিজে তথ্য দিয়ে ওয়েবসাইট অ্যাকাউন্টে রেজিস্ট্রেশন করতে পারেন, অথবা ডেমো অ্যাকাউন্ট দিয়ে সরাসরি সাইন-ইন করতে পারেন।", 
                                 color = OnDarkMed,
                                 fontSize = 13.sp
                             )
                         } else {
                             Text(
-                                text = "নিচে আপনার নাম এবং ইমেইল লিখুন:",
+                                text = "নিচে তথ্যগুলো দিয়ে ওয়েবসাইটের সাথে রেজিস্ট্রেশন করুন:",
                                 color = OnDarkMed,
-                                fontSize = 13.sp
+                                fontSize = 12.sp
                             )
-                            Spacer(Modifier.height(4.dp))
+                            if (errorMessage != null) {
+                                Text(
+                                    text = errorMessage!!,
+                                    color = MaterialTheme.colorScheme.error,
+                                    fontSize = 12.sp,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
                             OutlinedTextField(
                                 value = manualName,
-                                onValueChange = { manualName = it },
-                                label = { Text("নাম", color = OnDarkLow) },
+                                onValueChange = { manualName = it; errorMessage = null },
+                                label = { Text("পূর্ণ নাম (ইংরেজি)", color = OnDarkLow) },
                                 singleLine = true,
+                                enabled = !isLoading,
                                 modifier = Modifier.fillMaxWidth(),
                                 colors = OutlinedTextFieldDefaults.colors(
                                     focusedBorderColor = TealAccent,
                                     unfocusedBorderColor = DarkOutline,
-                                    focusedLabelColor = TealAccent,
-                                    unfocusedLabelColor = OnDarkLow,
                                     focusedTextColor = OnDarkHigh,
                                     unfocusedTextColor = OnDarkMed
                                 )
                             )
                             OutlinedTextField(
                                 value = manualEmail,
-                                onValueChange = { manualEmail = it },
-                                label = { Text("ইমেইল", color = OnDarkLow) },
+                                onValueChange = { manualEmail = it; errorMessage = null },
+                                label = { Text("ইমেইল অ্যাড্রেস", color = OnDarkLow) },
                                 singleLine = true,
+                                enabled = !isLoading,
                                 modifier = Modifier.fillMaxWidth(),
                                 colors = OutlinedTextFieldDefaults.colors(
                                     focusedBorderColor = TealAccent,
                                     unfocusedBorderColor = DarkOutline,
-                                    focusedLabelColor = TealAccent,
-                                    unfocusedLabelColor = OnDarkLow,
+                                    focusedTextColor = OnDarkHigh,
+                                    unfocusedTextColor = OnDarkMed
+                                )
+                            )
+                            OutlinedTextField(
+                                value = manualUsername,
+                                onValueChange = { manualUsername = it; errorMessage = null },
+                                label = { Text("ইউজারনেম (username)", color = OnDarkLow) },
+                                singleLine = true,
+                                enabled = !isLoading,
+                                modifier = Modifier.fillMaxWidth(),
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    focusedBorderColor = TealAccent,
+                                    unfocusedBorderColor = DarkOutline,
+                                    focusedTextColor = OnDarkHigh,
+                                    unfocusedTextColor = OnDarkMed
+                                )
+                            )
+                            OutlinedTextField(
+                                value = manualPassword,
+                                onValueChange = { manualPassword = it; errorMessage = null },
+                                label = { Text("পাসওয়ার্ড (Password)", color = OnDarkLow) },
+                                singleLine = true,
+                                enabled = !isLoading,
+                                modifier = Modifier.fillMaxWidth(),
+                                visualTransformation = androidx.compose.ui.text.input.PasswordVisualTransformation(),
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    focusedBorderColor = TealAccent,
+                                    unfocusedBorderColor = DarkOutline,
                                     focusedTextColor = OnDarkHigh,
                                     unfocusedTextColor = OnDarkMed
                                 )
@@ -174,44 +212,71 @@ fun SettingsScreen(
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        if (!isManualMode) {
-                            TextButton(
-                                onClick = { isManualMode = true }
-                            ) {
-                                Text("নিজে লিখুন", color = TealAccent, fontWeight = FontWeight.Bold)
-                            }
-                            Button(
-                                onClick = {
-                                    vm.loginUser("বাংলা গবেষক", "researcher@du.ac.bd", "")
-                                    showDemoDialog = false
-                                },
-                                colors = ButtonDefaults.buttonColors(containerColor = TealAccent)
-                            ) {
-                                Text("ডেমো লগইন", color = Color.White)
-                            }
+                        if (isLoading) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(20.dp),
+                                color = TealAccent,
+                                strokeWidth = 2.dp
+                            )
+                            Spacer(Modifier.width(6.dp))
+                            Text("প্রক্রিয়াকরণ হচ্ছে...", color = OnDarkMed, fontSize = 13.sp)
                         } else {
-                            TextButton(
-                                onClick = { isManualMode = false }
-                            ) {
-                                Text("ফিরে যান", color = OnDarkLow)
-                            }
-                            Button(
-                                onClick = {
-                                    val finalName = manualName.trim().ifBlank { "বাংলা গবেষক" }
-                                    val finalEmail = manualEmail.trim().ifBlank { "researcher@du.ac.bd" }
-                                    vm.loginUser(finalName, finalEmail, "")
-                                    showDemoDialog = false
-                                },
-                                colors = ButtonDefaults.buttonColors(containerColor = TealAccent),
-                                enabled = manualName.isNotBlank()
-                            ) {
-                                Text("প্রবেশ করুন", color = Color.White)
+                            if (!isRegisterMode) {
+                                TextButton(
+                                    onClick = { isRegisterMode = true }
+                                ) {
+                                    Text("রেজিস্ট্রেশন করুন", color = TealAccent, fontWeight = FontWeight.Bold)
+                                }
+                                Button(
+                                    onClick = {
+                                        vm.loginUser("বাংলা গবেষক", "researcher@du.ac.bd", "")
+                                        showDemoDialog = false
+                                    },
+                                    colors = ButtonDefaults.buttonColors(containerColor = TealAccent)
+                                ) {
+                                    Text("ডেমো লগইন", color = Color.White)
+                                }
+                            } else {
+                                TextButton(
+                                    onClick = { isRegisterMode = false; errorMessage = null }
+                                ) {
+                                    Text("ফিরে যান", color = OnDarkLow)
+                                }
+                                Button(
+                                    onClick = {
+                                        if (manualName.isBlank() || manualEmail.isBlank() || manualUsername.isBlank() || manualPassword.isBlank()) {
+                                            errorMessage = "সবগুলো ফিল্ড সঠিকভাবে পূরণ করুন"
+                                            return@Button
+                                        }
+                                        isLoading = true
+                                        errorMessage = null
+                                        vm.registerUserOnWebsite(
+                                            name = manualName.trim(),
+                                            email = manualEmail.trim(),
+                                            username = manualUsername.trim(),
+                                            password = manualPassword,
+                                            affiliation = "App Client",
+                                            onResult = { result ->
+                                                isLoading = false
+                                                if (result.isSuccess) {
+                                                    showDemoDialog = false
+                                                } else {
+                                                    errorMessage = result.exceptionOrNull()?.message ?: "রেজিস্ট্রেশন ব্যর্থ হয়েছে"
+                                                }
+                                            }
+                                        )
+                                    },
+                                    colors = ButtonDefaults.buttonColors(containerColor = TealAccent),
+                                    enabled = manualName.isNotBlank() && manualEmail.isNotBlank() && manualUsername.isNotBlank() && manualPassword.isNotBlank()
+                                ) {
+                                    Text("নিবন্ধন সম্পন্ন করুন", color = Color.White)
+                                }
                             }
                         }
                     }
                 },
                 dismissButton = {
-                    if (!isManualMode) {
+                    if (!isRegisterMode && !isLoading) {
                         TextButton(onClick = { showDemoDialog = false }) {
                             Text("বাতিল", color = OnDarkLow)
                         }

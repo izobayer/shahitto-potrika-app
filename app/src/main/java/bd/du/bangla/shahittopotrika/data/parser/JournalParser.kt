@@ -173,4 +173,72 @@ object JournalParser {
             logoUrl = logo
         )
     }
+
+    // ── Manual User Registration on Website ──────────────────────
+    fun registerUserOnWebsite(
+        name: String,
+        email: String,
+        username: String,
+        password: String,
+        affiliation: String = "App Client"
+    ): Result<Unit> = kotlin.runCatching {
+        val registerUrl = "$BASE_URL/user/register"
+        val getRequest = Request.Builder()
+            .url(registerUrl)
+            .header("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36")
+            .header("Accept", "text/html,application/xhtml+xml")
+            .build()
+            
+        val getResponse = client.newCall(getRequest).execute()
+        val cookies = getResponse.headers("Set-Cookie")
+        val html = getResponse.body?.string() ?: ""
+        val doc = Jsoup.parse(html, registerUrl)
+        
+        val csrfToken = doc.selectFirst("input[name=csrfToken]")?.attr("value")
+            ?: throw Exception("CSRF token not found on registration page")
+            
+        val nameParts = name.trim().split(" ", limit = 2)
+        val givenName = nameParts.firstOrNull() ?: name
+        val familyName = if (nameParts.size > 1) nameParts[1] else ""
+        
+        val formBuilder = okhttp3.FormBody.Builder()
+            .add("csrfToken", csrfToken)
+            .add("givenName", givenName)
+            .add("familyName", familyName)
+            .add("email", email)
+            .add("username", username)
+            .add("password", password)
+            .add("passwordAgain", password)
+            .add("country", "BD")
+            .add("affiliation", affiliation)
+            .add("privacyConsent", "1")
+            .add("emailConsent", "1")
+            
+        val postRequest = Request.Builder()
+            .url(registerUrl)
+            .post(formBuilder.build())
+            .header("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36")
+            .header("Accept", "text/html,application/xhtml+xml")
+            
+        cookies.forEach { cookie ->
+            val cookieValue = cookie.substringBefore(";")
+            postRequest.addHeader("Cookie", cookieValue)
+        }
+        
+        val postResponse = client.newCall(postRequest.build()).execute()
+        val postHtml = postResponse.body?.string() ?: ""
+        
+        if (postResponse.code == 200 && (postHtml.contains("error") || postHtml.contains("required") || postHtml.contains("invalid"))) {
+            val errDoc = Jsoup.parse(postHtml)
+            val errorMsg = errDoc.select(".pkp_form_error, .error, .notification-error").text().trim()
+            if (errorMsg.isNotBlank()) {
+                throw Exception(errorMsg)
+            }
+            throw Exception("রেজিস্ট্রেশন ব্যর্থ হয়েছে। দয়া করে সব তথ্য পুনরায় যাচাই করুন।")
+        }
+        
+        if (postResponse.code >= 400) {
+            throw Exception("সার্ভার রেসপন্স কোড: ${postResponse.code}")
+        }
+    }
 }
