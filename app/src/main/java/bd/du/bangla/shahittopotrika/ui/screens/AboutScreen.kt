@@ -35,6 +35,7 @@ import bd.du.bangla.shahittopotrika.ui.theme.OnDarkHigh
 import bd.du.bangla.shahittopotrika.ui.theme.OnDarkMed
 import bd.du.bangla.shahittopotrika.ui.theme.QayyumBookFamily
 import bd.du.bangla.shahittopotrika.ui.theme.TealAccent
+import bd.du.bangla.shahittopotrika.ui.theme.AccentBlue
 import bd.du.bangla.shahittopotrika.viewmodel.JournalViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -83,7 +84,8 @@ fun AboutScreen(
                             label           = "পত্রিকার নাম",
                             value           = info.name,
                             valueFontFamily = QayyumBookFamily,
-                            valueFontSize   = 15.sp
+                            valueFontSize   = 15.sp,
+                            valueColor      = AccentBlue
                         )
                         HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
                         InfoRow("ISSN (মুদ্রণ)", info.issn)
@@ -206,7 +208,8 @@ fun AboutScreen(
                         SpanStyle(
                             fontFamily = QayyumBookFamily,
                             fontWeight = FontWeight.Bold,
-                            fontSize   = 13.sp
+                            fontSize   = 13.sp,
+                            color      = AccentBlue
                         )
                     ) {
                         append("সাহিত্য পত্রিকা")
@@ -240,7 +243,8 @@ fun InfoRow(
     label: String,
     value: String,
     valueFontFamily: androidx.compose.ui.text.font.FontFamily? = null,
-    valueFontSize: androidx.compose.ui.unit.TextUnit = 13.sp
+    valueFontSize: androidx.compose.ui.unit.TextUnit = 13.sp,
+    valueColor: androidx.compose.ui.graphics.Color = TealAccent
 ) {
     Row(
         modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
@@ -257,7 +261,7 @@ fun InfoRow(
             fontFamily = valueFontFamily,
             modifier   = Modifier.weight(1.2f),
             textAlign  = TextAlign.End,
-            color      = TealAccent
+            color      = valueColor
         )
     }
 }

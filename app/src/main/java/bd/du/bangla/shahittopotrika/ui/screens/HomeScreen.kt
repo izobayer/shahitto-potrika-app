@@ -1,6 +1,7 @@
 package bd.du.bangla.shahittopotrika.ui.screens
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
@@ -87,21 +88,32 @@ fun HomeScreen(
                         .padding(horizontal = 16.dp, vertical = 4.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text(
-                            "সাহিত্য পত্রিকা",
-                            fontFamily = QayyumBookFamily,
-                            fontWeight = FontWeight.Bold,
-                            fontSize   = 22.sp,
-                            color      = TealAccent
+                    Row(
+                        modifier = Modifier.weight(1f),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Image(
+                            painter = androidx.compose.ui.res.painterResource(id = bd.du.bangla.shahittopotrika.R.drawable.du_logo),
+                            contentDescription = "ঢাকা বিশ্ববিদ্যালয় লোগো",
+                            modifier = Modifier.size(36.dp)
                         )
-                        Spacer(Modifier.height(1.dp))
-                        Text(
-                            "বাংলা বিভাগ, ঢাকা বিশ্ববিদ্যালয়",
-                            fontSize   = 10.sp,
-                            color      = OnDarkLow,
-                            fontWeight = FontWeight.Normal
-                        )
+                        Spacer(Modifier.width(10.dp))
+                        Column {
+                            Text(
+                                "সাহিত্য পত্রিকা",
+                                fontFamily = QayyumBookFamily,
+                                fontWeight = FontWeight.Bold,
+                                fontSize   = 22.sp,
+                                color      = AccentBlue
+                            )
+                            Spacer(Modifier.height(1.dp))
+                            Text(
+                                "বাংলা বিভাগ, ঢাকা বিশ্ববিদ্যালয়",
+                                fontSize   = 12.sp,
+                                color      = OnDarkLow,
+                                fontWeight = FontWeight.Normal
+                            )
+                        }
                     }
                     IconButton(onClick = onHistoryClick) {
                         Icon(Icons.Default.History, "ইতিহাস", tint = OnDarkMed)
@@ -258,7 +270,7 @@ fun HomeScreen(
                         fontFamily = QayyumBookFamily,
                         fontWeight = FontWeight.Bold,
                         fontSize   = 16.sp,
-                        color      = OnDarkMed,
+                        color      = AccentBlue,
                         textAlign  = TextAlign.Center
                     )
                     Spacer(Modifier.height(4.dp))
