@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.sp
 import bd.du.bangla.shahittopotrika.ui.theme.DarkSurface
 import bd.du.bangla.shahittopotrika.ui.theme.OnDarkHigh
 import bd.du.bangla.shahittopotrika.ui.theme.TealAccent
+import bd.du.bangla.shahittopotrika.ui.theme.AccentBlue
 import bd.du.bangla.shahittopotrika.viewmodel.JournalViewModel
 import java.text.SimpleDateFormat
 import java.util.*
@@ -120,7 +121,7 @@ fun ReadHistoryScreen(
                                 if (item.authors.isNotBlank()) {
                                     Spacer(Modifier.height(2.dp))
                                     Text(item.authors, fontSize = 11.sp,
-                                        color = TealAccent,
+                                        color = AccentBlue,
                                         fontWeight = FontWeight.Bold,
                                         maxLines = 1, overflow = TextOverflow.Ellipsis)
                                 }

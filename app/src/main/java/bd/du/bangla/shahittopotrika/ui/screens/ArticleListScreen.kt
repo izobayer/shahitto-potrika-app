@@ -152,7 +152,7 @@ fun ArticleCard(article: Article, onClick: () -> Unit, modifier: Modifier = Modi
                 Text(
                     article.authors,
                     fontSize   = 12.sp,
-                    color      = TealAccent,
+                    color      = AccentBlue,
                     maxLines   = 1,
                     overflow   = TextOverflow.Ellipsis,
                     fontWeight = FontWeight.Bold

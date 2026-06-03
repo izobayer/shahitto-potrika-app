@@ -138,7 +138,7 @@ object JournalParser {
             val id = articleUrl.substringAfterLast("/")
             Article(
                 id = id, title = titleEl.text(),
-                authors = el.selectFirst(".authors")?.text() ?: "",
+                authors = cleanAuthors(el.selectFirst(".authors")?.text() ?: ""),
                 abstract = el.selectFirst(".abstract")?.text() ?: "",
                 url = articleUrl, pdfUrl = null
             )

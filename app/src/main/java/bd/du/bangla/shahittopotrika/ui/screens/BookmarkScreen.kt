@@ -37,6 +37,7 @@ import bd.du.bangla.shahittopotrika.ui.theme.OnDarkHigh
 import bd.du.bangla.shahittopotrika.ui.theme.OnDarkLow
 import bd.du.bangla.shahittopotrika.ui.theme.OnDarkMed
 import bd.du.bangla.shahittopotrika.ui.theme.TealAccent
+import bd.du.bangla.shahittopotrika.ui.theme.AccentBlue
 import bd.du.bangla.shahittopotrika.viewmodel.BookmarkViewModel
 import bd.du.bangla.shahittopotrika.viewmodel.JournalViewModel
 
@@ -358,7 +359,7 @@ fun BookmarkCard(
                     Text(
                         text = bookmark.authors,
                         fontSize = 12.sp,
-                        color = TealAccent,
+                        color = AccentBlue,
                         fontWeight = FontWeight.Bold,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis

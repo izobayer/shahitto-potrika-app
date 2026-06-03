@@ -337,7 +337,7 @@ fun ArticleDetailScreen(
                                             text = authorName,
                                             fontSize = 14.sp,
                                             fontWeight = FontWeight.Bold,
-                                            color = TealAccent,
+                                            color = AccentBlue,
                                             maxLines = 2
                                         )
                                         // Affiliation — only show for first author
