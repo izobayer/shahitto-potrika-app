@@ -6,6 +6,8 @@ import bd.du.bangla.shahittopotrika.data.local.entity.*
 import bd.du.bangla.shahittopotrika.data.model.Article
 import bd.du.bangla.shahittopotrika.data.model.Issue
 import bd.du.bangla.shahittopotrika.data.model.JournalInfo
+import bd.du.bangla.shahittopotrika.data.model.Author
+import bd.du.bangla.shahittopotrika.data.model.AuthorDetails
 import bd.du.bangla.shahittopotrika.data.parser.JournalParser
 import bd.du.bangla.shahittopotrika.data.preferences.UserPreferences
 import kotlinx.coroutines.flow.Flow
@@ -142,4 +144,13 @@ class JournalRepository(context: Context) {
     }
 
     suspend fun deleteComment(commentId: String) = commentDao.delete(commentId)
+
+    // ── Authors List & Details ──────────────────────────────────
+    suspend fun getAuthorList(): Result<List<Author>> = runCatching {
+        JournalParser.fetchAuthorList()
+    }
+
+    suspend fun getAuthorDetails(authorId: String): Result<AuthorDetails> = runCatching {
+        JournalParser.fetchAuthorDetails(authorId)
+    }
 }

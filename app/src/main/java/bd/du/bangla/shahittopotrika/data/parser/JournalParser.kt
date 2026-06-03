@@ -3,6 +3,8 @@ package bd.du.bangla.shahittopotrika.data.parser
 import bd.du.bangla.shahittopotrika.data.model.Article
 import bd.du.bangla.shahittopotrika.data.model.Issue
 import bd.du.bangla.shahittopotrika.data.model.JournalInfo
+import bd.du.bangla.shahittopotrika.data.model.Author
+import bd.du.bangla.shahittopotrika.data.model.AuthorDetails
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import org.jsoup.Jsoup
@@ -240,5 +242,45 @@ object JournalParser {
         if (postResponse.code >= 400) {
             throw Exception("সার্ভার রেসপন্স কোড: ${postResponse.code}")
         }
+    }
+
+    // ── Authors List & Details Scraper ──────────────────────────
+    fun fetchAuthorList(): List<Author> {
+        val doc = fetch("https://journal.bangla.du.ac.bd/author")
+        return doc.select(".premium-author-card").map { el ->
+            val name = el.attr("data-name")
+            val portraitImg = el.selectFirst(".author-portrait img")?.absUrl("src")
+            val link = el.selectFirst("a.card-top")?.absUrl("href") ?: ""
+            val id = java.net.URLDecoder.decode(link.substringAfter("/author/view/"), "UTF-8").ifBlank { name }
+            val firstLetter = el.attr("data-first-letter").ifBlank { name.take(1) }
+            Author(name = name, id = id, photoUrl = portraitImg, firstLetter = firstLetter)
+        }
+    }
+
+    fun fetchAuthorDetails(authorId: String): AuthorDetails {
+        val authorUrl = "https://journal.bangla.du.ac.bd/author/view/${java.net.URLEncoder.encode(authorId, "UTF-8").replace("+", "%20")}"
+        val doc = fetch(authorUrl)
+        val headerEl = doc.selectFirst(".author_header")
+        val name = headerEl?.selectFirst("h1")?.text() ?: authorId
+        val photoUrl = headerEl?.selectFirst("img")?.absUrl("src")
+        val title = headerEl?.select("div")?.getOrNull(1)?.text()
+
+        val articles = mutableListOf<Article>()
+        doc.select(".obj_article_summary").forEach { el ->
+            val titleEl = el.selectFirst(".title a") ?: return@forEach
+            val articleUrl = titleEl.absUrl("href")
+            val id = articleUrl.substringAfterLast("/").ifBlank { articleUrl.hashCode().toString() }
+            val authors = cleanAuthors(el.select(".authors").text())
+            val abstract = el.selectFirst(".abstract")?.text() ?: ""
+            val pdfEl = el.selectFirst("a.obj_galley_link.pdf")
+            articles.add(
+                Article(
+                    id = id, title = titleEl.text(), authors = authors,
+                    abstract = abstract, url = articleUrl,
+                    pdfUrl = pdfEl?.absUrl("href")
+                )
+            )
+        }
+        return AuthorDetails(name = name, photoUrl = photoUrl, title = title, articles = articles)
     }
 }

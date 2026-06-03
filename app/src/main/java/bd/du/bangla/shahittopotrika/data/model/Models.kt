@@ -38,3 +38,17 @@ sealed class UiState<out T> {
     data class Success<T>(val data: T) : UiState<T>()
     data class Error(val message: String) : UiState<Nothing>()
 }
+
+data class Author(
+    val name: String,
+    val id: String,
+    val photoUrl: String?,
+    val firstLetter: String
+)
+
+data class AuthorDetails(
+    val name: String,
+    val photoUrl: String?,
+    val title: String?,
+    val articles: List<Article>
+)

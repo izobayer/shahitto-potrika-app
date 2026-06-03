@@ -47,7 +47,8 @@ fun HomeScreen(
     onAboutClick: () -> Unit,
     onBookmarksClick: () -> Unit,
     onSettingsClick: () -> Unit = {},
-    onHistoryClick: () -> Unit = {}
+    onHistoryClick: () -> Unit = {},
+    onAuthorsClick: () -> Unit = {}
 ) {
     val currentIssueState by viewModel.currentIssue.collectAsState()
     val archiveState       by viewModel.issueArchive.collectAsState()
@@ -201,24 +202,46 @@ fun HomeScreen(
                 Spacer(Modifier.height(28.dp))
 
                 // ── Quick nav ─────────────────────────────────
-                Row(
+                Column(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 20.dp),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    QuickNavCard(
-                        title    = "পঠন ইতিহাস",
-                        icon     = Icons.Default.History,
-                        modifier = Modifier.weight(1f),
-                        onClick  = onHistoryClick
-                    )
-                    QuickNavCard(
-                        title    = "সংরক্ষিত",
-                        icon     = Icons.Default.Bookmark,
-                        modifier = Modifier.weight(1f),
-                        onClick  = onBookmarksClick
-                    )
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        QuickNavCard(
+                            title    = "পঠন ইতিহাস",
+                            icon     = Icons.Default.History,
+                            modifier = Modifier.weight(1f),
+                            onClick  = onHistoryClick
+                        )
+                        QuickNavCard(
+                            title    = "সংরক্ষিত",
+                            icon     = Icons.Default.Bookmark,
+                            modifier = Modifier.weight(1f),
+                            onClick  = onBookmarksClick
+                        )
+                    }
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        QuickNavCard(
+                            title    = "লেখক তালিকা",
+                            icon     = Icons.Default.People,
+                            modifier = Modifier.weight(1f),
+                            onClick  = onAuthorsClick
+                        )
+                        QuickNavCard(
+                            title    = "সেটিংস",
+                            icon     = Icons.Default.Settings,
+                            modifier = Modifier.weight(1f),
+                            onClick  = onSettingsClick
+                        )
+                    }
                 }
 
                 Spacer(Modifier.height(24.dp))

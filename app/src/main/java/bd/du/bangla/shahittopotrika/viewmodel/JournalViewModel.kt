@@ -10,6 +10,8 @@ import bd.du.bangla.shahittopotrika.data.model.Article
 import bd.du.bangla.shahittopotrika.data.model.Issue
 import bd.du.bangla.shahittopotrika.data.model.JournalInfo
 import bd.du.bangla.shahittopotrika.data.model.UiState
+import bd.du.bangla.shahittopotrika.data.model.Author
+import bd.du.bangla.shahittopotrika.data.model.AuthorDetails
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -246,6 +248,34 @@ class JournalViewModel(app: Application) : AndroidViewModel(app) {
             repo.getJournalInfo().fold(
                 onSuccess = { _journalInfo.value = UiState.Success(it) },
                 onFailure = { _journalInfo.value = UiState.Error(it.message ?: "লোড করতে সমস্যা") }
+            )
+        }
+    }
+
+    // ── Authors List & Details ──────────────────────────────
+    private val _authorList = MutableStateFlow<UiState<List<Author>>>(UiState.Loading)
+    val authorList: StateFlow<UiState<List<Author>>> = _authorList
+
+    private val _authorDetails = MutableStateFlow<UiState<AuthorDetails>>(UiState.Loading)
+    val authorDetails: StateFlow<UiState<AuthorDetails>> = _authorDetails
+
+    fun loadAuthorList(forceRefresh: Boolean = false) {
+        if (_authorList.value is UiState.Success && !forceRefresh) return
+        viewModelScope.launch(Dispatchers.IO) {
+            _authorList.value = UiState.Loading
+            repo.getAuthorList().fold(
+                onSuccess = { _authorList.value = UiState.Success(it) },
+                onFailure = { _authorList.value = UiState.Error(it.message ?: "লোড করতে সমস্যা") }
+            )
+        }
+    }
+
+    fun loadAuthorDetails(authorId: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            _authorDetails.value = UiState.Loading
+            repo.getAuthorDetails(authorId).fold(
+                onSuccess = { _authorDetails.value = UiState.Success(it) },
+                onFailure = { _authorDetails.value = UiState.Error(it.message ?: "লোড করতে সমস্যা") }
             )
         }
     }

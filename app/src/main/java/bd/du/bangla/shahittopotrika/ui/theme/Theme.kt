@@ -30,17 +30,17 @@ val QayyumBookFamily = FontFamily(
     Font(R.font.qayyum_book, FontWeight.Bold),
 )
 
-// ── Noto Sans Bengali — matches journal.bangla.du.ac.bd website ──────────────
-val NotoSansBengaliFamily = FontFamily(
-    Font(R.font.noto_sans_bengali, FontWeight.Thin),
-    Font(R.font.noto_sans_bengali, FontWeight.ExtraLight),
-    Font(R.font.noto_sans_bengali, FontWeight.Light),
-    Font(R.font.noto_sans_bengali, FontWeight.Normal),
-    Font(R.font.noto_sans_bengali, FontWeight.Medium),
-    Font(R.font.noto_sans_bengali, FontWeight.SemiBold),
-    Font(R.font.noto_sans_bengali, FontWeight.Bold),
-    Font(R.font.noto_sans_bengali, FontWeight.ExtraBold),
-    Font(R.font.noto_sans_bengali, FontWeight.Black),
+// ── Kalpurush font family ─────────────────────────────────────────────────────
+val KalpurushFamily = FontFamily(
+    Font(R.font.kalpurush, FontWeight.Thin),
+    Font(R.font.kalpurush, FontWeight.ExtraLight),
+    Font(R.font.kalpurush, FontWeight.Light),
+    Font(R.font.kalpurush, FontWeight.Normal),
+    Font(R.font.kalpurush, FontWeight.Medium),
+    Font(R.font.kalpurush, FontWeight.SemiBold),
+    Font(R.font.kalpurush, FontWeight.Bold),
+    Font(R.font.kalpurush, FontWeight.ExtraBold),
+    Font(R.font.kalpurush, FontWeight.Black),
 )
 
 // ── Dark palette (Blinkist-style Navy-Teal) ───────────────────────────────────
@@ -100,103 +100,103 @@ val AccentBlue  = Color(0xFF2563EB)
 val TextPrimary = Color(0xFF1B2C3D)
 val TextSub     = Color(0xFF5A6A7A)
 
-// ── Typography (Noto Sans Bengali everywhere except branding) ─────────────────
+// ── Typography (Kalpurush everywhere except branding) ─────────────────
 val AppTypography = Typography(
     displayLarge = TextStyle(
-        fontFamily    = NotoSansBengaliFamily,
+        fontFamily    = KalpurushFamily,
         fontWeight    = FontWeight.Black,
         fontSize      = 57.sp,
         lineHeight    = 64.sp,
         letterSpacing = (-0.25).sp
     ),
     displayMedium = TextStyle(
-        fontFamily = NotoSansBengaliFamily,
+        fontFamily = KalpurushFamily,
         fontWeight = FontWeight.ExtraBold,
         fontSize   = 45.sp,
         lineHeight = 52.sp
     ),
     displaySmall = TextStyle(
-        fontFamily = NotoSansBengaliFamily,
+        fontFamily = KalpurushFamily,
         fontWeight = FontWeight.Bold,
         fontSize   = 36.sp,
         lineHeight = 44.sp
     ),
     headlineLarge = TextStyle(
-        fontFamily    = NotoSansBengaliFamily,
+        fontFamily    = KalpurushFamily,
         fontWeight    = FontWeight.ExtraBold,
         fontSize      = 30.sp,
         lineHeight    = 38.sp,
         letterSpacing = (-0.5).sp
     ),
     headlineMedium = TextStyle(
-        fontFamily = NotoSansBengaliFamily,
+        fontFamily = KalpurushFamily,
         fontWeight = FontWeight.Bold,
         fontSize   = 24.sp,
         lineHeight = 32.sp
     ),
     headlineSmall = TextStyle(
-        fontFamily = NotoSansBengaliFamily,
+        fontFamily = KalpurushFamily,
         fontWeight = FontWeight.Bold,
         fontSize   = 20.sp,
         lineHeight = 28.sp
     ),
     titleLarge = TextStyle(
-        fontFamily = NotoSansBengaliFamily,
+        fontFamily = KalpurushFamily,
         fontWeight = FontWeight.Bold,
         fontSize   = 18.sp,
         lineHeight = 26.sp
     ),
     titleMedium = TextStyle(
-        fontFamily    = NotoSansBengaliFamily,
+        fontFamily    = KalpurushFamily,
         fontWeight    = FontWeight.SemiBold,
         fontSize      = 15.sp,
         lineHeight    = 22.sp,
         letterSpacing = 0.15.sp
     ),
     titleSmall = TextStyle(
-        fontFamily    = NotoSansBengaliFamily,
-        fontWeight    = FontWeight.Medium,
+        fontFamily    = KalpurushFamily,
+        fontWeight = FontWeight.Medium,
         fontSize      = 13.sp,
         lineHeight    = 20.sp,
         letterSpacing = 0.1.sp
     ),
     bodyLarge = TextStyle(
-        fontFamily    = NotoSansBengaliFamily,
+        fontFamily    = KalpurushFamily,
         fontWeight    = FontWeight.Normal,
         fontSize      = 15.sp,
         lineHeight    = 24.sp,
         letterSpacing = 0.15.sp
     ),
     bodyMedium = TextStyle(
-        fontFamily    = NotoSansBengaliFamily,
+        fontFamily    = KalpurushFamily,
         fontWeight    = FontWeight.Normal,
         fontSize      = 14.sp,
         lineHeight    = 22.sp,
         letterSpacing = 0.25.sp
     ),
     bodySmall = TextStyle(
-        fontFamily    = NotoSansBengaliFamily,
+        fontFamily    = KalpurushFamily,
         fontWeight    = FontWeight.Normal,
         fontSize      = 12.sp,
         lineHeight    = 19.sp,
         letterSpacing = 0.4.sp
     ),
     labelLarge = TextStyle(
-        fontFamily    = NotoSansBengaliFamily,
+        fontFamily    = KalpurushFamily,
         fontWeight    = FontWeight.SemiBold,
         fontSize      = 13.sp,
         lineHeight    = 20.sp,
         letterSpacing = 0.1.sp
     ),
     labelMedium = TextStyle(
-        fontFamily    = NotoSansBengaliFamily,
+        fontFamily    = KalpurushFamily,
         fontWeight    = FontWeight.Medium,
         fontSize      = 11.sp,
         lineHeight    = 16.sp,
         letterSpacing = 0.5.sp
     ),
     labelSmall = TextStyle(
-        fontFamily    = NotoSansBengaliFamily,
+        fontFamily    = KalpurushFamily,
         fontWeight    = FontWeight.Normal,
         fontSize      = 10.sp,
         lineHeight    = 14.sp,

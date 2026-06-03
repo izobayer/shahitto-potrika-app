@@ -27,6 +27,8 @@ object Routes {
     const val READ_HISTORY   = "read_history"
     const val NOTES          = "notes/{articleId}/{articleTitle}"
     const val CHAT           = "chat"
+    const val AUTHOR_LIST    = "author_list"
+    const val AUTHOR_DETAIL  = "author_detail/{authorId}"
 
     fun articleList(issueUrl: String) =
         "article_list/${URLEncoder.encode(issueUrl, "UTF-8")}"
@@ -38,6 +40,8 @@ object Routes {
         "notes/${URLEncoder.encode(articleId, "UTF-8")}/${URLEncoder.encode(articleTitle, "UTF-8")}"
     fun search(query: String? = null) =
         if (query != null) "search?query=${URLEncoder.encode(query, "UTF-8")}" else "search"
+    fun authorDetail(authorId: String) =
+        "author_detail/${URLEncoder.encode(authorId, "UTF-8")}"
 }
 
 @Composable
@@ -65,7 +69,8 @@ fun AppNavigation(
                 onAboutClick     = { navController.navigate(Routes.ABOUT) },
                 onBookmarksClick = { navController.navigate(Routes.BOOKMARKS) },
                 onSettingsClick  = { navController.navigate(Routes.SETTINGS) },
-                onHistoryClick   = { navController.navigate(Routes.READ_HISTORY) }
+                onHistoryClick   = { navController.navigate(Routes.READ_HISTORY) },
+                onAuthorsClick   = { navController.navigate(Routes.AUTHOR_LIST) }
             )
         }
 
@@ -106,7 +111,7 @@ fun AppNavigation(
                     navController.navigate(Routes.notes(id, title))
                 },
                 onAuthorClick = { authorName ->
-                    navController.navigate(Routes.search(authorName))
+                    navController.navigate(Routes.authorDetail(authorName))
                 }
             )
         }
@@ -186,6 +191,36 @@ fun AppNavigation(
                 articleTitle = articleTitle,
                 viewModel    = journalVm,
                 onBack       = { navController.popBackStack() }
+            )
+        }
+
+        composable(Routes.AUTHOR_LIST) {
+            AuthorListScreen(
+                viewModel     = journalVm,
+                onAuthorClick = { author ->
+                    navController.navigate(Routes.authorDetail(author.id))
+                },
+                onBack        = { navController.popBackStack() }
+            )
+        }
+
+        composable(
+            route = Routes.AUTHOR_DETAIL,
+            arguments = listOf(
+                androidx.navigation.navArgument("authorId") {
+                    type = androidx.navigation.NavType.StringType
+                }
+            )
+        ) { back ->
+            val authorId = back.arguments?.getString("authorId")
+                ?.let { URLDecoder.decode(it, "UTF-8") } ?: ""
+            AuthorDetailScreen(
+                authorId       = authorId,
+                viewModel      = journalVm,
+                onArticleClick = { article ->
+                    navController.navigate(Routes.articleDetail(article.url))
+                },
+                onBack         = { navController.popBackStack() }
             )
         }
     }
