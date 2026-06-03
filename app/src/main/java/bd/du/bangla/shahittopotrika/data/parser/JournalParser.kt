@@ -42,12 +42,44 @@ object JournalParser {
             val seriesEl = el.selectFirst(".series, .volume, .pkp_vol_no")
             val title = cleanIssueTitle(titleEl?.text() ?: "সংখ্যা ${idx + 1}")
             val volumeText = seriesEl?.text() ?: ""
-            val year = el.selectFirst(".date, .published")?.text()?.take(4) ?: ""
+            // Extract 4-digit Gregorian year from volume text (e.g. "Vol. 60 No. 3 (2025)"), or fall back to date/title checks
+            val yearRegex = Regex("\\b(19\\d{2}|20\\d{2})\\b")
+            var yearText = yearRegex.find(volumeText)?.value ?: ""
+            if (yearText.isBlank()) {
+                val dateText = el.selectFirst(".date, .published")?.text() ?: ""
+                yearText = yearRegex.find(dateText)?.value ?: dateText.take(4)
+            }
+            if (yearText.isBlank()) {
+                val titleText = titleEl?.text() ?: ""
+                yearText = yearRegex.find(titleText)?.value ?: ""
+                if (yearText.isBlank()) {
+                    val bengaliYearRegex = Regex("[০-৯]{4}")
+                    val bnYear = bengaliYearRegex.find(titleText)?.value ?: ""
+                    if (bnYear.isNotBlank()) {
+                        yearText = bnYear.map { char ->
+                            when (char) {
+                                '০' -> '0'
+                                '১' -> '1'
+                                '২' -> '2'
+                                '৩' -> '3'
+                                '৪' -> '4'
+                                '৫' -> '5'
+                                '৬' -> '6'
+                                '৭' -> '7'
+                                '৮' -> '8'
+                                '৯' -> '9'
+                                else -> char
+                            }
+                        }.joinToString("")
+                    }
+                }
+            }
+
             Issue(
                 id = id, title = title,
                 volume = volumeText.substringBefore(",").trim(),
                 number = volumeText.substringAfter(",").trim(),
-                year = year, coverImageUrl = cover, url = url
+                year = yearText, coverImageUrl = cover, url = url
             )
         }
     }
